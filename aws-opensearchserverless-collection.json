@@ -1,0 +1,66 @@
+{
+    "typeName": "AWS::OpenSearchServerless::Collection",
+    "description": "Amazon OpenSearchServerless collection resource",
+    "properties": {
+        "Description": {
+            "type": "string",
+            "maxLength": 1000,
+            "description": "The description of the collection"
+        },
+        "Id": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 3,
+            "description": "The identifier of the collection"
+        },
+        "Name": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 3,
+            "pattern": "^[a-z][a-z0-9-]+$",
+            "description": "The name of the collection.\n\nThe name must meet the following criteria:\nUnique to your account and AWS Region\nStarts with a lowercase letter\nContains only lowercase letters a-z, the numbers 0-9 and the hyphen (-)\nContains between 3 and 32 characters\n"
+        }
+    },
+    "required": [
+        "Name"
+    ],
+    "readOnlyProperties": [
+        "/properties/Id"
+    ],
+    "writeOnlyProperties": [
+        "/properties/Description",
+        "/properties/Name"
+    ],
+    "createOnlyProperties": [
+        "/properties/Description",
+        "/properties/Name"
+    ],
+    "primaryIdentifier": [
+        "/properties/Id"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "aoss:CreateCollection",
+                "aoss:BatchGetCollection"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "aoss:DeleteCollection",
+                "aoss:BatchGetCollection"
+            ]
+        },
+        "list": {
+            "permissions": [
+                "aoss:ListCollections"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "aoss:BatchGetCollection"
+            ]
+        }
+    },
+    "additionalProperties": false
+}
