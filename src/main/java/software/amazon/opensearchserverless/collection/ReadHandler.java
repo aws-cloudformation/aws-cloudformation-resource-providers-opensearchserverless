@@ -1,6 +1,7 @@
 package software.amazon.opensearchserverless.collection;
 
 import com.amazonaws.util.StringUtils;
+import lombok.NonNull;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
@@ -13,11 +14,11 @@ public class ReadHandler extends BaseHandlerStd {
     private Logger logger;
 
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-        final AmazonWebServicesClientProxy proxy,
-        final ResourceHandlerRequest<ResourceModel> request,
+        final @NonNull AmazonWebServicesClientProxy proxy,
+        final @NonNull ResourceHandlerRequest<ResourceModel> request,
         final CallbackContext callbackContext,
-        final ProxyClient<OpenSearchServerlessClient> proxyClient,
-        final Logger logger) {
+        final @NonNull ProxyClient<OpenSearchServerlessClient> proxyClient,
+        final @NonNull Logger logger) {
 
         this.logger = logger;
 
@@ -29,9 +30,9 @@ public class ReadHandler extends BaseHandlerStd {
 
         return proxy.initiate("AWS-OpenSearchServerless-Collection::Read", proxyClient, model, callbackContext)
                 .translateToServiceRequest(Translator::translateToReadRequest)
-                .makeServiceCall(this::batchGetCollection)
+                .makeServiceCall(this::getActiveCollection)
                 .handleError((awsRequest, exception, client, model1, context) -> {
-                    return handleBatchGetCollectionException(awsRequest, exception, client, model1, context);
+                    return handleGetActiveCollectionException(awsRequest, exception, client, model1, context);
                 })
                 .done(batchGetCollectionResponse -> ProgressEvent.defaultSuccessHandler(Translator.translateFromReadResponse(batchGetCollectionResponse)));
     }

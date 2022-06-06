@@ -11,6 +11,7 @@ import software.amazon.awssdk.services.opensearchserverless.model.CollectionStat
 import software.amazon.awssdk.services.opensearchserverless.model.DeleteCollectionRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.DeleteCollectionResponse;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
+import software.amazon.cloudformation.exceptions.CfnNotStabilizedException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.OperationStatus;
@@ -182,6 +183,53 @@ public class DeleteHandlerTest extends AbstractTestBase {
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).deleteCollection(any(DeleteCollectionRequest.class));
+    }
+
+    @Test
+    public void handleRequest_Failure_CollectionDeleteFailedAfterRelease() {
+        //Delete failed (or stabilization fail) with status as ACTIVE after delete
+        final ResourceModel model = ResourceModel.builder()
+                .id(COLLECTION_ID)
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .build();
+
+        final BatchGetCollectionResponse batchGetCollectionResponse = BatchGetCollectionResponse.builder()
+                .collectionDetails(
+                        CollectionDetail.builder()
+                                .id(COLLECTION_ID)
+                                .status(CollectionStatus.ACTIVE)
+                                .name(COLLECTION_NAME)
+                                .description(COLLECTION_DESCRIPTION)
+                                .arn(COLLECTION_ARN)
+                                .collectionEndpoint(COLLECTION_ENDPOINT)
+                                .dashboardEndpoint(DASHBOARD_ENDPOINT)
+                                .createdDate(CREATED_DATE)
+                                .build()
+                ).build();
+        final BatchGetCollectionResponse batchGetCollectionResponseFailed = BatchGetCollectionResponse.builder()
+                .collectionDetails(
+                        CollectionDetail.builder()
+                                .id(COLLECTION_ID)
+                                .status(CollectionStatus.FAILED)
+                                .name(COLLECTION_NAME)
+                                .description(COLLECTION_DESCRIPTION)
+                                .arn(COLLECTION_ARN)
+                                .collectionEndpoint(COLLECTION_ENDPOINT)
+                                .dashboardEndpoint(DASHBOARD_ENDPOINT)
+                                .createdDate(CREATED_DATE)
+                                .build()
+                ).build();
+        when(proxyClient.client().batchGetCollection(any(BatchGetCollectionRequest.class)))
+                .thenReturn(batchGetCollectionResponse)
+                .thenReturn(batchGetCollectionResponseFailed);
+        final DeleteCollectionResponse deleteCollectionResponse = DeleteCollectionResponse.builder().build();
+        when(proxyClient.client().deleteCollection(any(DeleteCollectionRequest.class))).thenReturn(deleteCollectionResponse);
+
+        assertThrows(CfnNotStabilizedException.class,
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
     }
 
     @Test

@@ -1,6 +1,7 @@
 package software.amazon.opensearchserverless.collection;
 
 import com.amazonaws.util.StringUtils;
+import lombok.NonNull;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionResponse;
@@ -21,18 +22,17 @@ public class CreateHandler extends BaseHandlerStd {
     private Logger logger;
 
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-        final AmazonWebServicesClientProxy proxy,
-        final ResourceHandlerRequest<ResourceModel> request,
-        final CallbackContext callbackContext,
-        final ProxyClient<OpenSearchServerlessClient> proxyClient,
-        final Logger logger) {
+            final @NonNull AmazonWebServicesClientProxy proxy,
+            final @NonNull ResourceHandlerRequest<ResourceModel> request,
+            final CallbackContext callbackContext,
+            final @NonNull ProxyClient<OpenSearchServerlessClient> proxyClient,
+            final @NonNull Logger logger) {
 
         this.logger = logger;
         final ResourceModel model = request.getDesiredResourceState();
 
-        if (callbackContext == null) {
-            if (model.getId() != null)
-                throw new CfnInvalidRequestException("Id should not be set");
+        if (callbackContext == null && model.getId() != null) {
+            throw new CfnInvalidRequestException("Id should not be set");
         }
         if(StringUtils.isNullOrEmpty(model.getName())) {
             return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "Name cannot be empty");
@@ -53,12 +53,23 @@ public class CreateHandler extends BaseHandlerStd {
             .then(progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
     }
 
+    /**
+     * Stabilization of Collection for the Create operation.
+     * Returns true only if collection status is ACTIVE
+     * @param createCollectionRequest the aws service request to create collection resource
+     * @param createCollectionResponse the aws service response to create collection resource
+     * @param proxyClient the aws service client to make the call
+     * @param model the resource model
+     * @param callbackContext the callback context for aws service request
+     * @return
+     */
     protected boolean stabilizeCollectionCreate(
-            final CreateCollectionRequest createCollectionRequest,
-            final CreateCollectionResponse createCollectionResponse,
-            final ProxyClient<OpenSearchServerlessClient> proxyClient,
-            final ResourceModel model,
+            final @NonNull CreateCollectionRequest createCollectionRequest,
+            final @NonNull CreateCollectionResponse createCollectionResponse,
+            final @NonNull ProxyClient<OpenSearchServerlessClient> proxyClient,
+            final @NonNull ResourceModel model,
             final CallbackContext callbackContext) {
+        logger.log(String.format("Stabilize CollectionCreate for resource %s", createCollectionRequest));
 
         BatchGetCollectionRequest request = BatchGetCollectionRequest.builder().ids(createCollectionResponse.createCollectionDetail().id()).build();
         BatchGetCollectionResponse response = proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::batchGetCollection);
@@ -83,17 +94,17 @@ public class CreateHandler extends BaseHandlerStd {
 
     /**
      * Create operation will be called.
-     * @param createCollectionRequest
-     * @param proxyClient
+     * @param createCollectionRequest the aws service request to create collection resource
+     * @param proxyClient the aws service client to make the call
      * @return
      */
     private CreateCollectionResponse createCollection(
-            final CreateCollectionRequest createCollectionRequest,
-            final ProxyClient<OpenSearchServerlessClient> proxyClient) {
-        CreateCollectionResponse createCollectionResponse =
+            final @NonNull CreateCollectionRequest createCollectionRequest,
+            final @NonNull ProxyClient<OpenSearchServerlessClient> proxyClient) {
+        final CreateCollectionResponse createCollectionResponse =
                 proxyClient.injectCredentialsAndInvokeV2(createCollectionRequest, proxyClient.client()::createCollection);
 
-        logger.log(String.format("%s successfully created", ResourceModel.TYPE_NAME));
+        logger.log(String.format("%s successfully created for %s", ResourceModel.TYPE_NAME, createCollectionRequest));
         return createCollectionResponse;
     }
 }

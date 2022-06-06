@@ -1,13 +1,12 @@
 package software.amazon.opensearchserverless.collection;
 
+import lombok.NonNull;
 import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.CollectionStatus;
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.ListCollectionsRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.ListCollectionsResponse;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
@@ -24,10 +23,10 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
 
   @Override
   public final ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-    final AmazonWebServicesClientProxy proxy,
-    final ResourceHandlerRequest<ResourceModel> request,
-    final CallbackContext callbackContext,
-    final Logger logger) {
+          final @NonNull AmazonWebServicesClientProxy proxy,
+          final @NonNull ResourceHandlerRequest<ResourceModel> request,
+          final CallbackContext callbackContext,
+          final @NonNull Logger logger) {
     return handleRequest(
       proxy,
       request,
@@ -45,15 +44,15 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     final Logger logger);
 
   /**
-   * batchGetCollection returns objects with status as CollectionStatus.ACTIVE only
-   * @param batchGetCollectionRequest
-   * @param proxyClient
+   * getActiveCollection returns object with status as CollectionStatus.ACTIVE only
+   * @param batchGetCollectionRequest the aws service request to describe a resource
+   * @param proxyClient the aws service client to make the call
    * @return
    */
-  protected BatchGetCollectionResponse batchGetCollection(
-          final BatchGetCollectionRequest batchGetCollectionRequest,
-          final ProxyClient<OpenSearchServerlessClient> proxyClient) {
-    BatchGetCollectionResponse response = proxyClient.injectCredentialsAndInvokeV2(batchGetCollectionRequest, proxyClient.client()::batchGetCollection);
+  protected BatchGetCollectionResponse getActiveCollection(
+          final @NonNull BatchGetCollectionRequest batchGetCollectionRequest,
+          final @NonNull ProxyClient<OpenSearchServerlessClient> proxyClient) {
+    final BatchGetCollectionResponse response = proxyClient.injectCredentialsAndInvokeV2(batchGetCollectionRequest, proxyClient.client()::batchGetCollection);
     if (!response.collectionDetails().isEmpty() && response.collectionDetails().get(0).status().equals(CollectionStatus.ACTIVE)){
       return response;
     }
@@ -62,32 +61,22 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
   }
 
   /**
-   * listCollections returns objects
-   * @param listCollectionsRequest
-   * @param proxyClient
-   * @return
-   */
-  protected ListCollectionsResponse listCollections(
-          final ListCollectionsRequest listCollectionsRequest,
-          final ProxyClient<OpenSearchServerlessClient> proxyClient) {
-    ListCollectionsResponse response = proxyClient.injectCredentialsAndInvokeV2(listCollectionsRequest, proxyClient.client()::listCollections);
-    return response;
-
-  }
-
-  /**
    * Get failed status when the collection is not found with given Id, throws exception otherwise.
-   * @param awsRequest
-   * @param exception
-   * @param client
-   * @param model
-   * @param context
+   * @param awsRequest the aws service request
+   * @param exception the exception object upon the request
+   * @param client the aws service client to make the call
+   * @param model the resource model
+   * @param context the context for aws service request
    * @return
    * @throws Exception
    */
-  protected ProgressEvent<ResourceModel, CallbackContext> handleBatchGetCollectionException
-  (AwsRequest awsRequest, Exception exception, ProxyClient<OpenSearchServerlessClient> client, ResourceModel model, CallbackContext context)
-          throws Exception {
+  protected ProgressEvent<ResourceModel, CallbackContext> handleGetActiveCollectionException(
+          final @NonNull AwsRequest awsRequest,
+          final @NonNull Exception exception,
+          final @NonNull ProxyClient<OpenSearchServerlessClient> client,
+          final @NonNull ResourceModel model,
+          final CallbackContext context
+  ) throws Exception {
     if((exception instanceof AwsServiceException && ((AwsServiceException) exception).awsErrorDetails().errorCode().equals(INVALID_COLLECTION_ID_NOT_FOUND))
             || exception instanceof CfnNotFoundException){
       return ProgressEvent.failed(model, context, HandlerErrorCode.NotFound, exception.getMessage());

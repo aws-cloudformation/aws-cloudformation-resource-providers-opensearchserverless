@@ -1,5 +1,6 @@
 package software.amazon.opensearchserverless.collection;
 
+import lombok.NonNull;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.ListCollectionsRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.ListCollectionsResponse;
@@ -16,11 +17,11 @@ public class ListHandler extends BaseHandlerStd {
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-        final AmazonWebServicesClientProxy proxy,
-        final ResourceHandlerRequest<ResourceModel> request,
+        final @NonNull AmazonWebServicesClientProxy proxy,
+        final @NonNull ResourceHandlerRequest<ResourceModel> request,
         final CallbackContext callbackContext,
-        final ProxyClient<OpenSearchServerlessClient> proxyClient,
-        final Logger logger) {
+        final @NonNull ProxyClient<OpenSearchServerlessClient> proxyClient,
+        final @NonNull Logger logger) {
 
         final ListCollectionsRequest listCollectionsRequest = ListCollectionsRequest.builder().nextToken(request.getNextToken()).build();
         final ListCollectionsResponse listCollectionsResponse = proxy.injectCredentialsAndInvokeV2(listCollectionsRequest, proxyClient.client()::listCollections);

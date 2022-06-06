@@ -1,5 +1,6 @@
 package software.amazon.opensearchserverless.collection;
 
+import lombok.NonNull;
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.CollectionDetail;
@@ -28,7 +29,7 @@ public class Translator {
    * @param model resource model
    * @return CreateCollectionRequest the aws service request to create a resource
    */
-  static CreateCollectionRequest translateToCreateRequest(final ResourceModel model) {
+  static CreateCollectionRequest translateToCreateRequest(final @NonNull ResourceModel model) {
     return CreateCollectionRequest.builder()
             .name(model.getName())
             .description(model.getDescription())
@@ -40,7 +41,7 @@ public class Translator {
    * @param model resource model
    * @return BatchGetCollectionRequest the aws service request to describe a resource
    */
-  static BatchGetCollectionRequest translateToReadRequest(final ResourceModel model) {
+  static BatchGetCollectionRequest translateToReadRequest(final @NonNull ResourceModel model) {
     return BatchGetCollectionRequest.builder()
             .ids(model.getId())
             .build();
@@ -51,7 +52,7 @@ public class Translator {
    * @param batchGetCollectionResponse the aws service describe resource response
    * @return model resource model
    */
-  static ResourceModel translateFromReadResponse(final BatchGetCollectionResponse batchGetCollectionResponse) {
+  static ResourceModel translateFromReadResponse(final @NonNull BatchGetCollectionResponse batchGetCollectionResponse) {
     CollectionDetail collectionDetail = batchGetCollectionResponse.collectionDetails().get(0);
     return ResourceModel.builder()
             .id(collectionDetail.id())
@@ -65,7 +66,7 @@ public class Translator {
    * @param model resource model
    * @return DeleteCollectionRequest the aws service request to delete a resource
    */
-  static DeleteCollectionRequest translateToDeleteRequest(final ResourceModel model) {
+  static DeleteCollectionRequest translateToDeleteRequest(final @NonNull ResourceModel model) {
     return DeleteCollectionRequest.builder()
             .id(model.getId())
             .build();
@@ -76,7 +77,7 @@ public class Translator {
    * @param listCollectionsResponse the aws service describe resource response
    * @return list of resource models
    */
-  static List<ResourceModel> translateFromListRequest(final ListCollectionsResponse listCollectionsResponse) {
+  static List<ResourceModel> translateFromListRequest(final @NonNull ListCollectionsResponse listCollectionsResponse) {
     // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L75-L82
     return streamOfOrEmpty(listCollectionsResponse.collectionSummaries())
             .filter(collectionDetail -> collectionDetail.status().equals(CollectionStatus.ACTIVE))
@@ -87,7 +88,7 @@ public class Translator {
             .collect(Collectors.toList());
   }
 
-  private static <T> Stream<T> streamOfOrEmpty(final Collection<T> collection) {
+  private static <T> Stream<T> streamOfOrEmpty(final @NonNull Collection<T> collection) {
     return Optional.ofNullable(collection)
             .map(Collection::stream)
             .orElseGet(Stream::empty);
