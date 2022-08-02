@@ -1,6 +1,11 @@
 package software.amazon.opensearchserverless.collection;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+
 import com.amazonaws.util.StringUtils;
+import com.google.common.collect.Maps;
 import lombok.NonNull;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionRequest;
@@ -38,10 +43,14 @@ public class CreateHandler extends BaseHandlerStd {
             return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "Name cannot be empty");
         }
 
+        Map<String, String> allDesiredTags = Maps.newHashMap();
+        allDesiredTags.putAll(Optional.ofNullable(request.getDesiredResourceTags()).orElse(Collections.emptyMap()));
+        allDesiredTags.putAll(Optional.ofNullable(request.getSystemTags()).orElse(Collections.emptyMap()));
+
         return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
             .then(progress ->
                 proxy.initiate("AWS-OpenSearchServerless-Collection::Create", proxyClient,progress.getResourceModel(), progress.getCallbackContext())
-                        .translateToServiceRequest(Translator::translateToCreateRequest)
+                        .translateToServiceRequest(cbModel -> Translator.translateToCreateRequest(cbModel, allDesiredTags))
                         .makeServiceCall(this::createCollection)
                         .stabilize(this::stabilizeCollectionCreate)
                         .done((createCollectionRequest, createCollectionResponse, client, resourceModel, callbackContext1) -> {

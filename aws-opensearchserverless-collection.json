@@ -1,6 +1,31 @@
 {
     "typeName": "AWS::OpenSearchServerless::Collection",
     "description": "Amazon OpenSearchServerless collection resource",
+    "definitions": {
+        "Tag": {
+            "type": "object",
+            "description": "A key-value pair metadata associated with resource",
+            "properties": {
+                "Key": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "description": "The key in the key-value pair"
+                },
+                "Value": {
+                    "type": "string",
+                    "maxLength": 256,
+                    "minLength": 0,
+                    "description": "The value in the key-value pair"
+                }
+            },
+            "required": [
+                "Key",
+                "Value"
+            ],
+            "additionalProperties": false
+        }
+    },
     "properties": {
         "Description": {
             "type": "string",
@@ -19,6 +44,16 @@
             "minLength": 3,
             "pattern": "^[a-z][a-z0-9-]+$",
             "description": "The name of the collection.\n\nThe name must meet the following criteria:\nUnique to your account and AWS Region\nStarts with a lowercase letter\nContains only lowercase letters a-z, the numbers 0-9 and the hyphen (-)\nContains between 3 and 32 characters\n"
+        },
+        "Tags": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Tag"
+            },
+            "maxItems": 50,
+            "minItems": 0,
+            "insertionOrder": false,
+            "description": "List of tags to be added to the resource"
         }
     },
     "required": [
@@ -29,11 +64,13 @@
     ],
     "writeOnlyProperties": [
         "/properties/Description",
-        "/properties/Name"
+        "/properties/Name",
+        "/properties/Tags"
     ],
     "createOnlyProperties": [
         "/properties/Description",
-        "/properties/Name"
+        "/properties/Name",
+        "/properties/Tags"
     ],
     "primaryIdentifier": [
         "/properties/Id"

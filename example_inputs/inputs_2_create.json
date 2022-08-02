@@ -1,0 +1,14 @@
+{
+    "Name": "collection-name-2",
+    "Description": "Collection description 2",
+    "Tags": [
+        {
+          "Key": "Key1",
+          "Value": "Value1"
+        },
+        {
+          "Key": "Key2",
+          "Value": "Value2"
+        }
+    ]
+}
