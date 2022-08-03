@@ -13,7 +13,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Type" : "AWS::OpenSearchServerless::Collection",
     "Properties" : {
         "<a href="#description" title="Description">Description</a>" : <i>String</i>,
-        "<a href="#name" title="Name">Name</a>" : <i>String</i>
+        "<a href="#name" title="Name">Name</a>" : <i>String</i>,
+        "<a href="#tags" title="Tags">Tags</a>" : <i>[ <a href="tag.md">Tag</a>, ... ]</i>
     }
 }
 </pre>
@@ -25,6 +26,8 @@ Type: AWS::OpenSearchServerless::Collection
 Properties:
     <a href="#description" title="Description">Description</a>: <i>String</i>
     <a href="#name" title="Name">Name</a>: <i>String</i>
+    <a href="#tags" title="Tags">Tags</a>: <i>
+      - <a href="tag.md">Tag</a></i>
 </pre>
 
 ## Properties
@@ -61,6 +64,16 @@ _Minimum_: <code>3</code>
 _Maximum_: <code>32</code>
 
 _Pattern_: <code>^[a-z][a-z0-9-]+$</code>
+
+_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
+
+#### Tags
+
+List of tags to be added to the resource
+
+_Required_: No
+
+_Type_: List of <a href="tag.md">Tag</a>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 

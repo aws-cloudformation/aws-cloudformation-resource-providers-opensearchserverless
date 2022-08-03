@@ -1,6 +1,7 @@
 package software.amazon.opensearchserverless.collection;
 
 import lombok.NonNull;
+
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.CollectionDetail;
@@ -8,9 +9,12 @@ import software.amazon.awssdk.services.opensearchserverless.model.CollectionStat
 import software.amazon.awssdk.services.opensearchserverless.model.CreateCollectionRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.DeleteCollectionRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.ListCollectionsResponse;
+import software.amazon.awssdk.services.opensearchserverless.model.Tag;
+import software.amazon.awssdk.utils.CollectionUtils;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,11 +33,17 @@ public class Translator {
    * @param model resource model
    * @return CreateCollectionRequest the aws service request to create a resource
    */
-  static CreateCollectionRequest translateToCreateRequest(final @NonNull ResourceModel model) {
-    return CreateCollectionRequest.builder()
-            .name(model.getName())
-            .description(model.getDescription())
-            .build();
+  static CreateCollectionRequest translateToCreateRequest(final @NonNull ResourceModel model, final Map<String, String> desiredTags) {
+
+    CreateCollectionRequest.Builder createCollectionRequestBuilder = CreateCollectionRequest.builder()
+        .name(model.getName())
+        .description(model.getDescription());
+
+    if (!CollectionUtils.isNullOrEmpty(desiredTags)) {
+      createCollectionRequestBuilder = createCollectionRequestBuilder.tags(translateModelTagsToSDK(desiredTags));
+    }
+
+    return createCollectionRequestBuilder.build();
   }
 
   /**
@@ -92,6 +102,20 @@ public class Translator {
     return Optional.ofNullable(collection)
             .map(Collection::stream)
             .orElseGet(Stream::empty);
+  }
+
+  /**
+   * Translate Map of Tags to SDK Tags
+   * @param tags
+   * @return
+   */
+  public static List<Tag> translateModelTagsToSDK(final Map<String, String> tags) {
+    return tags.entrySet().stream()
+            .map(e -> Tag.builder()
+                    .key(e.getKey())
+                    .value(e.getValue())
+                    .build())
+            .collect(Collectors.toList());
   }
 
 }
