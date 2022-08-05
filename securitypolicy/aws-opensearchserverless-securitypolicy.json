@@ -1,0 +1,81 @@
+{
+    "typeName": "AWS::OpenSearchServerless::SecurityPolicy",
+    "description": "Amazon OpenSearchServerless security policy resource",
+    "definitions": {
+        "SecurityPolicyType": {
+            "type": "string",
+            "description": "The possible types for the network policy",
+            "enum": [
+                "encryption",
+                "network"
+            ]
+        }
+    },
+    "properties": {
+        "PolicyDescription": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1,
+            "description": "The description of the policy"
+        },
+        "PolicyDocument": {
+            "type": "string",
+            "maxLength": 20480,
+            "minLength": 1,
+            "pattern": "[\t\n\r -~¡-ÿ]+",
+            "description": "The description of the security policy"
+        },
+        "PolicyName": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 3,
+            "pattern": "^[a-z][a-z0-9-]+$",
+            "description": "The name of the policy"
+        },
+        "PolicyType": {
+            "$ref": "#/definitions/SecurityPolicyType"
+        }
+    },
+    "required": [
+        "PolicyDocument"
+    ],
+    "primaryIdentifier": [
+        "/properties/PolicyName",
+        "/properties/PolicyType"
+    ],
+    "readOnlyProperties": [
+        "/properties/PolicyName",
+        "/properties/PolicyType"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "aoss:CreateSecurityPolicy",
+                "aoss:GetSecurityPolicy"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "aoss:UpdateSecurityPolicy",
+                "aoss:GetSecurityPolicy"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "aoss:DeleteSecurityPolicy",
+                "aoss:GetSecurityPolicy"
+            ]
+        },
+        "list": {
+            "permissions": [
+                "aoss:ListSecurityPolicies"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "aoss:GetSecurityPolicy"
+            ]
+        }
+    },
+    "additionalProperties": false
+}
