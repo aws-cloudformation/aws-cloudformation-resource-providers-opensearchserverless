@@ -24,3 +24,6 @@ sam-tests/
 
 # sam
 .aws-sam
+
+# gradle folder
+.gradle/
