@@ -1,0 +1,6 @@
+{
+    "PolicyName": "securitypolicy-name",
+    "PolicyType": "encryption",
+    "PolicyDescription": "Securitypolicy description",
+    "PolicyDocument": "Test Policy Document"
+}
