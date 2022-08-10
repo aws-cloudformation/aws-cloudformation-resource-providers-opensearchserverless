@@ -14,7 +14,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Properties" : {
         "<a href="#description" title="Description">Description</a>" : <i>String</i>,
         "<a href="#name" title="Name">Name</a>" : <i>String</i>,
-        "<a href="#tags" title="Tags">Tags</a>" : <i>[ <a href="tag.md">Tag</a>, ... ]</i>
+        "<a href="#tags" title="Tags">Tags</a>" : <i>[ <a href="tag.md">Tag</a>, ... ]</i>,
     }
 }
 </pre>
@@ -92,4 +92,16 @@ For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::G
 #### Id
 
 The identifier of the collection
+
+#### Arn
+
+The Amazon Resource Name (ARN) of the collection.
+
+#### CollectionEndpoint
+
+The endpoint for the collection.
+
+#### DashboardEndpoint
+
+The OpenSearch Dashboards endpoint for the collection.
 
