@@ -1,0 +1,6 @@
+{
+    "Name": "accesspolicy-name",
+    "Type": "data",
+    "Description": "Accesspolicy description",
+    "Policy": "Test Access Policy Document"
+}
