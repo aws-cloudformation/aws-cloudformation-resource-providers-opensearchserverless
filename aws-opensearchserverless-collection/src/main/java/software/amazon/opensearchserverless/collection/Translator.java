@@ -68,6 +68,9 @@ public class Translator {
             .id(collectionDetail.id())
             .name(collectionDetail.name())
             .description(collectionDetail.description())
+            .arn(collectionDetail.arn())
+            .collectionEndpoint(collectionDetail.collectionEndpoint())
+            .dashboardEndpoint(collectionDetail.dashboardEndpoint())
             .build();
   }
 
@@ -98,7 +101,7 @@ public class Translator {
             .collect(Collectors.toList());
   }
 
-  private static <T> Stream<T> streamOfOrEmpty(final @NonNull Collection<T> collection) {
+  private static <T> Stream<T> streamOfOrEmpty(final Collection<T> collection) {
     return Optional.ofNullable(collection)
             .map(Collection::stream)
             .orElseGet(Stream::empty);
@@ -106,8 +109,8 @@ public class Translator {
 
   /**
    * Translate Map of Tags to SDK Tags
-   * @param tags
-   * @return
+   * @param tags key value map containing tags
+   * @return list of sdk model tags
    */
   public static List<Tag> translateModelTagsToSDK(final Map<String, String> tags) {
     return tags.entrySet().stream()

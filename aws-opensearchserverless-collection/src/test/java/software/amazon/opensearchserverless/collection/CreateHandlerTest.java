@@ -28,11 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest extends AbstractTestBase {
@@ -74,6 +70,15 @@ public class CreateHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_SimpleSuccess() {
+        final ResourceModel expectedModel = ResourceModel.builder()
+                .id(COLLECTION_ID)
+                .name(COLLECTION_NAME)
+                .description(COLLECTION_DESCRIPTION)
+                .arn(COLLECTION_ARN)
+                .collectionEndpoint(COLLECTION_ENDPOINT)
+                .dashboardEndpoint(DASHBOARD_ENDPOINT)
+                .build();
+
         final ResourceModel requestModel = ResourceModel.builder()
                 .name(COLLECTION_NAME)
                 .description(COLLECTION_DESCRIPTION)
@@ -112,7 +117,7 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
-        assertThat(response.getResourceModel()).isEqualTo(requestModel);
+        assertThat(response.getResourceModel()).isEqualTo(expectedModel);
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();

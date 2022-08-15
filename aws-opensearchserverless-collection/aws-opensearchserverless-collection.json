@@ -54,13 +54,28 @@
             "minItems": 0,
             "insertionOrder": false,
             "description": "List of tags to be added to the resource"
+        },
+        "Arn": {
+            "description": "The Amazon Resource Name (ARN) of the collection.",
+            "type": "string"
+        },
+        "CollectionEndpoint": {
+            "description": "The endpoint for the collection.",
+            "type": "string"
+        },
+        "DashboardEndpoint": {
+            "description": "The OpenSearch Dashboards endpoint for the collection.",
+            "type": "string"
         }
     },
     "required": [
         "Name"
     ],
     "readOnlyProperties": [
-        "/properties/Id"
+        "/properties/Id",
+        "/properties/Arn",
+        "/properties/CollectionEndpoint",
+        "/properties/DashboardEndpoint"
     ],
     "writeOnlyProperties": [
         "/properties/Description",
