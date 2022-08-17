@@ -1,0 +1,9 @@
+{
+    "Description": "SecurityConfig description",
+    "SamlOptions": {
+        "Metadata": "metadata",
+        "UserAttribute": "user-attribute",
+        "GroupAttribute": "group-attribute",
+        "SessionTimeout": 1.5
+    }
+}
