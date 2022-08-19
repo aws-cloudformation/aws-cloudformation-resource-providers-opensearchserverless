@@ -1,0 +1,93 @@
+{
+    "typeName": "AWS::OpenSearchServerless::VpcEndpoint",
+    "description": "Amazon OpenSearchServerless vpc endpoint resource",
+    "properties": {
+        "Id": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "pattern": "^vpce-[0-9a-z]*$",
+            "description": "The identifier of the VPC Endpoint"
+        },
+        "Name": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 3,
+            "pattern": "^[a-z][a-z0-9-]+$",
+            "description": "The name of the VPC Endpoint"
+        },
+        "SecurityGroupIds": {
+            "type": "array",
+            "insertionOrder": false,
+            "items": {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[\\w+\\-]+$"
+            },
+            "maxItems": 5,
+            "minItems": 1,
+            "description": "The ID of one or more security groups to associate with the endpoint network interface"
+        },
+        "SubnetIds": {
+            "type": "array",
+            "insertionOrder": false,
+            "items": {
+                "type": "string",
+                "maxLength": 32,
+                "minLength": 1,
+                "pattern": "^subnet-([0-9a-f]{8}|[0-9a-f]{17})$"
+            },
+            "maxItems": 3,
+            "minItems": 2,
+            "description": "The ID of one or more subnets in which to create an endpoint network interface"
+        },
+        "VpcId": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "pattern": "^vpc-[0-9a-z]*$",
+            "description": "The ID of the VPC in which the endpoint will be used."
+        }
+    },
+    "required": [
+        "Name",
+        "SubnetIds",
+        "VpcId"
+    ],
+    "readOnlyProperties": [
+        "/properties/Id"
+    ],
+    "createOnlyProperties": [
+        "/properties/Name",
+        "/properties/VpcId",
+        "/properties/SubnetIds",
+        "/properties/SecurityGroupIds"
+    ],
+    "primaryIdentifier": [
+        "/properties/Id"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "aoss:CreateVpcEndpoint"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "aoss:BatchGetVpcEndpoint"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "aoss:DeleteVpcEndpoint"
+            ]
+        },
+        "list": {
+            "permissions": [
+                "aoss:ListVpcEndpoints"
+            ]
+        }
+    },
+    "additionalProperties": false
+}
