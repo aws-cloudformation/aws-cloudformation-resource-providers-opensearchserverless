@@ -1,5 +1,6 @@
 {
     "Id": "h-0b558101b422d089a",
     "Name": "collection-name",
+    "Type": "SEARCH",
     "Description": "Collection description"
 }

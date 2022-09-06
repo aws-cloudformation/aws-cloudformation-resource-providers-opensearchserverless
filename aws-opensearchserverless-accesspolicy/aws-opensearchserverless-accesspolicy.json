@@ -21,7 +21,7 @@
         "Type": {
             "$ref": "#/definitions/AccessPolicyType"
         },
-        "Version": {
+        "PolicyVersion": {
             "type": "string",
             "maxLength": 36,
             "minLength": 20,
@@ -38,12 +38,12 @@
             "type": "string",
             "maxLength": 20480,
             "minLength": 1,
-            "pattern": "[\t\n\r -~¡-ÿ]+",
-            "description": "The JSON policy document that you want to use as the content for the new policy"
+            "pattern": "[\\u0009\\u000A\\u000D\\u0020-\\u007E\\u00A1-\\u00FF]+",
+            "description": "The JSON policy document that is the content for the policy"
         }
     },
     "readOnlyProperties": [
-        "/properties/Version"
+        "/properties/PolicyVersion"
     ],
     "createOnlyProperties": [
         "/properties/Name",
@@ -56,7 +56,8 @@
     "handlers": {
         "create": {
             "permissions": [
-                "aoss:CreateAccessPolicy"
+                "aoss:CreateAccessPolicy",
+                "aoss:GetAccessPolicy"
             ]
         },
         "read": {
@@ -66,12 +67,14 @@
         },
         "update": {
             "permissions": [
-                "aoss:UpdateAccessPolicy"
+                "aoss:UpdateAccessPolicy",
+                "aoss:GetAccessPolicy"
             ]
         },
         "delete": {
             "permissions": [
-                "aoss:DeleteAccessPolicy"
+                "aoss:DeleteAccessPolicy",
+                "aoss:GetAccessPolicy"
             ]
         },
         "list": {

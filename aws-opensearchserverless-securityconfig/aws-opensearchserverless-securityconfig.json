@@ -11,7 +11,7 @@
                     "description": "The XML saml provider metadata document that you want to use",
                     "maxLength": 20480,
                     "minLength": 1,
-                    "pattern": "[\u0009\u000A\u000D\u0020-\u007E\u00A1-\u00FF]+"
+                    "pattern": "[\\u0009\\u000A\\u000D\\u0020-\\u007E\\u00A1-\\u00FF]+"
                 },
                 "UserAttribute": {
                     "type": "string",
@@ -46,6 +46,13 @@
         }
     },
     "properties": {
+        "ConfigVersion": {
+            "type": "string",
+            "maxLength": 36,
+            "minLength": 20,
+            "pattern": "^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$",
+            "description": "The version of the policy"
+        },
         "Description": {
             "type": "string",
             "maxLength": 1000,
@@ -77,7 +84,8 @@
         "Type"
     ],
     "readOnlyProperties": [
-        "/properties/Id"
+        "/properties/Id",
+        "/properties/ConfigVersion"
     ],
     "writeOnlyProperties": [
         "/properties/Description",

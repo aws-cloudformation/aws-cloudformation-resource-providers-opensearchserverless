@@ -57,7 +57,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
                                                          .type(MOCK_ACCESS_POLICY_TYPE)
                                                          .description(MOCK_ACCESS_POLICY_DESCRIPTION)
                                                          .policy(MOCK_ACCESS_POLICY_DOCUMENT)
-                                                         .version(MOCK_ACCESS_POLICY_VERSION)
+                                                         .policyVersion(MOCK_ACCESS_POLICY_VERSION)
                                                          .build();
 
         final UpdateAccessPolicyResponse updateAccessPolicyResponse =
@@ -68,7 +68,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
                                                                     .type(MOCK_ACCESS_POLICY_TYPE)
                                                                     .description(MOCK_ACCESS_POLICY_DESCRIPTION)
                                                                     .policy(MOCK_ACCESS_POLICY_DOCUMENT)
-                                                                    .version(MOCK_ACCESS_POLICY_VERSION)
+                                                                    .policyVersion(MOCK_ACCESS_POLICY_VERSION)
                                                                     .build()
                                                              )
                                           .build();
@@ -77,6 +77,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
         final ResourceModel model = ResourceModel.builder()
                                                  .name(MOCK_ACCESS_POLICY_NAME)
                                                  .type(MOCK_ACCESS_POLICY_TYPE)
+                                                 .policyVersion(MOCK_ACCESS_POLICY_VERSION)
                                                  .description(MOCK_ACCESS_POLICY_DESCRIPTION)
                                                  .policy(MOCK_ACCESS_POLICY_DOCUMENT)
                                                  .build();

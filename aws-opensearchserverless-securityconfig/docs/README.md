@@ -101,3 +101,7 @@ For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::G
 
 The identifier of the security config
 
+#### ConfigVersion
+
+The version of the policy
+

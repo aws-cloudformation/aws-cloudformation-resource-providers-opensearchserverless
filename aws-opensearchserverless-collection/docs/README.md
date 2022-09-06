@@ -15,6 +15,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#description" title="Description">Description</a>" : <i>String</i>,
         "<a href="#name" title="Name">Name</a>" : <i>String</i>,
         "<a href="#tags" title="Tags">Tags</a>" : <i>[ <a href="tag.md">Tag</a>, ... ]</i>,
+        "<a href="#type" title="Type">Type</a>" : <i>String</i>
     }
 }
 </pre>
@@ -28,6 +29,7 @@ Properties:
     <a href="#name" title="Name">Name</a>: <i>String</i>
     <a href="#tags" title="Tags">Tags</a>: <i>
       - <a href="tag.md">Tag</a></i>
+    <a href="#type" title="Type">Type</a>: <i>String</i>
 </pre>
 
 ## Properties
@@ -74,6 +76,18 @@ List of tags to be added to the resource
 _Required_: No
 
 _Type_: List of <a href="tag.md">Tag</a>
+
+_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
+
+#### Type
+
+The possible types for the collection
+
+_Required_: No
+
+_Type_: String
+
+_Allowed Values_: <code>SEARCH</code> | <code>TIMESTREAM</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 

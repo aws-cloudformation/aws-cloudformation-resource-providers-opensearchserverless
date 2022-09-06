@@ -1,4 +1,5 @@
 {
     "Name": "collection-name",
+    "Type": "SEARCH",
     "Description": "Collection description"
 }

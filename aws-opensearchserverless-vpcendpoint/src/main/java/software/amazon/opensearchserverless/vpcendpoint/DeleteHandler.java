@@ -97,6 +97,7 @@ public class DeleteHandler extends BaseHandlerStd {
             final Logger logger) {
         DeleteVpcEndpointResponse deleteVpcEndpointResponse;
         try {
+            logger.log(String.format("Sending delete Vpc Endpoint request: %s",deleteVpcEndpointRequest));
             deleteVpcEndpointResponse = proxyClient.injectCredentialsAndInvokeV2(deleteVpcEndpointRequest, proxyClient.client()::deleteVpcEndpoint);
         } catch (ResourceNotFoundException e) {
             throw new CfnNotFoundException(e);
@@ -107,7 +108,7 @@ public class DeleteHandler extends BaseHandlerStd {
         } catch (AwsServiceException e) {
             throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
         }
-        logger.log(String.format("%s successfully deleted for %s", ResourceModel.TYPE_NAME, 31));
+        logger.log(String.format("%s successfully deleted. response: %s", ResourceModel.TYPE_NAME, deleteVpcEndpointResponse));
         return deleteVpcEndpointResponse;
     }
 }

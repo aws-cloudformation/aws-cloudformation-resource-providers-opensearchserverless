@@ -34,6 +34,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
     private static final String MOCK_SECURITY_CONFIG_ID = "1";
     private static final String MOCK_SECURITY_CONFIG_DESCRIPTION = "Security config description";
+    private static final String MOCK_SECURITY_CONFIG_VERSION = "securityconfigversion";
     private static final String MOCK_METADATA = "metadata";
     private static final String MOCK_USER_ATTRIBUTE = "user-attribute";
     private static final String MOCK_GROUP_ATTRIBUTE = "group-attribute";
@@ -77,6 +78,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     public void handleRequest_SimpleSuccess() {
         final ResourceModel expectedModel = ResourceModel.builder()
                                                          .id(MOCK_SECURITY_CONFIG_ID)
+                                                         .configVersion(MOCK_SECURITY_CONFIG_VERSION)
                                                          .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
                                                          .samlOptions(MOCK_SAML_OPTIONS)
                                                          .build();
@@ -85,6 +87,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
                 UpdateSecurityConfigResponse.builder().securityConfigDetail(
                                                     SecurityConfigDetail.builder()
                                                                         .id(MOCK_SECURITY_CONFIG_ID)
+                                                                        .configVersion(MOCK_SECURITY_CONFIG_VERSION)
                                                                         .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
                                                                         .samlOptions(MOCK_SDK_SAML_OPTIONS)
                                                                         .build())
@@ -93,6 +96,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         final ResourceModel model = ResourceModel.builder()
                                                  .id(MOCK_SECURITY_CONFIG_ID)
+                                                 .configVersion(MOCK_SECURITY_CONFIG_VERSION)
                                                  .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
                                                  .samlOptions(MOCK_SAML_OPTIONS)
                                                  .build();
@@ -117,6 +121,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         final ResourceModel model = ResourceModel.builder()
                                                  .id(MOCK_SECURITY_CONFIG_ID)
+                                                 .configVersion(MOCK_SECURITY_CONFIG_VERSION)
                                                  .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
                                                  .samlOptions(MOCK_SAML_OPTIONS)
                                                  .build();
@@ -133,6 +138,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         final ResourceModel model = ResourceModel.builder()
                                                  .id(MOCK_SECURITY_CONFIG_ID)
+                                                 .configVersion(MOCK_SECURITY_CONFIG_VERSION)
                                                  .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
                                                  .samlOptions(MOCK_SAML_OPTIONS)
                                                  .build();
@@ -150,6 +156,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         final ResourceModel model = ResourceModel.builder()
                                                  .id(MOCK_SECURITY_CONFIG_ID)
+                                                 .configVersion(MOCK_SECURITY_CONFIG_VERSION)
                                                  .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
                                                  .samlOptions(MOCK_SAML_OPTIONS)
                                                  .build();
@@ -179,8 +186,27 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
     @Test
     @org.junit.jupiter.api.Tag("skipSdkInteraction")
-    public void handleRequest_WithNoDescriptionAndSamlOptions_Fail() {
+    public void handleRequest_WithoutVersion_Fail() {
         final ResourceModel desiredResourceModel = ResourceModel.builder().id(MOCK_SECURITY_CONFIG_ID).build();
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                                                                                    .desiredResourceState(desiredResourceModel)
+                                                                                    .build();
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler
+                .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InvalidRequest);
+    }
+
+    @Test
+    @org.junit.jupiter.api.Tag("skipSdkInteraction")
+    public void handleRequest_WithNoDescriptionAndSamlOptions_Fail() {
+        final ResourceModel desiredResourceModel = ResourceModel.builder()
+                                                                .id(MOCK_SECURITY_CONFIG_ID)
+                                                                .configVersion(MOCK_SECURITY_CONFIG_VERSION)
+                                                                .build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                                                                                     .desiredResourceState(desiredResourceModel)
                                                                                     .build();

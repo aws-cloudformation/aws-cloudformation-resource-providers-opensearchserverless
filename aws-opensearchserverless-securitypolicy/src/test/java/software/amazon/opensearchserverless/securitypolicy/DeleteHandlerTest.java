@@ -1,20 +1,22 @@
 package software.amazon.opensearchserverless.securitypolicy;
 
-import java.time.Duration;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
-import software.amazon.awssdk.services.opensearchserverless.model.*;
+import software.amazon.awssdk.services.opensearchserverless.model.DeleteSecurityPolicyRequest;
+import software.amazon.awssdk.services.opensearchserverless.model.DeleteSecurityPolicyResponse;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
+
+import java.time.Duration;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -24,13 +26,10 @@ public class DeleteHandlerTest extends AbstractTestBase {
 
     private static final String MOCK_POLICY_NAME = "policy-name";
     private static final String MOCK_POLICY_TYPE = "encryption";
-
-    private AmazonWebServicesClientProxy proxy;
-
-    private ProxyClient<OpenSearchServerlessClient> proxyClient;
-
     @Mock
     OpenSearchServerlessClient openSearchServerlessClient;
+    private AmazonWebServicesClientProxy proxy;
+    private ProxyClient<OpenSearchServerlessClient> proxyClient;
 
     @BeforeEach
     public void setup() {
@@ -49,13 +48,13 @@ public class DeleteHandlerTest extends AbstractTestBase {
         final DeleteHandler handler = new DeleteHandler();
 
         final ResourceModel model = ResourceModel.builder()
-                .policyName(MOCK_POLICY_NAME)
-                .policyType(MOCK_POLICY_TYPE)
-                .build();
+                                                 .name(MOCK_POLICY_NAME)
+                                                 .type(MOCK_POLICY_TYPE)
+                                                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .build();
+                                                                                    .desiredResourceState(model)
+                                                                                    .build();
 
         final DeleteSecurityPolicyResponse deleteSecurityPolicyResponse = DeleteSecurityPolicyResponse.builder().build();
         when(proxyClient.client().deleteSecurityPolicy(any(DeleteSecurityPolicyRequest.class))).thenReturn(deleteSecurityPolicyResponse);
