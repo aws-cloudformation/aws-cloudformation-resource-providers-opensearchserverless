@@ -56,7 +56,7 @@ public class CreateHandlerTest extends AbstractTestBase {
                                                          .type(MOCK_ACCESS_POLICY_TYPE)
                                                          .description(MOCK_ACCESS_POLICY_DESCRIPTION)
                                                          .policy(MOCK_ACCESS_POLICY_DOCUMENT)
-                                                         .version(MOCK_ACCESS_POLICY_VERSION)
+                                                         .policyVersion(MOCK_ACCESS_POLICY_VERSION)
                                                          .build();
 
         final ResourceModel model = ResourceModel.builder()
@@ -75,7 +75,7 @@ public class CreateHandlerTest extends AbstractTestBase {
                                                                     .type(MOCK_ACCESS_POLICY_TYPE)
                                                                     .description(MOCK_ACCESS_POLICY_DESCRIPTION)
                                                                     .policy(MOCK_ACCESS_POLICY_DOCUMENT)
-                                                                    .version(MOCK_ACCESS_POLICY_VERSION)
+                                                                    .policyVersion(MOCK_ACCESS_POLICY_VERSION)
                                                                     .build()
                                                              )
                                           .build();

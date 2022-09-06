@@ -31,6 +31,7 @@ public class ListHandler extends BaseHandlerStd {
         if(StringUtils.isNullOrEmpty(model.getType())) {
             return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "Type cannot be empty");
         }
+
         final ListSecurityConfigsRequest listSecurityConfigsRequest = Translator.translateToListRequest(model, request.getNextToken());
         final ListSecurityConfigsResponse listSecurityConfigsResponse = proxy.injectCredentialsAndInvokeV2(listSecurityConfigsRequest, proxyClient.client()::listSecurityConfigs);
         String nextToken = listSecurityConfigsResponse.nextToken();

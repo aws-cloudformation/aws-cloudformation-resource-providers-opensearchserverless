@@ -24,6 +24,14 @@
                 "Value"
             ],
             "additionalProperties": false
+        },
+        "CollectionType": {
+            "type": "string",
+            "description": "The possible types for the collection",
+            "enum": [
+                "SEARCH",
+                "TIMESTREAM"
+            ]
         }
     },
     "properties": {
@@ -66,6 +74,9 @@
         "DashboardEndpoint": {
             "description": "The OpenSearch Dashboards endpoint for the collection.",
             "type": "string"
+        },
+        "Type": {
+            "$ref": "#/definitions/CollectionType"
         }
     },
     "required": [
@@ -77,15 +88,11 @@
         "/properties/CollectionEndpoint",
         "/properties/DashboardEndpoint"
     ],
-    "writeOnlyProperties": [
-        "/properties/Description",
-        "/properties/Name",
-        "/properties/Tags"
-    ],
     "createOnlyProperties": [
         "/properties/Description",
         "/properties/Name",
-        "/properties/Tags"
+        "/properties/Tags",
+        "/properties/Type"
     ],
     "primaryIdentifier": [
         "/properties/Id"

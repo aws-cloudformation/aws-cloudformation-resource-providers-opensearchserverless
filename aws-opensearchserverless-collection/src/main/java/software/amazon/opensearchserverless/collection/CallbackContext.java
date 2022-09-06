@@ -1,6 +1,7 @@
 package software.amazon.opensearchserverless.collection;
 
 import software.amazon.cloudformation.proxy.StdCallbackContext;
+
 import lombok.Data;
 
 @Data

@@ -104,6 +104,7 @@ public class CreateHandler extends BaseHandlerStd {
             final Logger logger) {
         CreateVpcEndpointResponse createVpcEndpointResponse;
         try {
+            logger.log(String.format("Sending create Vpc Endpoint request: %s",createVpcEndpointRequest));
             createVpcEndpointResponse = proxyClient.injectCredentialsAndInvokeV2(createVpcEndpointRequest, proxyClient.client()::createVpcEndpoint);
         } catch (ConflictException e) {
             throw new CfnAlreadyExistsException(e);
@@ -114,7 +115,7 @@ public class CreateHandler extends BaseHandlerStd {
         } catch (AwsServiceException e) {
             throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
         }
-        logger.log(String.format("%s successfully created for %s", ResourceModel.TYPE_NAME, createVpcEndpointRequest));
+        logger.log(String.format("%s successfully created. response: %s", ResourceModel.TYPE_NAME, createVpcEndpointResponse));
         return createVpcEndpointResponse;
     }
 }

@@ -27,3 +27,9 @@ sam-tests/
 
 # gradle folder
 .gradle/
+
+# build folder
+build/
+
+# bemol folder
+.bemol
