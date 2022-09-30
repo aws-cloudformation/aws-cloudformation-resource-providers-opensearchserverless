@@ -32,6 +32,7 @@ public class CreateHandlerTest extends AbstractTestBase {
     private static final String MOCK_SECURITY_CONFIG_TYPE = SecurityConfigType.SAML.name();
     private static final String MOCK_SECURITY_CONFIG_NAME = "security-config-name";
     private static final String MOCK_SECURITY_CONFIG_DESCRIPTION = "Security config description";
+    private static final String MOCK_SECURITY_CONFIG_VERSION = "securityconfigversion";
     private static final String MOCK_METADATA = "metadata";
     private static final String MOCK_USER_ATTRIBUTE = "user-attribute";
     private static final String MOCK_GROUP_ATTRIBUTE = "group-attribute";
@@ -74,6 +75,7 @@ public class CreateHandlerTest extends AbstractTestBase {
     public void handleRequest_SimpleSuccess() {
         final ResourceModel expectedModel = ResourceModel.builder()
                                                          .id(MOCK_SECURITY_CONFIG_ID)
+                                                         .configVersion(MOCK_SECURITY_CONFIG_VERSION)
                                                          .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
                                                          .samlOptions(MOCK_SAML_OPTIONS)
                                                          .build();
@@ -82,6 +84,7 @@ public class CreateHandlerTest extends AbstractTestBase {
                 CreateSecurityConfigResponse.builder().securityConfigDetail(
                                                     SecurityConfigDetail.builder()
                                                                         .id(MOCK_SECURITY_CONFIG_ID)
+                                                                        .configVersion(MOCK_SECURITY_CONFIG_VERSION)
                                                                         .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
                                                                         .samlOptions(MOCK_SDK_SAML_OPTIONS)
                                                                         .build())

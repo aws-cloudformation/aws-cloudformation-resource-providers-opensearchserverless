@@ -12,40 +12,47 @@
         }
     },
     "properties": {
-        "PolicyDescription": {
+        "Description": {
             "type": "string",
             "maxLength": 1000,
             "minLength": 1,
             "description": "The description of the policy"
         },
-        "PolicyDocument": {
+        "Policy": {
             "type": "string",
             "maxLength": 20480,
             "minLength": 1,
-            "pattern": "[\t\n\r -~¡-ÿ]+",
-            "description": "The description of the security policy"
+            "pattern": "[\\u0009\\u000A\\u000D\\u0020-\\u007E\\u00A1-\\u00FF]+",
+            "description": "The JSON policy document that is the content for the policy"
         },
-        "PolicyName": {
+        "Name": {
             "type": "string",
             "maxLength": 32,
             "minLength": 3,
             "pattern": "^[a-z][a-z0-9-]+$",
             "description": "The name of the policy"
         },
-        "PolicyType": {
+        "PolicyVersion": {
+            "type": "string",
+            "maxLength": 36,
+            "minLength": 20,
+            "pattern": "^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$",
+            "description": "The version of the policy"
+        },
+        "Type": {
             "$ref": "#/definitions/SecurityPolicyType"
         }
     },
     "required": [
-        "PolicyDocument"
+        "Policy"
     ],
     "primaryIdentifier": [
-        "/properties/PolicyName",
-        "/properties/PolicyType"
+        "/properties/Name",
+        "/properties/Type"
     ],
     "readOnlyProperties": [
-        "/properties/PolicyName",
-        "/properties/PolicyType"
+        "/properties/Name",
+        "/properties/Type"
     ],
     "handlers": {
         "create": {

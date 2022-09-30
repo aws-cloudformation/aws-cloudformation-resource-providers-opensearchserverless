@@ -12,8 +12,9 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 {
     "Type" : "AWS::OpenSearchServerless::SecurityPolicy",
     "Properties" : {
-        "<a href="#policydescription" title="PolicyDescription">PolicyDescription</a>" : <i>String</i>,
-        "<a href="#policydocument" title="PolicyDocument">PolicyDocument</a>" : <i>String</i>,
+        "<a href="#description" title="Description">Description</a>" : <i>String</i>,
+        "<a href="#policy" title="Policy">Policy</a>" : <i>String</i>,
+        "<a href="#policyversion" title="PolicyVersion">PolicyVersion</a>" : <i>String</i>,
     }
 }
 </pre>
@@ -23,13 +24,14 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 Type: AWS::OpenSearchServerless::SecurityPolicy
 Properties:
-    <a href="#policydescription" title="PolicyDescription">PolicyDescription</a>: <i>String</i>
-    <a href="#policydocument" title="PolicyDocument">PolicyDocument</a>: <i>String</i>
+    <a href="#description" title="Description">Description</a>: <i>String</i>
+    <a href="#policy" title="Policy">Policy</a>: <i>String</i>
+    <a href="#policyversion" title="PolicyVersion">PolicyVersion</a>: <i>String</i>
 </pre>
 
 ## Properties
 
-#### PolicyDescription
+#### Description
 
 The description of the policy
 
@@ -43,9 +45,9 @@ _Maximum_: <code>1000</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### PolicyDocument
+#### Policy
 
-The description of the security policy
+The JSON policy document that is the content for the policy
 
 _Required_: Yes
 
@@ -55,8 +57,23 @@ _Minimum_: <code>1</code>
 
 _Maximum_: <code>20480</code>
 
-_Pattern_: <code>[	
- -~¡-ÿ]+</code>
+_Pattern_: <code>[\u0009\u000A\u000D\u0020-\u007E\u00A1-\u00FF]+</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### PolicyVersion
+
+The version of the policy
+
+_Required_: No
+
+_Type_: String
+
+_Minimum_: <code>20</code>
+
+_Maximum_: <code>36</code>
+
+_Pattern_: <code>^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -68,11 +85,11 @@ The `Fn::GetAtt` intrinsic function returns a value for a specified attribute of
 
 For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::GetAtt](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-getatt.html).
 
-#### PolicyName
+#### Name
 
 The name of the policy
 
-#### PolicyType
+#### Type
 
 The possible types for the network policy
 

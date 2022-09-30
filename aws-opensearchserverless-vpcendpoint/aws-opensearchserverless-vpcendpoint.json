@@ -38,8 +38,8 @@
                 "minLength": 1,
                 "pattern": "^subnet-([0-9a-f]{8}|[0-9a-f]{17})$"
             },
-            "maxItems": 3,
-            "minItems": 2,
+            "maxItems": 6,
+            "minItems": 1,
             "description": "The ID of one or more subnets in which to create an endpoint network interface"
         },
         "VpcId": {

@@ -13,10 +13,13 @@ import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
+
+import com.amazonaws.util.StringUtils;
 
 public class DeleteHandler extends BaseHandlerStd {
 
@@ -26,6 +29,16 @@ public class DeleteHandler extends BaseHandlerStd {
             final CallbackContext callbackContext,
             final ProxyClient<OpenSearchServerlessClient> proxyClient,
             final Logger logger) {
+
+        final ResourceModel model = request.getDesiredResourceState();
+
+        if (StringUtils.isNullOrEmpty(model.getName())) {
+            return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "Name cannot be empty");
+        }
+
+        if (StringUtils.isNullOrEmpty(model.getType())) {
+            return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "Type cannot be empty");
+        }
 
         return proxy.initiate("AWS-OpenSearchServerless-AccessPolicy::Delete", proxyClient, request.getDesiredResourceState(), callbackContext)
                     .translateToServiceRequest(Translator::translateToDeleteRequest)
@@ -39,6 +52,7 @@ public class DeleteHandler extends BaseHandlerStd {
             final Logger logger) {
         DeleteAccessPolicyResponse deleteAccessPolicyResponse;
         try {
+            logger.log(String.format("Sending delete access policy request: %s", deleteAccessPolicyRequest));
             deleteAccessPolicyResponse = proxyClient.injectCredentialsAndInvokeV2(deleteAccessPolicyRequest, proxyClient.client()::deleteAccessPolicy);
         } catch (ResourceNotFoundException e) {
             throw new CfnNotFoundException(e);
@@ -49,7 +63,7 @@ public class DeleteHandler extends BaseHandlerStd {
         } catch (AwsServiceException e) {
             throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
         }
-        logger.log(String.format("%s successfully deleted for %s", ResourceModel.TYPE_NAME, 31));
+        logger.log(String.format("%s successfully deleted. response: %s", ResourceModel.TYPE_NAME, deleteAccessPolicyResponse));
         return deleteAccessPolicyResponse;
     }
 }

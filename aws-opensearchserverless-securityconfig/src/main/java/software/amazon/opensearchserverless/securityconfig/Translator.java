@@ -81,7 +81,8 @@ public class Translator {
      * @return awsRequest the aws service request to modify security config
      */
     public static UpdateSecurityConfigRequest translateToUpdateRequest(ResourceModel model) {
-        UpdateSecurityConfigRequest.Builder builder = UpdateSecurityConfigRequest.builder().id(model.getId());
+        UpdateSecurityConfigRequest.Builder builder =
+                UpdateSecurityConfigRequest.builder().id(model.getId()).configVersion(model.getConfigVersion());
 
         if (model.getDescription() != null) {
             builder.description(model.getDescription());
@@ -168,6 +169,7 @@ public class Translator {
     private static ResourceModel translateSecurityConfigDetailFromSDK(SecurityConfigDetail securityConfigDetail) {
         return ResourceModel.builder()
                             .id(securityConfigDetail.id())
+                            .configVersion(securityConfigDetail.configVersion())
                             .description(securityConfigDetail.description())
                             .samlOptions(translateSamlConfigOptionsFromSDK(securityConfigDetail.samlOptions()))
                             .build();

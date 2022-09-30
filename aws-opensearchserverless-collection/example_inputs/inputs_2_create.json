@@ -1,5 +1,6 @@
 {
     "Name": "collection-name-2",
+    "Type": "SEARCH",
     "Description": "Collection description 2",
     "Tags": [
         {

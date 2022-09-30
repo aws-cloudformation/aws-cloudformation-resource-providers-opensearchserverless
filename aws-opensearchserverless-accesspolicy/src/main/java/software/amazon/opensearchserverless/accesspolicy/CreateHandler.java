@@ -12,10 +12,13 @@ import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
+
+import com.amazonaws.util.StringUtils;
 
 public class CreateHandler extends BaseHandlerStd {
 
@@ -25,6 +28,19 @@ public class CreateHandler extends BaseHandlerStd {
             final CallbackContext callbackContext,
             final ProxyClient<OpenSearchServerlessClient> proxyClient,
             final Logger logger) {
+
+        ResourceModel model = request.getDesiredResourceState();
+        if (StringUtils.isNullOrEmpty(model.getName())) {
+            return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "Name cannot be empty");
+        }
+
+        if (StringUtils.isNullOrEmpty(model.getType())) {
+            return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "Type cannot be empty");
+        }
+
+        if (StringUtils.isNullOrEmpty(model.getPolicy())) {
+            return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "Policy cannot be empty");
+        }
 
         return proxy.initiate("AWS-OpenSearchServerless-AccessPolicy::Create", proxyClient, request.getDesiredResourceState(), callbackContext)
                     .translateToServiceRequest(Translator::translateToCreateRequest)
@@ -38,6 +54,7 @@ public class CreateHandler extends BaseHandlerStd {
             final Logger logger) {
         CreateAccessPolicyResponse createAccessPolicyResponse;
         try {
+            logger.log(String.format("Sending create access policy request: %s", createAccessPolicyRequest));
             createAccessPolicyResponse = proxyClient.injectCredentialsAndInvokeV2(createAccessPolicyRequest, proxyClient.client()::createAccessPolicy);
         } catch (ConflictException e) {
             throw new CfnAlreadyExistsException(e);
@@ -48,7 +65,7 @@ public class CreateHandler extends BaseHandlerStd {
         } catch (AwsServiceException e) {
             throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
         }
-        logger.log(String.format("%s successfully created for %s", ResourceModel.TYPE_NAME, createAccessPolicyRequest));
+        logger.log(String.format("%s successfully created. response: %s", ResourceModel.TYPE_NAME, createAccessPolicyResponse));
         return createAccessPolicyResponse;
     }
 }

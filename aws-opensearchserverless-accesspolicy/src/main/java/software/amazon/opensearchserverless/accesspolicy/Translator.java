@@ -90,7 +90,7 @@ public class Translator {
         UpdateAccessPolicyRequest.Builder builder = UpdateAccessPolicyRequest.builder()
                                                                              .type(model.getType())
                                                                              .name(model.getName())
-                                                                             .version(model.getVersion());
+                                                                             .policyVersion(model.getPolicyVersion());
         if (model.getDescription() != null) {
             builder.description(model.getDescription());
         }
@@ -146,7 +146,7 @@ public class Translator {
         return ResourceModel.builder()
                 .type(accessPolicyDetail.typeAsString())
                 .name(accessPolicyDetail.name())
-                .version(accessPolicyDetail.version())
+                .policyVersion(accessPolicyDetail.policyVersion())
                 .description(accessPolicyDetail.description())
                 .policy(accessPolicyDetail.policy())
                 .build();

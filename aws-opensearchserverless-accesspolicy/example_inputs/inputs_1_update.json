@@ -1,5 +1,6 @@
 {
     "Name": "accesspolicy-name",
     "Type": "data",
-    "Description": "Accesspolicy description updated"
+    "Description": "Accesspolicy description updated",
+    "PolicyVersion": "1"
 }

@@ -13,10 +13,13 @@ import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
+
+import com.amazonaws.util.StringUtils;
 
 public class UpdateHandler extends BaseHandlerStd {
 
@@ -26,6 +29,23 @@ public class UpdateHandler extends BaseHandlerStd {
         final CallbackContext callbackContext,
         final ProxyClient<OpenSearchServerlessClient> proxyClient,
         final Logger logger) {
+
+        final ResourceModel model = request.getDesiredResourceState();
+        if(StringUtils.isNullOrEmpty(model.getType())) {
+            return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "Type cannot be empty");
+        }
+
+        if(StringUtils.isNullOrEmpty(model.getName())) {
+            return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "Name cannot be empty");
+        }
+
+        if(StringUtils.isNullOrEmpty(model.getPolicyVersion())) {
+            return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "PolicyVersion cannot be empty");
+        }
+
+        if(StringUtils.isNullOrEmpty(model.getDescription()) && StringUtils.isNullOrEmpty(model.getPolicy())) {
+            return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "One of Description or Policy is required");
+        }
 
         return proxy.initiate("AWS-OpenSearchServerless-AccessPolicy::Update", proxyClient, request.getDesiredResourceState(), callbackContext)
                     .translateToServiceRequest(Translator::translateToUpdateRequest)

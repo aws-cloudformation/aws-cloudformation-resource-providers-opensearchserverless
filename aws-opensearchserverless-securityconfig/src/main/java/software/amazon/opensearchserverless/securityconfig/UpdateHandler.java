@@ -37,7 +37,11 @@ public class UpdateHandler extends BaseHandlerStd {
             return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "Id cannot be empty");
         }
 
-        if(StringUtils.isNullOrEmpty(model.getDescription()) || model.getSamlOptions() == null) {
+        if(StringUtils.isNullOrEmpty(model.getConfigVersion())) {
+            return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "ConfigVersion cannot be empty");
+        }
+
+        if(StringUtils.isNullOrEmpty(model.getDescription()) && model.getSamlOptions() == null) {
             return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "One of description or saml-options is required");
         }
 
