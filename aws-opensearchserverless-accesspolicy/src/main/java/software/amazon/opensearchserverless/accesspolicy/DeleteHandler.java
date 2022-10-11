@@ -55,7 +55,7 @@ public class DeleteHandler extends BaseHandlerStd {
             logger.log(String.format("Sending delete access policy request: %s", deleteAccessPolicyRequest));
             deleteAccessPolicyResponse = proxyClient.injectCredentialsAndInvokeV2(deleteAccessPolicyRequest, proxyClient.client()::deleteAccessPolicy);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(e);
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME,String.format("Name:%s, Type:%s", deleteAccessPolicyRequest.name(), deleteAccessPolicyRequest.typeAsString()),e);
         } catch (ValidationException e) {
             throw new CfnInvalidRequestException(deleteAccessPolicyRequest.toString(), e);
         } catch (InternalServerException e) {

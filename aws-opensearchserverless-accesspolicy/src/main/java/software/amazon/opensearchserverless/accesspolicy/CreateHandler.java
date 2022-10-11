@@ -57,7 +57,7 @@ public class CreateHandler extends BaseHandlerStd {
             logger.log(String.format("Sending create access policy request: %s", createAccessPolicyRequest));
             createAccessPolicyResponse = proxyClient.injectCredentialsAndInvokeV2(createAccessPolicyRequest, proxyClient.client()::createAccessPolicy);
         } catch (ConflictException e) {
-            throw new CfnAlreadyExistsException(e);
+            throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME,String.format("Name:%s, Type:%s", createAccessPolicyRequest.name(), createAccessPolicyRequest.typeAsString()),e);
         } catch (ValidationException e) {
             throw new CfnInvalidRequestException(createAccessPolicyRequest.toString(), e);
         } catch (InternalServerException e) {
