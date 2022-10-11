@@ -40,7 +40,7 @@ public class UpdateHandler extends BaseHandlerStd {
         }
 
         if(StringUtils.isNullOrEmpty(model.getPolicyVersion())) {
-            return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "PolicyVersion cannot be empty");
+            return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.NotFound, "PolicyVersion cannot be empty");
         }
 
         if(StringUtils.isNullOrEmpty(model.getDescription()) && StringUtils.isNullOrEmpty(model.getPolicy())) {
