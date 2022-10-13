@@ -1,6 +1,12 @@
 {
     "typeName": "AWS::OpenSearchServerless::SecurityConfig",
     "description": "Amazon OpenSearchServerless security config resource",
+    "tagging": {
+        "taggable": false,
+        "tagOnCreate": false,
+        "tagUpdatable": false,
+        "cloudFormationSystemTags": false
+    },
     "definitions": {
         "SamlConfigOptions": {
             "type": "object",
@@ -57,7 +63,7 @@
             "type": "string",
             "maxLength": 1000,
             "minLength": 1,
-            "description": "A friendly description of security config"
+            "description": "Security config description"
         },
         "Id": {
             "type": "string",
@@ -69,7 +75,7 @@
             "type": "string",
             "maxLength": 32,
             "minLength": 3,
-            "pattern": "^[a-z][a-z0-9-]+$",
+            "pattern": "^[a-z][a-z0-9-]{2,31}$",
             "description": "The friendly name of the security config"
         },
         "SamlOptions": {
@@ -83,15 +89,9 @@
         "Name",
         "Type"
     ],
-    "readOnlyProperties": [
-        "/properties/Id",
-        "/properties/ConfigVersion"
-    ],
     "writeOnlyProperties": [
-        "/properties/Description",
-        "/properties/Name",
-        "/properties/SamlOptions",
-        "/properties/Type"
+        "/properties/Type",
+        "/properties/Name"
     ],
     "createOnlyProperties": [
         "/properties/Name",
@@ -99,6 +99,9 @@
     ],
     "primaryIdentifier": [
         "/properties/Id"
+    ],
+    "additionalIdentifiers": [
+        ["/properties/Name"]
     ],
     "handlers": {
         "create": {
