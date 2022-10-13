@@ -1,5 +1,6 @@
 package software.amazon.opensearchserverless.accesspolicy;
 
+import com.amazonaws.util.StringUtils;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.GetAccessPolicyRequest;
@@ -12,6 +13,7 @@ import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
@@ -25,6 +27,15 @@ public class ReadHandler extends BaseHandlerStd {
             final CallbackContext callbackContext,
             final ProxyClient<OpenSearchServerlessClient> proxyClient,
             final Logger logger) {
+
+        ResourceModel model = request.getDesiredResourceState();
+        if (StringUtils.isNullOrEmpty(model.getName())) {
+            return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "Name cannot be empty");
+        }
+
+        if (StringUtils.isNullOrEmpty(model.getType())) {
+            return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "Type cannot be empty");
+        }
 
         return proxy.initiate("AWS-OpenSearchServerless-AccessPolicy::Read", proxyClient, request.getDesiredResourceState(), callbackContext)
                     .translateToServiceRequest(Translator::translateToReadRequest)
@@ -42,7 +53,7 @@ public class ReadHandler extends BaseHandlerStd {
             logger.log(String.format("Sending delete access policy request: %s", getAccessPolicyRequest));
             getAccessPolicyResponse = proxyClient.injectCredentialsAndInvokeV2(getAccessPolicyRequest, proxyClient.client()::getAccessPolicy);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(e);
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME,String.format("Name:%s, Type:%s", getAccessPolicyRequest.name(), getAccessPolicyRequest.typeAsString()),e);
         } catch (ValidationException e) {
             throw new CfnInvalidRequestException(getAccessPolicyRequest.toString(), e);
         } catch (InternalServerException e) {

@@ -1,0 +1,15 @@
+{
+    "CreateInputs": {
+        "Name": "accesspolicy-name-1",
+        "Type": "data",
+        "Description": "Accesspolicy description",
+        "Policy": "[{\"Description\":\"data policy v1.0\",\"Rules\":[{\"ResourceType\":\"index\",\"Resource\":[\"index/*/*\"],\"Permission\":[\"aoss:ReadDocument\"]},{\"ResourceType\":\"collection\",\"Resource\":[\"collection/*\"],\"Permission\":[\"aoss:*\"]}],\"Principal\":[\"arn:aws:iam::{{account}}:user/test-abc\"]}]"
+    },
+    "PatchInputs": [
+        {
+            "op": "replace",
+            "path": "Description",
+            "value": "Accesspolicy description updated"
+        }
+    ]
+}

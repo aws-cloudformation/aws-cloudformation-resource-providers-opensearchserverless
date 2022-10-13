@@ -45,7 +45,7 @@ _Minimum_: <code>3</code>
 
 _Maximum_: <code>32</code>
 
-_Pattern_: <code>^[a-z][a-z0-9-]+$</code>
+_Pattern_: <code>^[a-z][a-z0-9-]{2,31}$</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
@@ -77,7 +77,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 #### Policy
 
-The JSON policy document that you want to use as the content for the new policy
+The JSON policy document that is the content for the policy
 
 _Required_: No
 
