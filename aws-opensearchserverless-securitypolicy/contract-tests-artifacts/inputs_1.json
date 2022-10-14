@@ -1,0 +1,15 @@
+{
+    "CreateInputs": {
+        "Name": "securitypolicy-name-1",
+        "Type": "encryption",
+        "Description": "SecurityPolicy  description 1",
+        "Policy":  "{\"Rules\":[{\"ResourceType\":\"collection\",\"Resource\":[\"collection/cfntest*\"]}],\"AWSOwnedKey\":true}"
+    },
+    "PatchInputs": [
+        {
+            "op": "replace",
+            "path": "Description",
+            "value": "SecurityPolicy description 1 updated"
+        }
+    ]
+}
