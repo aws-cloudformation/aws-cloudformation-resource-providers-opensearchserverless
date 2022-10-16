@@ -35,11 +35,11 @@ public class CreateHandler extends BaseHandlerStd {
     private Logger logger;
 
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-            final @NonNull AmazonWebServicesClientProxy proxy,
-            final @NonNull ResourceHandlerRequest<ResourceModel> request,
-            final CallbackContext callbackContext,
-            final @NonNull ProxyClient<OpenSearchServerlessClient> proxyClient,
-            final @NonNull Logger logger) {
+        final @NonNull AmazonWebServicesClientProxy proxy,
+        final @NonNull ResourceHandlerRequest<ResourceModel> request,
+        final CallbackContext callbackContext,
+        final @NonNull ProxyClient<OpenSearchServerlessClient> proxyClient,
+        final @NonNull Logger logger) {
 
         this.logger = logger;
         final ResourceModel model = request.getDesiredResourceState();
@@ -60,18 +60,18 @@ public class CreateHandler extends BaseHandlerStd {
         allDesiredTags.putAll(Optional.ofNullable(request.getSystemTags()).orElse(Collections.emptyMap()));
 
         return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
-                            .then(progress ->
-                                          proxy.initiate("AWS-OpenSearchServerless-Collection::Create", proxyClient, progress.getResourceModel(), progress.getCallbackContext())
-                                               .translateToServiceRequest(cbModel -> Translator.translateToCreateRequest(cbModel, allDesiredTags))
-                                               .makeServiceCall(this::createCollection)
-                                               .stabilize(this::stabilizeCollectionCreate)
-                                               .done((createCollectionRequest, createCollectionResponse, client, resourceModel, callbackContext1) -> {
-                                                   resourceModel.setId(createCollectionResponse.createCollectionDetail().id());
-                                                   return ProgressEvent.progress(resourceModel, callbackContext1);
-                                               })
+            .then(progress ->
+                proxy.initiate("AWS-OpenSearchServerless-Collection::Create", proxyClient, progress.getResourceModel(), progress.getCallbackContext())
+                    .translateToServiceRequest(cbModel -> Translator.translateToCreateRequest(cbModel, allDesiredTags))
+                    .makeServiceCall(this::createCollection)
+                    .stabilize(this::stabilizeCollectionCreate)
+                    .done((createCollectionRequest, createCollectionResponse, client, resourceModel, callbackContext1) -> {
+                        resourceModel.setId(createCollectionResponse.createCollectionDetail().id());
+                        return ProgressEvent.progress(resourceModel, callbackContext1);
+                    })
 
-                                 )
-                            .then(progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
+            )
+            .then(progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
     }
 
     /**
@@ -80,19 +80,20 @@ public class CreateHandler extends BaseHandlerStd {
      * @param createCollectionRequest  the aws service request to create collection resource
      * @param createCollectionResponse the aws service response to create collection resource
      * @param proxyClient              the aws service client to make the call
-     * @param model                    the resource model
+     * @param resourceModel            the resource model
      * @param callbackContext          the callback context for aws service request
      * @return true only if collection status is ACTIVE
      */
     protected boolean stabilizeCollectionCreate(
-            final @NonNull CreateCollectionRequest createCollectionRequest,
-            final @NonNull CreateCollectionResponse createCollectionResponse,
-            final @NonNull ProxyClient<OpenSearchServerlessClient> proxyClient,
-            final @NonNull ResourceModel model,
-            final CallbackContext callbackContext) {
-        logger.log(String.format("Stabilize CollectionCreate for resource %s", createCollectionRequest));
-
-        BatchGetCollectionRequest request = BatchGetCollectionRequest.builder().ids(createCollectionResponse.createCollectionDetail().id()).build();
+        final @NonNull CreateCollectionRequest createCollectionRequest,
+        final @NonNull CreateCollectionResponse createCollectionResponse,
+        final @NonNull ProxyClient<OpenSearchServerlessClient> proxyClient,
+        final @NonNull ResourceModel resourceModel,
+        final CallbackContext callbackContext) {
+        String id = createCollectionResponse.createCollectionDetail().id();
+        resourceModel.setId(id);
+        logger.log(String.format("Stabilize CollectionCreate for resource %s", resourceModel));
+        BatchGetCollectionRequest request = Translator.translateToReadRequest(resourceModel);
         BatchGetCollectionResponse response = proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::batchGetCollection);
 
         if (!response.hasCollectionDetails() || response.collectionDetails().size() != 1) {
@@ -121,13 +122,13 @@ public class CreateHandler extends BaseHandlerStd {
      * @return the aws service response
      */
     private CreateCollectionResponse createCollection(
-            final @NonNull CreateCollectionRequest createCollectionRequest,
-            final @NonNull ProxyClient<OpenSearchServerlessClient> proxyClient) {
+        final @NonNull CreateCollectionRequest createCollectionRequest,
+        final @NonNull ProxyClient<OpenSearchServerlessClient> proxyClient) {
         final CreateCollectionResponse createCollectionResponse;
         try {
             logger.log(String.format("sending create collection request: %s", createCollectionRequest));
             createCollectionResponse =
-                    proxyClient.injectCredentialsAndInvokeV2(createCollectionRequest, proxyClient.client()::createCollection);
+                proxyClient.injectCredentialsAndInvokeV2(createCollectionRequest, proxyClient.client()::createCollection);
         } catch (ConflictException e) {
             throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME,createCollectionRequest.name(),e);
         } catch (ValidationException e) {

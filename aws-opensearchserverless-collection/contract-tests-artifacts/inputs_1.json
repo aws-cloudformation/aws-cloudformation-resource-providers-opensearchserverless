@@ -1,0 +1,7 @@
+{
+    "CreateInputs": {
+        "Name": "contracttest-collection-name",
+        "Type": "SEARCH",
+        "Description": "contracttest Collection description"
+    }
+}

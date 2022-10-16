@@ -1,6 +1,13 @@
 {
     "typeName": "AWS::OpenSearchServerless::Collection",
     "description": "Amazon OpenSearchServerless collection resource",
+    "tagging": {
+        "taggable": true,
+        "tagOnCreate": true,
+        "tagUpdatable": false,
+        "cloudFormationSystemTags": true,
+        "tagProperty": "/properties/Tags"
+    },
     "definitions": {
         "Tag": {
             "type": "object",
@@ -30,7 +37,7 @@
             "description": "The possible types for the collection",
             "enum": [
                 "SEARCH",
-                "TIMESTREAM"
+                "TIMESERIES"
             ]
         }
     },
@@ -50,7 +57,7 @@
             "type": "string",
             "maxLength": 32,
             "minLength": 3,
-            "pattern": "^[a-z][a-z0-9-]+$",
+            "pattern": "^[a-z][a-z0-9-]{2,31}$",
             "description": "The name of the collection.\n\nThe name must meet the following criteria:\nUnique to your account and AWS Region\nStarts with a lowercase letter\nContains only lowercase letters a-z, the numbers 0-9 and the hyphen (-)\nContains between 3 and 32 characters\n"
         },
         "Tags": {
@@ -89,13 +96,15 @@
         "/properties/DashboardEndpoint"
     ],
     "createOnlyProperties": [
-        "/properties/Description",
         "/properties/Name",
         "/properties/Tags",
         "/properties/Type"
     ],
     "primaryIdentifier": [
         "/properties/Id"
+    ],
+    "additionalIdentifiers": [
+        ["/properties/Name"]
     ],
     "handlers": {
         "create": {
