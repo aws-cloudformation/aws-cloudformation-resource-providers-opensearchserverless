@@ -47,7 +47,7 @@ _Minimum_: <code>3</code>
 
 _Maximum_: <code>32</code>
 
-_Pattern_: <code>^[a-z][a-z0-9-]+$</code>
+_Pattern_: <code>^[a-z][a-z0-9-]{2,31}$</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 

@@ -1,4 +1,0 @@
-{
-    "SecurityGroupIds": ["securitygroupid1, securitygroupid2"],
-    "SubnetIds":  ["subnetid1", "subnetid2"]
-}
