@@ -44,7 +44,7 @@ _Type_: String
 
 _Maximum_: <code>1000</code>
 
-_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 #### Name
 
@@ -65,7 +65,7 @@ _Minimum_: <code>3</code>
 
 _Maximum_: <code>32</code>
 
-_Pattern_: <code>^[a-z][a-z0-9-]+$</code>
+_Pattern_: <code>^[a-z][a-z0-9-]{2,31}$</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
@@ -87,7 +87,7 @@ _Required_: No
 
 _Type_: String
 
-_Allowed Values_: <code>SEARCH</code> | <code>TIMESTREAM</code>
+_Allowed Values_: <code>SEARCH</code> | <code>TIMESERIES</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
