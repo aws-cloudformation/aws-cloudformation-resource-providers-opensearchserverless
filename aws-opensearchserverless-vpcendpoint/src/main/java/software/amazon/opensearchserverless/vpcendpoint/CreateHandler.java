@@ -28,11 +28,11 @@ import com.amazonaws.util.StringUtils;
 public class CreateHandler extends BaseHandlerStd {
 
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-            final AmazonWebServicesClientProxy proxy,
-            final ResourceHandlerRequest<ResourceModel> request,
-            final CallbackContext callbackContext,
-            final ProxyClient<OpenSearchServerlessClient> proxyClient,
-            final Logger logger) {
+        final AmazonWebServicesClientProxy proxy,
+        final ResourceHandlerRequest<ResourceModel> request,
+        final CallbackContext callbackContext,
+        final ProxyClient<OpenSearchServerlessClient> proxyClient,
+        final Logger logger) {
 
         final ResourceModel model = request.getDesiredResourceState();
         if (callbackContext == null && model.getId() != null) {
@@ -49,35 +49,34 @@ public class CreateHandler extends BaseHandlerStd {
         }
 
         return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
-                            .then(progress ->
-                                          proxy.initiate("AWS-OpenSearchServerless-VpcEndpoint::Create", proxyClient, progress.getResourceModel(), progress.getCallbackContext())
-                                               .translateToServiceRequest(Translator::translateToCreateRequest)
-                                               .makeServiceCall((awsRequest, client) -> createVpcEndpoint(awsRequest, client, logger))
-                                               .stabilize((awsRequest, awsResponse, client, cbMmodel, context) -> stabilizeVpcEndpointCreate(awsRequest, awsResponse, client, logger))
-                                               .done((createVpcEndpointRequest, createVpcEndpointResponse, client, resourceModel, callbackContext1) -> {
-                                                   resourceModel.setId(createVpcEndpointResponse.createVpcEndpointDetail().id());
-                                                   return ProgressEvent.progress(resourceModel, callbackContext1);
-                                               })
-                                 )
-                            .then(progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
+            .then(progress ->
+                proxy.initiate("AWS-OpenSearchServerless-VpcEndpoint::Create", proxyClient, progress.getResourceModel(), progress.getCallbackContext())
+                    .translateToServiceRequest(Translator::translateToCreateRequest)
+                    .makeServiceCall((awsRequest, client) -> createVpcEndpoint(awsRequest, client, logger))
+                    .stabilize((awsRequest, awsResponse, client, cbModel, context) -> stabilizeVpcEndpointCreate(awsResponse, client, cbModel, logger))
+                    .done((createVpcEndpointRequest, createVpcEndpointResponse, client, resourceModel, callbackContext1) -> ProgressEvent.progress(resourceModel, callbackContext1))
+            )
+            .then(progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
     }
 
     /**
      * Stabilization of VpcEndpoint for the Create operation.
      *
-     * @param createVpcEndpointRequest  the aws service request to create VpcEndpoint resource
      * @param createVpcEndpointResponse the aws service response to create VpcEndpoint resource
      * @param proxyClient               the aws service client to make the call
+     * @param resourceModel             the resource model
      * @return true only if collection status is ACTIVE
      */
     private boolean stabilizeVpcEndpointCreate(
-            final CreateVpcEndpointRequest createVpcEndpointRequest,
-            final CreateVpcEndpointResponse createVpcEndpointResponse,
-            final ProxyClient<OpenSearchServerlessClient> proxyClient,
-            final Logger logger) {
-        logger.log(String.format("Stabilize VpcEndpointCreate for resource %s", createVpcEndpointRequest));
+        final CreateVpcEndpointResponse createVpcEndpointResponse,
+        final ProxyClient<OpenSearchServerlessClient> proxyClient,
+        final ResourceModel resourceModel,
+        final Logger logger) {
+        String id = createVpcEndpointResponse.createVpcEndpointDetail().id();
+        resourceModel.setId(id);
+        logger.log(String.format("Stabilize VpcEndpointCreate for resource %s", resourceModel));
 
-        BatchGetVpcEndpointRequest request = BatchGetVpcEndpointRequest.builder().ids(createVpcEndpointResponse.createVpcEndpointDetail().id()).build();
+        BatchGetVpcEndpointRequest request = Translator.translateToReadRequest(resourceModel);
         BatchGetVpcEndpointResponse response = proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::batchGetVpcEndpoint);
 
         if (!response.hasVpcEndpointDetails() || response.vpcEndpointDetails().size() != 1) {
@@ -99,9 +98,9 @@ public class CreateHandler extends BaseHandlerStd {
     }
 
     private CreateVpcEndpointResponse createVpcEndpoint(
-            final CreateVpcEndpointRequest createVpcEndpointRequest,
-            final ProxyClient<OpenSearchServerlessClient> proxyClient,
-            final Logger logger) {
+        final CreateVpcEndpointRequest createVpcEndpointRequest,
+        final ProxyClient<OpenSearchServerlessClient> proxyClient,
+        final Logger logger) {
         CreateVpcEndpointResponse createVpcEndpointResponse;
         try {
             logger.log(String.format("Sending create Vpc Endpoint request: %s",createVpcEndpointRequest));
