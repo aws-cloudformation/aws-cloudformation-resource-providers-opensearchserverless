@@ -1,0 +1,18 @@
+{
+    "CreateInputs": {
+        "CapacityLimits": {
+            "MaxIndexingCapacityInOCU": 5,
+            "MaxSearchCapacityInOCU": 3
+        }
+    },
+    "PatchInputs": [
+        {
+            "op": "replace",
+            "path": "CapacityLimits",
+            "value": {
+                "MaxIndexingCapacityInOCU": 3,
+                "MaxSearchCapacityInOCU": 5
+            }
+        }
+    ]
+}
