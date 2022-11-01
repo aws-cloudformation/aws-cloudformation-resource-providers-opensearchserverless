@@ -52,11 +52,12 @@
     "required": [
         "Policy"
     ],
-    "primaryIdentifier": [
-        "/properties/Name",
-        "/properties/Type"
-    ],
     "readOnlyProperties": [
+        "/properties/Name",
+        "/properties/Type",
+        "/properties/PolicyVersion"
+    ],
+    "primaryIdentifier": [
         "/properties/Name",
         "/properties/Type"
     ],

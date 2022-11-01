@@ -4,6 +4,7 @@ import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerless
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.CollectionDetail;
+import software.amazon.awssdk.services.opensearchserverless.model.CollectionStatus;
 import software.amazon.awssdk.services.opensearchserverless.model.DeleteCollectionRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.DeleteCollectionResponse;
 import software.amazon.cloudformation.exceptions.CfnNotStabilizedException;
@@ -70,20 +71,15 @@ public class DeleteHandler extends BaseHandlerStd {
 
         final BatchGetCollectionRequest request = BatchGetCollectionRequest.builder().ids(deleteCollectionRequest.id()).build();
         final BatchGetCollectionResponse batchGetCollectionResponse = proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::batchGetCollection);
-        //If the collection is not ACTIVE after it is Deleted, its a success scenario
-        if (batchGetCollectionResponse.collectionDetails().isEmpty())
+
+        if (batchGetCollectionResponse.collectionDetails().isEmpty()) {
             return true;
-        final CollectionDetail collectionDetail = batchGetCollectionResponse.collectionDetails().get(0); //The output will always have one collection with any status
-        switch (collectionDetail.status()) {
-            case FAILED:
-                //This is a failure case
-                throw new CfnNotStabilizedException(ResourceModel.TYPE_NAME, collectionDetail.id());
-            case ACTIVE:
-            case CREATING:
-            case DELETING:
-            default:
-                //If the status is any of the above, the stabilization check can be retried
+        } else if (batchGetCollectionResponse.collectionDetails().size() == 1) {
+            final CollectionDetail collectionDetail = batchGetCollectionResponse.collectionDetails().get(0);
+            if (collectionDetail.status().equals(CollectionStatus.DELETING)) {
                 return false;
+            }
         }
+        throw new CfnNotStabilizedException(ResourceModel.TYPE_NAME, deleteCollectionRequest.id());
     }
 }

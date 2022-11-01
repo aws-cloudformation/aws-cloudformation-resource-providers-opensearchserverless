@@ -82,7 +82,7 @@ public class ListHandlerTest extends AbstractTestBase {
     public void handleRequest_Filters_ActiveState() {
         final Collection<VpcEndpointSummary> vpcEndpointSummaries = ImmutableList.of(
                 VpcEndpointSummary.builder().id("id1").status(VpcEndpointStatus.ACTIVE).build(),
-                VpcEndpointSummary.builder().id("id2").status(VpcEndpointStatus.CREATING).build());
+                VpcEndpointSummary.builder().id("id2").status(VpcEndpointStatus.PENDING).build());
         final ListVpcEndpointsResponse listVpcEndpointsResponse =
                 ListVpcEndpointsResponse.builder().vpcEndpointSummaries(vpcEndpointSummaries).build();
         Mockito.when(openSearchServerlessClient.listVpcEndpoints(any(ListVpcEndpointsRequest.class)))

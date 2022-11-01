@@ -79,22 +79,16 @@ public class CreateHandler extends BaseHandlerStd {
         BatchGetVpcEndpointRequest request = Translator.translateToReadRequest(resourceModel);
         BatchGetVpcEndpointResponse response = proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::batchGetVpcEndpoint);
 
-        if (!response.hasVpcEndpointDetails() || response.vpcEndpointDetails().size() != 1) {
-            return false; //This will retry the stabilization as the vpcEndpoint does not exist yet
+        if (response.hasVpcEndpointDetails() && response.vpcEndpointDetails().size() == 1) {
+            VpcEndpointDetail vpcEndpointDetail = response.vpcEndpointDetails().get(0);
+            switch (vpcEndpointDetail.status()) {
+                case PENDING:
+                    return false;
+                case ACTIVE:
+                    return true;
+            }
         }
-        VpcEndpointDetail vpcEndpointDetail = response.vpcEndpointDetails().get(0);
-        switch (vpcEndpointDetail.status()) {
-            case ACTIVE:
-                return true;
-            case FAILED:
-            case DELETING:
-                //This is a failure case
-                throw new CfnNotStabilizedException(ResourceModel.TYPE_NAME, vpcEndpointDetail.id());
-            case CREATING:
-            default:
-                //The vpcEndpoint is not in ACTIVE state and stabilization can be retried.
-                return false;
-        }
+        throw new CfnNotStabilizedException(ResourceModel.TYPE_NAME, id);
     }
 
     private CreateVpcEndpointResponse createVpcEndpoint(
