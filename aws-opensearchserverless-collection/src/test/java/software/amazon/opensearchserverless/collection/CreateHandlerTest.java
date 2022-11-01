@@ -166,25 +166,19 @@ public class CreateHandlerTest extends AbstractTestBase {
                                                              .description(COLLECTION_DESCRIPTION)
                                                              .build();
 
-        final BatchGetCollectionResponse batchGetCollectionResponse = BatchGetCollectionResponse.builder().build();
-        final BatchGetCollectionResponse batchGetCollectionResponse3 =
-                BatchGetCollectionResponse.builder()
-                                          .collectionDetails(ImmutableList.of(collectionDetail1, collectionDetail2))
-                                          .build();
-        final BatchGetCollectionResponse batchGetCollectionResponse5 =
+        final BatchGetCollectionResponse batchGetCollectionResponse1 =
                 BatchGetCollectionResponse.builder()
                                           .collectionDetails(ImmutableList.of(collectionDetail1)).
                                           build();
-        final BatchGetCollectionResponse batchGetCollectionResponse9 =
+        final BatchGetCollectionResponse batchGetCollectionResponse2 =
                 BatchGetCollectionResponse.builder()
                                           .collectionDetails(ImmutableList.of(collectionDetail2))
                                           .build();
 
         when(proxyClient.client().batchGetCollection(any(BatchGetCollectionRequest.class)))
-                .thenReturn(batchGetCollectionResponse)
-                .thenReturn(batchGetCollectionResponse3)
-                .thenReturn(batchGetCollectionResponse5)
-                .thenReturn(batchGetCollectionResponse9);
+                .thenReturn(batchGetCollectionResponse1)
+                .thenReturn(batchGetCollectionResponse1)
+                .thenReturn(batchGetCollectionResponse2);
 
         final ProgressEvent<ResourceModel, CallbackContext> response = handler
                 .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);

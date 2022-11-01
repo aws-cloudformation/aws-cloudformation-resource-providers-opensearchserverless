@@ -14,7 +14,6 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Properties" : {
         "<a href="#description" title="Description">Description</a>" : <i>String</i>,
         "<a href="#policy" title="Policy">Policy</a>" : <i>String</i>,
-        "<a href="#policyversion" title="PolicyVersion">PolicyVersion</a>" : <i>String</i>,
     }
 }
 </pre>
@@ -26,7 +25,6 @@ Type: AWS::OpenSearchServerless::SecurityPolicy
 Properties:
     <a href="#description" title="Description">Description</a>: <i>String</i>
     <a href="#policy" title="Policy">Policy</a>: <i>String</i>
-    <a href="#policyversion" title="PolicyVersion">PolicyVersion</a>: <i>String</i>
 </pre>
 
 ## Properties
@@ -61,22 +59,6 @@ _Pattern_: <code>[\u0009\u000A\u000D\u0020-\u007E\u00A1-\u00FF]+</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### PolicyVersion
-
-The version of the policy
-
-_Required_: No
-
-_Type_: String
-
-_Minimum_: <code>20</code>
-
-_Maximum_: <code>36</code>
-
-_Pattern_: <code>^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$</code>
-
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
-
 ## Return Values
 
 ### Fn::GetAtt
@@ -92,4 +74,8 @@ The name of the policy
 #### Type
 
 The possible types for the network policy
+
+#### PolicyVersion
+
+The version of the policy
 

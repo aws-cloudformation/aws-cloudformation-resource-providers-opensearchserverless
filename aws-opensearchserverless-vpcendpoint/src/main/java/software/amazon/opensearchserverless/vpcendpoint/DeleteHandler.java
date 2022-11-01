@@ -2,14 +2,7 @@ package software.amazon.opensearchserverless.vpcendpoint;
 
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
-import software.amazon.awssdk.services.opensearchserverless.model.BatchGetVpcEndpointRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.BatchGetVpcEndpointResponse;
-import software.amazon.awssdk.services.opensearchserverless.model.DeleteVpcEndpointRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.DeleteVpcEndpointResponse;
-import software.amazon.awssdk.services.opensearchserverless.model.InternalServerException;
-import software.amazon.awssdk.services.opensearchserverless.model.ResourceNotFoundException;
-import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
-import software.amazon.awssdk.services.opensearchserverless.model.VpcEndpointDetail;
+import software.amazon.awssdk.services.opensearchserverless.model.*;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
@@ -75,20 +68,15 @@ public class DeleteHandler extends BaseHandlerStd {
 
         final BatchGetVpcEndpointRequest request = BatchGetVpcEndpointRequest.builder().ids(deleteVpcEndpointRequest.id()).build();
         final BatchGetVpcEndpointResponse batchGetVpcEndpointResponse = proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::batchGetVpcEndpoint);
-        if (batchGetVpcEndpointResponse.vpcEndpointDetails().isEmpty())
+        if (batchGetVpcEndpointResponse.vpcEndpointDetails().isEmpty()) {
             return true;
-        final VpcEndpointDetail vpcEndpointDetail = batchGetVpcEndpointResponse.vpcEndpointDetails().get(0); //The output will always have one vpcEndpointDetail with any status
-        switch (vpcEndpointDetail.status()) {
-            case FAILED:
-                //This is a failure case
-                throw new CfnNotStabilizedException(ResourceModel.TYPE_NAME, vpcEndpointDetail.id());
-            case ACTIVE:
-            case CREATING:
-            case DELETING:
-            default:
-                //If the status is any of the above, the stabilization check can be retried
+        } else if (batchGetVpcEndpointResponse.vpcEndpointDetails().size() == 1) {
+            final VpcEndpointDetail vpcEndpointDetail = batchGetVpcEndpointResponse.vpcEndpointDetails().get(0);
+            if (vpcEndpointDetail.status().equals(VpcEndpointStatus.DELETING)) {
                 return false;
+            }
         }
+        throw new CfnNotStabilizedException(ResourceModel.TYPE_NAME, deleteVpcEndpointRequest.id());
     }
 
     private DeleteVpcEndpointResponse deleteVpcEndpoint(

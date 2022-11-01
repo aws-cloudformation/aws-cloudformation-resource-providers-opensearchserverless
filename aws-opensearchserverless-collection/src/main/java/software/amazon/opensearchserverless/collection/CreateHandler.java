@@ -96,22 +96,16 @@ public class CreateHandler extends BaseHandlerStd {
         BatchGetCollectionRequest request = Translator.translateToReadRequest(resourceModel);
         BatchGetCollectionResponse response = proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::batchGetCollection);
 
-        if (!response.hasCollectionDetails() || response.collectionDetails().size() != 1) {
-            return false; //This actually retry the stabilization as the collection is not exist yet
+        if (response.hasCollectionDetails() && response.collectionDetails().size() == 1) {
+            CollectionDetail collectionDetail = response.collectionDetails().get(0);
+            switch (collectionDetail.status()) {
+                case ACTIVE:
+                    return true;
+                case CREATING:
+                    return false;
+            }
         }
-        CollectionDetail collectionDetail = response.collectionDetails().get(0);
-        switch (collectionDetail.status()) {
-            case ACTIVE:
-                return true;
-            case FAILED:
-            case DELETING:
-                //This is a failure case
-                throw new CfnNotStabilizedException(ResourceModel.TYPE_NAME, collectionDetail.id());
-            case CREATING:
-            default:
-                //The collection is not in ACTIVE state and stabilization can be retried.
-                return false;
-        }
+        throw new CfnNotStabilizedException(ResourceModel.TYPE_NAME, id);
     }
 
     /**

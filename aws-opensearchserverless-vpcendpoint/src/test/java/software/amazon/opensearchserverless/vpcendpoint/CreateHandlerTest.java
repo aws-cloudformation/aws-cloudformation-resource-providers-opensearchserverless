@@ -145,7 +145,7 @@ public class CreateHandlerTest extends AbstractTestBase {
                                                                     .subnetIds(MOCK_VPC_ENDPOINT_SUBNET_IDS)
                                                                     .securityGroupIds(MOCK_VPC_ENDPOINT_SECURITY_GROUP_IDS)
                                                                     .createdDate(MOCK_CREATED_DATE)
-                                                                    .status(VpcEndpointStatus.CREATING)
+                                                                    .status(VpcEndpointStatus.PENDING)
                                                                     .build())
                                            .build();
         final BatchGetVpcEndpointResponse batchGetVpcEndpointResponse2 =
