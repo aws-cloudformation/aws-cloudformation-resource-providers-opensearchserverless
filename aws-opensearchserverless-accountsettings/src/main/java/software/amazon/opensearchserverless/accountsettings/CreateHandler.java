@@ -32,7 +32,7 @@ public class CreateHandler extends BaseHandlerStd {
         if (capacityLimits.getMaxIndexingCapacityInOCU() == null
             && capacityLimits.getMaxSearchCapacityInOCU() == null) {
             return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest,
-                "Provide  at least one capacity limit.");
+                "Provide at least one capacity limit.");
         }
 
         return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
