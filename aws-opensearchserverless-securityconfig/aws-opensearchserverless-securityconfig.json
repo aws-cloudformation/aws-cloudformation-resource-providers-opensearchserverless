@@ -89,6 +89,10 @@
         "Name",
         "Type"
     ],
+    "readOnlyProperties": [
+        "/properties/ConfigVersion",
+        "/properties/Id"
+    ],
     "writeOnlyProperties": [
         "/properties/Type",
         "/properties/Name"
