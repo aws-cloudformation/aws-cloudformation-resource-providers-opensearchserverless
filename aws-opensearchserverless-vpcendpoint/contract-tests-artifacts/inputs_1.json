@@ -3,6 +3,13 @@
         "Name": "contract-test-vpc-name-1",
         "VpcId": "{{awsopensearchserverlessvpcendpointcto1}}",
         "SubnetIds": ["{{awsopensearchserverlessvpcendpointcto2}}"],
-        "SecurityGroupIds": ["{{awsopensearchserverlessvpcendpointcto3}}"]
-    }
+        "SecurityGroupIds": ["{{awsopensearchserverlessvpcendpointcto4}}"]
+    },
+    "PatchInputs": [
+        {
+            "op": "replace",
+            "path": "SubnetIds",
+            "value": ["{{awsopensearchserverlessvpcendpointcto3}}"]
+        }
+    ]
 }
