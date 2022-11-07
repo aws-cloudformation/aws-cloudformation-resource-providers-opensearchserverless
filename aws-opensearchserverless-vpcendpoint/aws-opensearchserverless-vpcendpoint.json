@@ -58,7 +58,6 @@
     },
     "required": [
         "Name",
-        "SubnetIds",
         "VpcId"
     ],
     "readOnlyProperties": [
@@ -66,9 +65,7 @@
     ],
     "createOnlyProperties": [
         "/properties/Name",
-        "/properties/VpcId",
-        "/properties/SubnetIds",
-        "/properties/SecurityGroupIds"
+        "/properties/VpcId"
     ],
     "primaryIdentifier": [
         "/properties/Id"
@@ -85,6 +82,11 @@
         "read": {
             "permissions": [
                 "aoss:BatchGetVpcEndpoint"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "aoss:UpdateVpcEndpoint"
             ]
         },
         "delete": {

@@ -5,12 +5,15 @@ import software.amazon.awssdk.services.opensearchserverless.model.BatchGetVpcEnd
 import software.amazon.awssdk.services.opensearchserverless.model.CreateVpcEndpointRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.DeleteVpcEndpointRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.ListVpcEndpointsResponse;
+import software.amazon.awssdk.services.opensearchserverless.model.UpdateVpcEndpointRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.VpcEndpointDetail;
 import software.amazon.awssdk.services.opensearchserverless.model.VpcEndpointStatus;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -86,4 +89,36 @@ public class Translator {
                    .map(Collection::stream)
                    .orElseGet(Stream::empty);
   }
+
+    public static UpdateVpcEndpointRequest translateToFirstUpdateRequest(ResourceModel resourceModel, VpcEndpointDetail currentVpcEndpointDetail) {
+      Set<String> currentSubnetIds = streamOfOrEmpty(currentVpcEndpointDetail.subnetIds()).collect(Collectors.toSet());
+      Set<String> currentSecurityGroupIds = streamOfOrEmpty(currentVpcEndpointDetail.securityGroupIds()).collect(Collectors.toSet());
+      Set<String> newSubnetIds = streamOfOrEmpty(resourceModel.getSubnetIds()).collect(Collectors.toSet());
+      Set<String> newSecurityGroupIds = streamOfOrEmpty(resourceModel.getSecurityGroupIds()).collect(Collectors.toSet());
+
+      Set<String> addSubnetIds = new HashSet<>(newSubnetIds);
+      Set<String> removeSubnetIds = new HashSet<>(currentSubnetIds);
+      Set<String> addSecurityGroupIds = new HashSet<>(newSecurityGroupIds);
+      Set<String> removeSecurityGroupIds = new HashSet<>(currentSecurityGroupIds);
+      addSubnetIds.removeAll(currentSubnetIds);
+      removeSubnetIds.removeAll(newSubnetIds);
+      addSecurityGroupIds.removeAll(currentSecurityGroupIds);
+      removeSecurityGroupIds.removeAll(newSecurityGroupIds);
+
+      UpdateVpcEndpointRequest.Builder updateVpcEndpointRequestBuilder = UpdateVpcEndpointRequest.builder()
+          .id(resourceModel.getId());
+      if (!addSubnetIds.isEmpty()) {
+        updateVpcEndpointRequestBuilder.addSubnetIds(addSubnetIds);
+      }
+      if (!removeSubnetIds.isEmpty()) {
+        updateVpcEndpointRequestBuilder.removeSubnetIds(removeSubnetIds);
+      }
+      if (!addSecurityGroupIds.isEmpty()) {
+        updateVpcEndpointRequestBuilder.addSecurityGroupIds(addSecurityGroupIds);
+      }
+      if (!removeSecurityGroupIds.isEmpty()) {
+        updateVpcEndpointRequestBuilder.removeSecurityGroupIds(removeSecurityGroupIds);
+      }
+      return updateVpcEndpointRequestBuilder.build();
+    }
 }

@@ -34,6 +34,7 @@ Resources:
                 - "aoss:CreateVpcEndpoint"
                 - "aoss:DeleteVpcEndpoint"
                 - "aoss:ListVpcEndpoints"
+                - "aoss:UpdateVpcEndpoint"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

@@ -65,7 +65,7 @@ public class CreateHandler extends BaseHandlerStd {
      * @param createVpcEndpointResponse the aws service response to create VpcEndpoint resource
      * @param proxyClient               the aws service client to make the call
      * @param resourceModel             the resource model
-     * @return true only if collection status is ACTIVE
+     * @return true only if VpcEndpoint status is ACTIVE
      */
     private boolean stabilizeVpcEndpointCreate(
         final CreateVpcEndpointResponse createVpcEndpointResponse,
