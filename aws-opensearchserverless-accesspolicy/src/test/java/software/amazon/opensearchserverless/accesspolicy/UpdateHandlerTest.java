@@ -1,10 +1,7 @@
 package software.amazon.opensearchserverless.accesspolicy;
 
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
-import software.amazon.awssdk.services.opensearchserverless.model.AccessPolicyDetail;
-import software.amazon.awssdk.services.opensearchserverless.model.AccessPolicyType;
-import software.amazon.awssdk.services.opensearchserverless.model.UpdateAccessPolicyRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.UpdateAccessPolicyResponse;
+import software.amazon.awssdk.services.opensearchserverless.model.*;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
@@ -17,11 +14,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateHandlerTest extends AbstractTestBase {
@@ -30,7 +30,8 @@ public class UpdateHandlerTest extends AbstractTestBase {
     private static final String MOCK_ACCESS_POLICY_NAME = "access-policy-name";
     private static final String MOCK_ACCESS_POLICY_DESCRIPTION = "Access policy description";
     private static final String MOCK_ACCESS_POLICY_DOCUMENT = "Access Policy Document";
-    private static final String MOCK_ACCESS_POLICY_VERSION = "accesspolicyversion";
+
+    private static final String MOCK_ACCESS_POLICY_VERSION = "Mock Access Policy Version";
     private OpenSearchServerlessClient openSearchServerlessClient;
     private AmazonWebServicesClientProxy proxy;
     private ProxyClient<OpenSearchServerlessClient> proxyClient;
@@ -57,7 +58,6 @@ public class UpdateHandlerTest extends AbstractTestBase {
                                                          .type(MOCK_ACCESS_POLICY_TYPE)
                                                          .description(MOCK_ACCESS_POLICY_DESCRIPTION)
                                                          .policy(MOCK_ACCESS_POLICY_DOCUMENT)
-                                                         .policyVersion(MOCK_ACCESS_POLICY_VERSION)
                                                          .build();
 
         final UpdateAccessPolicyResponse updateAccessPolicyResponse =
@@ -68,16 +68,28 @@ public class UpdateHandlerTest extends AbstractTestBase {
                                                                     .type(MOCK_ACCESS_POLICY_TYPE)
                                                                     .description(MOCK_ACCESS_POLICY_DESCRIPTION)
                                                                     .policy(MOCK_ACCESS_POLICY_DOCUMENT)
-                                                                    .policyVersion(MOCK_ACCESS_POLICY_VERSION)
                                                                     .build()
                                                              )
                                           .build();
+
+        final GetAccessPolicyResponse getAccessPolicyResponse =
+            GetAccessPolicyResponse.builder()
+                .accessPolicyDetail(
+                    AccessPolicyDetail.builder()
+                        .name(MOCK_ACCESS_POLICY_NAME)
+                        .type(MOCK_ACCESS_POLICY_TYPE)
+                        .description(MOCK_ACCESS_POLICY_DESCRIPTION)
+                        .policy(MOCK_ACCESS_POLICY_DOCUMENT)
+                        .policyVersion(MOCK_ACCESS_POLICY_VERSION)
+                        .build()
+                ).build();
+        when(openSearchServerlessClient.getAccessPolicy(any(GetAccessPolicyRequest.class))).thenReturn(getAccessPolicyResponse);
+
         when(openSearchServerlessClient.updateAccessPolicy(any(UpdateAccessPolicyRequest.class))).thenReturn(updateAccessPolicyResponse);
 
         final ResourceModel model = ResourceModel.builder()
                                                  .name(MOCK_ACCESS_POLICY_NAME)
                                                  .type(MOCK_ACCESS_POLICY_TYPE)
-                                                 .policyVersion(MOCK_ACCESS_POLICY_VERSION)
                                                  .description(MOCK_ACCESS_POLICY_DESCRIPTION)
                                                  .policy(MOCK_ACCESS_POLICY_DOCUMENT)
                                                  .build();

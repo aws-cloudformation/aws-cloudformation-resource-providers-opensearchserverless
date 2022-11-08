@@ -27,11 +27,11 @@ public class Translator {
      */
     static CreateAccessPolicyRequest translateToCreateRequest(final ResourceModel model) {
         return CreateAccessPolicyRequest.builder()
-                                        .name(model.getName())
-                                        .type(model.getType())
-                                        .description(model.getDescription())
-                                        .policy(model.getPolicy())
-                                        .build();
+            .name(model.getName())
+            .type(model.getType())
+            .description(model.getDescription())
+            .policy(model.getPolicy())
+            .build();
     }
 
     /**
@@ -52,9 +52,9 @@ public class Translator {
      */
     static GetAccessPolicyRequest translateToReadRequest(final ResourceModel model) {
         return GetAccessPolicyRequest.builder()
-                                     .name(model.getName())
-                                     .type(model.getType())
-                                     .build();
+            .name(model.getName())
+            .type(model.getType())
+            .build();
     }
 
     /**
@@ -75,22 +75,24 @@ public class Translator {
      */
     static DeleteAccessPolicyRequest translateToDeleteRequest(final ResourceModel model) {
         return DeleteAccessPolicyRequest.builder()
-                                        .type(model.getType())
-                                        .name(model.getName())
-                                        .build();
+            .type(model.getType())
+            .name(model.getName())
+            .build();
     }
 
     /**
      * Request to update properties of a previously created access policy
      *
-     * @param model resource model
+     * @param model                     resource model
+     * @param currentAccessPolicyDetail previously access policy
      * @return awsRequest the aws service request to modify access policy
      */
-    public static UpdateAccessPolicyRequest translateToUpdateRequest(ResourceModel model) {
+    public static UpdateAccessPolicyRequest translateToUpdateRequest(ResourceModel model,
+            AccessPolicyDetail currentAccessPolicyDetail) {
         UpdateAccessPolicyRequest.Builder builder = UpdateAccessPolicyRequest.builder()
-                                                                             .type(model.getType())
-                                                                             .name(model.getName())
-                                                                             .policyVersion(model.getPolicyVersion());
+            .type(model.getType())
+            .name(model.getName())
+            .policyVersion(currentAccessPolicyDetail.policyVersion());
         if (model.getDescription() != null) {
             builder.description(model.getDescription());
         }
@@ -146,7 +148,6 @@ public class Translator {
         return ResourceModel.builder()
                 .type(accessPolicyDetail.typeAsString())
                 .name(accessPolicyDetail.name())
-                .policyVersion(accessPolicyDetail.policyVersion())
                 .description(accessPolicyDetail.description())
                 .policy(accessPolicyDetail.policy())
                 .build();

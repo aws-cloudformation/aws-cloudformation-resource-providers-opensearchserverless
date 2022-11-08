@@ -20,7 +20,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ReadHandlerTest extends AbstractTestBase {
@@ -29,7 +33,6 @@ public class ReadHandlerTest extends AbstractTestBase {
     private static final String MOCK_ACCESS_POLICY_NAME = "access-policy-name";
     private static final String MOCK_ACCESS_POLICY_DESCRIPTION = "Access policy description";
     private static final String MOCK_ACCESS_POLICY_DOCUMENT = "Access Policy Document";
-    private static final String MOCK_ACCESS_POLICY_VERSION = "accesspolicyversion";
     private OpenSearchServerlessClient openSearchServerlessClient;
     private AmazonWebServicesClientProxy proxy;
     private ProxyClient<OpenSearchServerlessClient> proxyClient;
@@ -56,7 +59,6 @@ public class ReadHandlerTest extends AbstractTestBase {
                                                          .type(MOCK_ACCESS_POLICY_TYPE)
                                                          .description(MOCK_ACCESS_POLICY_DESCRIPTION)
                                                          .policy(MOCK_ACCESS_POLICY_DOCUMENT)
-                                                         .policyVersion(MOCK_ACCESS_POLICY_VERSION)
                                                          .build();
 
         final ResourceModel model = ResourceModel.builder()
@@ -73,7 +75,6 @@ public class ReadHandlerTest extends AbstractTestBase {
                                                                  .type(MOCK_ACCESS_POLICY_TYPE)
                                                                  .description(MOCK_ACCESS_POLICY_DESCRIPTION)
                                                                  .policy(MOCK_ACCESS_POLICY_DOCUMENT)
-                                                                 .policyVersion(MOCK_ACCESS_POLICY_VERSION)
                                                                  .build()
                                                           ).build();
         when(openSearchServerlessClient.getAccessPolicy(any(GetAccessPolicyRequest.class))).thenReturn(getAccessPolicyResponse);

@@ -50,7 +50,7 @@ public class ReadHandler extends BaseHandlerStd {
 
         GetAccessPolicyResponse getAccessPolicyResponse;
         try {
-            logger.log(String.format("Sending delete access policy request: %s", getAccessPolicyRequest));
+            logger.log(String.format("Sending get access policy request: %s", getAccessPolicyRequest));
             getAccessPolicyResponse = proxyClient.injectCredentialsAndInvokeV2(getAccessPolicyRequest, proxyClient.client()::getAccessPolicy);
         } catch (ResourceNotFoundException e) {
             throw new CfnNotFoundException(ResourceModel.TYPE_NAME,String.format("Name:%s, Type:%s", getAccessPolicyRequest.name(), getAccessPolicyRequest.typeAsString()),e);

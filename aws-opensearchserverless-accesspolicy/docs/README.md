@@ -101,5 +101,5 @@ For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::G
 
 #### PolicyVersion
 
-The version of the policy
+Returns the <code>PolicyVersion</code> value.
 
