@@ -27,13 +27,6 @@
         "Type": {
             "$ref": "#/definitions/AccessPolicyType"
         },
-        "PolicyVersion": {
-            "type": "string",
-            "maxLength": 36,
-            "minLength": 20,
-            "pattern": "^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$",
-            "description": "The version of the policy"
-        },
         "Description": {
             "type": "string",
             "maxLength": 1000,
@@ -48,9 +41,6 @@
             "description": "The JSON policy document that is the content for the policy"
         }
     },
-    "readOnlyProperties": [
-        "/properties/PolicyVersion"
-    ],
     "createOnlyProperties": [
         "/properties/Name",
         "/properties/Type"
