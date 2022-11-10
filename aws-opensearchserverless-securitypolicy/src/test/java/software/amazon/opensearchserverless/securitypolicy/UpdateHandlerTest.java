@@ -32,6 +32,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     private static final String MOCK_POLICY_DESCRIPTION = "Policy description";
     private static final String MOCK_POLICY_DOCUMENT = "Policy Document";
     private static final String MOCK_POLICY_VERSION = "policyversion";
+    private static final String MOCK_POLICY_VERSION_UPDATED = "policyversion Updated";
     @Mock
     OpenSearchServerlessClient openSearchServerlessClient;
     private AmazonWebServicesClientProxy proxy;
@@ -53,44 +54,44 @@ public class UpdateHandlerTest extends AbstractTestBase {
     public void handleRequest_SimpleSuccess() {
         final UpdateHandler handler = new UpdateHandler();
 
-        final UpdateSecurityPolicyResponse updateSecurityPolicyResponse =
-                UpdateSecurityPolicyResponse.builder()
-                                            .securityPolicyDetail(
-                                                    SecurityPolicyDetail.builder()
-                                                                        .name(MOCK_POLICY_NAME)
-                                                                        .type(MOCK_POLICY_TYPE)
-                                                                        .policyVersion(MOCK_POLICY_VERSION)
-                                                                        .description(MOCK_POLICY_DESCRIPTION)
-                                                                        .policy(MOCK_POLICY_DOCUMENT)
-                                                                        .build()
-                                                                 ).build();
-        Mockito.when(proxyClient.client().updateSecurityPolicy(any(UpdateSecurityPolicyRequest.class))).thenReturn(updateSecurityPolicyResponse);
+        final UpdateSecurityPolicyResponse updateSecurityPolicyResponse = UpdateSecurityPolicyResponse.builder()
+            .securityPolicyDetail(
+                SecurityPolicyDetail.builder()
+                    .name(MOCK_POLICY_NAME)
+                    .type(MOCK_POLICY_TYPE)
+                    .policyVersion(MOCK_POLICY_VERSION_UPDATED)
+                    .description(MOCK_POLICY_DESCRIPTION)
+                    .policy(MOCK_POLICY_DOCUMENT)
+                    .build()
+            ).build();
 
-        final GetSecurityPolicyResponse getSecurityPolicyResponse =
-                GetSecurityPolicyResponse.builder()
-                                         .securityPolicyDetail(
-                                                 SecurityPolicyDetail.builder()
-                                                                     .name(MOCK_POLICY_NAME)
-                                                                     .type(MOCK_POLICY_TYPE)
-                                                                     .policyVersion(MOCK_POLICY_VERSION)
-                                                                     .description(MOCK_POLICY_DESCRIPTION)
-                                                                     .policy(MOCK_POLICY_DOCUMENT)
-                                                                     .build()
-                                                                 ).build();
+        Mockito.when(proxyClient.client().updateSecurityPolicy(any(UpdateSecurityPolicyRequest.class)))
+            .thenReturn(updateSecurityPolicyResponse);
+
+        final GetSecurityPolicyResponse getSecurityPolicyResponse = GetSecurityPolicyResponse.builder()
+            .securityPolicyDetail(
+                SecurityPolicyDetail.builder()
+                    .name(MOCK_POLICY_NAME)
+                    .type(MOCK_POLICY_TYPE)
+                    .policyVersion(MOCK_POLICY_VERSION)
+                    .description(MOCK_POLICY_DESCRIPTION)
+                    .policy(MOCK_POLICY_DOCUMENT)
+                    .build()
+            ).build();
+
         Mockito.when(proxyClient.client().getSecurityPolicy(any(GetSecurityPolicyRequest.class)))
-               .thenReturn(getSecurityPolicyResponse);
+            .thenReturn(getSecurityPolicyResponse);
 
         final ResourceModel model = ResourceModel.builder()
-                                                 .name(MOCK_POLICY_NAME)
-                                                 .type(MOCK_POLICY_TYPE)
-                                                 .policyVersion(MOCK_POLICY_VERSION)
-                                                 .description(MOCK_POLICY_DESCRIPTION)
-                                                 .policy(MOCK_POLICY_DOCUMENT)
-                                                 .build();
+            .name(MOCK_POLICY_NAME)
+            .type(MOCK_POLICY_TYPE)
+            .description(MOCK_POLICY_DESCRIPTION)
+            .policy(MOCK_POLICY_DOCUMENT)
+            .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                                                                                    .desiredResourceState(model)
-                                                                                    .build();
+            .desiredResourceState(model)
+            .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
                 handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);

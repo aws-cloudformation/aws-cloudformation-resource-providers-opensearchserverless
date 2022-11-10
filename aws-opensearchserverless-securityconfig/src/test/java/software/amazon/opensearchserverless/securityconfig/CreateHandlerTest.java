@@ -75,7 +75,6 @@ public class CreateHandlerTest extends AbstractTestBase {
     public void handleRequest_SimpleSuccess() {
         final ResourceModel expectedModel = ResourceModel.builder()
                                                          .id(MOCK_SECURITY_CONFIG_ID)
-                                                         .configVersion(MOCK_SECURITY_CONFIG_VERSION)
                                                          .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
                                                          .samlOptions(MOCK_SAML_OPTIONS)
                                                          .build();

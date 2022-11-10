@@ -42,12 +42,12 @@
         }
     },
     "createOnlyProperties": [
-        "/properties/Name",
-        "/properties/Type"
+        "/properties/Type",
+        "/properties/Name"
     ],
     "primaryIdentifier": [
-        "/properties/Name",
-        "/properties/Type"
+        "/properties/Type",
+        "/properties/Name"
     ],
     "handlers": {
         "create": {

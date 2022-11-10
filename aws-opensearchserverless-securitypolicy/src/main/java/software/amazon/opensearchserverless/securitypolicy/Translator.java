@@ -1,13 +1,6 @@
 package software.amazon.opensearchserverless.securitypolicy;
 
-import software.amazon.awssdk.services.opensearchserverless.model.CreateSecurityPolicyRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.DeleteSecurityPolicyRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityPolicyRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityPolicyResponse;
-import software.amazon.awssdk.services.opensearchserverless.model.ListSecurityPoliciesRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.ListSecurityPoliciesResponse;
-import software.amazon.awssdk.services.opensearchserverless.model.SecurityPolicyDetail;
-import software.amazon.awssdk.services.opensearchserverless.model.UpdateSecurityPolicyRequest;
+import software.amazon.awssdk.services.opensearchserverless.model.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -25,11 +18,11 @@ public class Translator {
      */
     static CreateSecurityPolicyRequest translateToCreateRequest(final ResourceModel model) {
         return CreateSecurityPolicyRequest.builder()
-                                          .name(model.getName())
-                                          .type(model.getType())
-                                          .description(model.getDescription())
-                                          .policy(model.getPolicy())
-                                          .build();
+            .name(model.getName())
+            .type(model.getType())
+            .description(model.getDescription())
+            .policy(model.getPolicy())
+            .build();
     }
 
     /**
@@ -40,9 +33,9 @@ public class Translator {
      */
     static GetSecurityPolicyRequest translateToReadRequest(final ResourceModel model) {
         return GetSecurityPolicyRequest.builder()
-                                       .name(model.getName())
-                                       .type(model.getType())
-                                       .build();
+            .name(model.getName())
+            .type(model.getType())
+            .build();
     }
 
     /**
@@ -54,12 +47,11 @@ public class Translator {
     static ResourceModel translateFromReadResponse(final GetSecurityPolicyResponse getSecurityPolicyResponse) {
         SecurityPolicyDetail securityPolicyDetail = getSecurityPolicyResponse.securityPolicyDetail();
         return ResourceModel.builder()
-                            .name(securityPolicyDetail.name())
-                            .type(securityPolicyDetail.typeAsString())
-                            .policyVersion(securityPolicyDetail.policyVersion())
-                            .description(securityPolicyDetail.description())
-                            .policy(securityPolicyDetail.policy())
-                            .build();
+            .name(securityPolicyDetail.name())
+            .type(securityPolicyDetail.typeAsString())
+            .description(securityPolicyDetail.description())
+            .policy(securityPolicyDetail.policy())
+            .build();
     }
 
     /**
@@ -70,9 +62,9 @@ public class Translator {
      */
     static DeleteSecurityPolicyRequest translateToDeleteRequest(final ResourceModel model) {
         return DeleteSecurityPolicyRequest.builder()
-                                          .name(model.getName())
-                                          .type(model.getType())
-                                          .build();
+            .name(model.getName())
+            .type(model.getType())
+            .build();
     }
 
     /**
@@ -81,14 +73,15 @@ public class Translator {
      * @param model resource model
      * @return UpdateSecurityPolicyRequest the aws service request to modify a security policy
      */
-    static UpdateSecurityPolicyRequest translateToFirstUpdateRequest(final ResourceModel model) {
+    static UpdateSecurityPolicyRequest translateToUpdateRequest(final ResourceModel model,
+        SecurityPolicyDetail currentSecurityPolicyDetail) {
         return UpdateSecurityPolicyRequest.builder()
-                                          .name(model.getName())
-                                          .type(model.getType())
-                                          .policyVersion(model.getPolicyVersion())
-                                          .description(model.getDescription())
-                                          .policy(model.getPolicy())
-                                          .build();
+            .name(currentSecurityPolicyDetail.name())
+            .type(currentSecurityPolicyDetail.type())
+            .policyVersion(currentSecurityPolicyDetail.policyVersion())
+            .description(model.getDescription())
+            .policy(model.getPolicy())
+            .build();
     }
 
     /**
@@ -101,9 +94,9 @@ public class Translator {
      */
     static ListSecurityPoliciesRequest translateToListRequest(ResourceModel model, final String nextToken) {
         return ListSecurityPoliciesRequest.builder()
-                                          .type(model.getType())
-                                          .nextToken(nextToken)
-                                          .build();
+            .type(model.getType())
+            .nextToken(nextToken)
+            .build();
     }
 
     /**
@@ -113,19 +106,36 @@ public class Translator {
      * @param listSecurityPoliciesResponse the aws service describe security policy response
      * @return list of resource models
      */
-    static List<ResourceModel> translateFromListRequest(final ListSecurityPoliciesResponse listSecurityPoliciesResponse) {
+    static List<ResourceModel> translateFromListRequest(
+        final ListSecurityPoliciesResponse listSecurityPoliciesResponse) {
         return streamOfOrEmpty(listSecurityPoliciesResponse.securityPolicyDetails())
-                .map(resource -> ResourceModel.builder()
-                                              .name(resource.name())
-                                              .type(resource.typeAsString())
-                                              .build())
-                .collect(Collectors.toList());
+            .map(resource -> ResourceModel.builder()
+                .name(resource.name())
+                .type(resource.typeAsString())
+                .build())
+            .collect(Collectors.toList());
     }
 
     private static <T> Stream<T> streamOfOrEmpty(final Collection<T> collection) {
         return Optional.ofNullable(collection)
-                       .map(Collection::stream)
-                       .orElseGet(Stream::empty);
+            .map(Collection::stream)
+            .orElseGet(Stream::empty);
     }
 
+    /**
+     * Translates resource object from sdk into a resource model
+     *
+     * @param updateSecurityPolicyResponse the aws service describe resource response
+     * @return model resource model
+     */
+    public static ResourceModel translateFromUpdateResponse(
+        UpdateSecurityPolicyResponse updateSecurityPolicyResponse) {
+        SecurityPolicyDetail securityPolicyDetail = updateSecurityPolicyResponse.securityPolicyDetail();
+        return ResourceModel.builder()
+            .name(securityPolicyDetail.name())
+            .type(securityPolicyDetail.typeAsString())
+            .description(securityPolicyDetail.description())
+            .policy(securityPolicyDetail.policy())
+            .build();
+    }
 }

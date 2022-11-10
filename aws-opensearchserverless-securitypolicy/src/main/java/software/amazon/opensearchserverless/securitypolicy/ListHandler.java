@@ -13,25 +13,26 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import java.util.List;
 
 public class ListHandler extends BaseHandlerStd {
-
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-            final AmazonWebServicesClientProxy proxy,
-            final ResourceHandlerRequest<ResourceModel> request,
-            final CallbackContext callbackContext,
-            final ProxyClient<OpenSearchServerlessClient> proxyClient,
-            final Logger logger) {
+        final AmazonWebServicesClientProxy proxy,
+        final ResourceHandlerRequest<ResourceModel> request,
+        final CallbackContext callbackContext,
+        final ProxyClient<OpenSearchServerlessClient> proxyClient,
+        final Logger logger) {
 
         ResourceModel model = request.getDesiredResourceState();
-        final ListSecurityPoliciesRequest listSecurityPoliciesRequest = Translator.translateToListRequest(model, request.getNextToken());
-        final ListSecurityPoliciesResponse listSecurityPoliciesResponse = proxy.injectCredentialsAndInvokeV2(listSecurityPoliciesRequest, proxyClient.client()::listSecurityPolicies);
+        final ListSecurityPoliciesRequest listSecurityPoliciesRequest =
+            Translator.translateToListRequest(model, request.getNextToken());
+        final ListSecurityPoliciesResponse listSecurityPoliciesResponse = proxy.injectCredentialsAndInvokeV2(
+            listSecurityPoliciesRequest, proxyClient.client()::listSecurityPolicies);
         String nextToken = listSecurityPoliciesResponse.nextToken();
         final List<ResourceModel> models = Translator.translateFromListRequest(listSecurityPoliciesResponse);
 
         return ProgressEvent.<ResourceModel, CallbackContext>builder()
-                .resourceModels(models)
-                .nextToken(nextToken)
-                .status(OperationStatus.SUCCESS)
-                .build();
+            .resourceModels(models)
+            .nextToken(nextToken)
+            .status(OperationStatus.SUCCESS)
+            .build();
     }
 }

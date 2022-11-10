@@ -1,15 +1,6 @@
 package software.amazon.opensearchserverless.securityconfig;
 
-import software.amazon.awssdk.services.opensearchserverless.model.CreateSecurityConfigRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.CreateSecurityConfigResponse;
-import software.amazon.awssdk.services.opensearchserverless.model.DeleteSecurityConfigRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityConfigRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityConfigResponse;
-import software.amazon.awssdk.services.opensearchserverless.model.ListSecurityConfigsRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.ListSecurityConfigsResponse;
-import software.amazon.awssdk.services.opensearchserverless.model.SecurityConfigDetail;
-import software.amazon.awssdk.services.opensearchserverless.model.UpdateSecurityConfigRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.UpdateSecurityConfigResponse;
+import software.amazon.awssdk.services.opensearchserverless.model.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -80,9 +71,12 @@ public class Translator {
      * @param model resource model
      * @return awsRequest the aws service request to modify security config
      */
-    public static UpdateSecurityConfigRequest translateToUpdateRequest(ResourceModel model) {
+    public static UpdateSecurityConfigRequest translateToUpdateRequest(ResourceModel model,
+        SecurityConfigDetail currentSecurityConfigDetail) {
         UpdateSecurityConfigRequest.Builder builder =
-                UpdateSecurityConfigRequest.builder().id(model.getId()).configVersion(model.getConfigVersion());
+            UpdateSecurityConfigRequest.builder()
+                .id(model.getId())
+                .configVersion(currentSecurityConfigDetail.configVersion());
 
         if (model.getDescription() != null) {
             builder.description(model.getDescription());
@@ -169,7 +163,6 @@ public class Translator {
     private static ResourceModel translateSecurityConfigDetailFromSDK(SecurityConfigDetail securityConfigDetail) {
         return ResourceModel.builder()
                             .id(securityConfigDetail.id())
-                            .configVersion(securityConfigDetail.configVersion())
                             .description(securityConfigDetail.description())
                             .samlOptions(translateSamlConfigOptionsFromSDK(securityConfigDetail.samlOptions()))
                             .build();
