@@ -52,13 +52,6 @@
         }
     },
     "properties": {
-        "ConfigVersion": {
-            "type": "string",
-            "maxLength": 36,
-            "minLength": 20,
-            "pattern": "^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$",
-            "description": "The version of the policy"
-        },
         "Description": {
             "type": "string",
             "maxLength": 1000,
@@ -85,12 +78,7 @@
             "$ref": "#/definitions/SecurityConfigType"
         }
     },
-    "required": [
-        "Name",
-        "Type"
-    ],
     "readOnlyProperties": [
-        "/properties/ConfigVersion",
         "/properties/Id"
     ],
     "writeOnlyProperties": [
@@ -98,8 +86,8 @@
         "/properties/Name"
     ],
     "createOnlyProperties": [
-        "/properties/Name",
-        "/properties/Type"
+        "/properties/Type",
+        "/properties/Name"
     ],
     "primaryIdentifier": [
         "/properties/Id"

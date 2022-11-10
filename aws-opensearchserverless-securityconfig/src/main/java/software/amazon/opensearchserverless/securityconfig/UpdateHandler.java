@@ -2,17 +2,9 @@ package software.amazon.opensearchserverless.securityconfig;
 
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
-import software.amazon.awssdk.services.opensearchserverless.model.ConflictException;
-import software.amazon.awssdk.services.opensearchserverless.model.InternalServerException;
+import software.amazon.awssdk.services.opensearchserverless.model.*;
 import software.amazon.awssdk.services.opensearchserverless.model.ResourceNotFoundException;
-import software.amazon.awssdk.services.opensearchserverless.model.UpdateSecurityConfigRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.UpdateSecurityConfigResponse;
-import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
-import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
-import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
-import software.amazon.cloudformation.exceptions.CfnNotFoundException;
-import software.amazon.cloudformation.exceptions.CfnResourceConflictException;
-import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
+import software.amazon.cloudformation.exceptions.*;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
@@ -37,19 +29,53 @@ public class UpdateHandler extends BaseHandlerStd {
             return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "Id cannot be empty");
         }
 
-        if(StringUtils.isNullOrEmpty(model.getConfigVersion())) {
-            return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "ConfigVersion cannot be empty");
-        }
-
         if(StringUtils.isNullOrEmpty(model.getDescription()) && model.getSamlOptions() == null) {
             return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "One of description or saml-options is required");
         }
 
         return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
-                .then(progress -> proxy.initiate("AWS-OpenSearchServerless-SecurityConfig::Update", proxyClient, request.getDesiredResourceState(), callbackContext)
-                    .translateToServiceRequest(Translator::translateToUpdateRequest)
+            // STEP 1 [check if resource already exists]
+            // for more information ->
+            // https://docs.aws.amazon.com/cloudformation-cli/latest/userguide/resource-type-test-contract.html
+            // if target API does not support 'ResourceNotFoundException' then following check is required
+            .then(progress ->
+                // STEP 1.0 [initialize a proxy context]
+                // If your service API does not return ResourceNotFoundException
+                // on update requests against some identifier (e.g; resource Name)
+                // and instead returns a 200 even though a resource does not exist,
+                // you must first check if the resource exists here
+                // NOTE: If your service API throws 'ResourceNotFoundException'
+                // for update requests this method is not necessary
+                proxy.initiate("AWS-OpenSearchServerless-SecurityConfig::Update::PreUpdateCheck", proxyClient,
+                        progress.getResourceModel(), progress.getCallbackContext())
+
+                    // STEP 1.1 [initialize a proxy context]
+                    .translateToServiceRequest(Translator::translateToReadRequest)
+
+                    // STEP 1.2 [make an api call]
+                    .makeServiceCall((awsRequest, client) -> {
+                        // add custom read resource logic
+                        // If describe request does not return ResourceNotFoundException,
+                        // you must throw ResourceNotFoundException based on
+                        // awsResponse values
+                        GetSecurityConfigResponse awsResponse = getSecurityConfig(awsRequest, client, logger);
+                        callbackContext.setCurrentSecurityConfigDetail(awsResponse.securityConfigDetail());
+                        return awsResponse;
+                    })
+                    .progress()
+            )
+            .then(progress ->
+                // STEP 2.0 [initialize a proxy context]
+                // Implement client invocation of the update request through the proxyClient,
+                // which is already initialised with
+                // caller credentials, correct region and retry settings
+                proxy.initiate("AWS-OpenSearchServerless-SecurityConfig::Update",
+                        proxyClient, request.getDesiredResourceState(), callbackContext)
+                    .translateToServiceRequest(resourceModel -> Translator.translateToUpdateRequest(resourceModel,
+                        callbackContext.getCurrentSecurityConfigDetail()))
                     .makeServiceCall((awsRequest, client) -> updateSecurityConfig(awsRequest, client, logger))
-                    .done(awsResponse -> ProgressEvent.defaultSuccessHandler(Translator.translateFromUpdateResponse(awsResponse))));
+                    .done(awsResponse -> ProgressEvent.defaultSuccessHandler(
+                        Translator.translateFromUpdateResponse(awsResponse))));
     }
 
     private UpdateSecurityConfigResponse updateSecurityConfig(
@@ -73,5 +99,26 @@ public class UpdateHandler extends BaseHandlerStd {
         }
         logger.log(String.format("%s successfully updated for %s", ResourceModel.TYPE_NAME, updateSecurityConfigRequest));
         return updateSecurityConfigResponse;
+    }
+
+    private GetSecurityConfigResponse getSecurityConfig(
+        final GetSecurityConfigRequest getSecurityConfigRequest,
+        final ProxyClient<OpenSearchServerlessClient> proxyClient,
+        final Logger logger) {
+
+        GetSecurityConfigResponse getSecurityConfigResponse;
+        try {
+            getSecurityConfigResponse = proxyClient.injectCredentialsAndInvokeV2(getSecurityConfigRequest, proxyClient.client()::getSecurityConfig);
+        } catch (ResourceNotFoundException e) {
+            throw new CfnNotFoundException(e);
+        } catch (ValidationException e) {
+            throw new CfnInvalidRequestException(getSecurityConfigRequest.toString(), e);
+        } catch (InternalServerException e) {
+            throw new CfnInternalFailureException(e);
+        } catch (final AwsServiceException e) {
+            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
+        }
+        logger.log(String.format("%s has successfully been read.", ResourceModel.TYPE_NAME));
+        return getSecurityConfigResponse;
     }
 }

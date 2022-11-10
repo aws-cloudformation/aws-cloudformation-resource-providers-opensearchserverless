@@ -68,26 +68,29 @@ public class ReadHandlerTest extends AbstractTestBase {
     @Test
     public void handleRequest_SimpleSuccess() {
         final ResourceModel expectedModel = ResourceModel.builder()
-                                                         .id(MOCK_SECURITY_CONFIG_ID)
-                                                         .configVersion(MOCK_SECURITY_CONFIG_VERSION)
-                                                         .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
-                                                         .samlOptions(MOCK_SAML_OPTIONS)
-                                                         .build();
+            .id(MOCK_SECURITY_CONFIG_ID)
+            .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
+            .samlOptions(MOCK_SAML_OPTIONS)
+            .build();
 
         final ResourceModel model = ResourceModel.builder().id(MOCK_SECURITY_CONFIG_ID).build();
-        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(model).build();
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+            .desiredResourceState(model)
+            .build();
         final GetSecurityConfigResponse getSecurityConfigResponse =
-                GetSecurityConfigResponse.builder().securityConfigDetail(
-                                                 SecurityConfigDetail.builder()
-                                                                     .id(MOCK_SECURITY_CONFIG_ID)
-                                                                     .configVersion(MOCK_SECURITY_CONFIG_VERSION)
-                                                                     .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
-                                                                     .samlOptions(MOCK_SDK_SAML_OPTIONS)
-                                                                     .build())
-                                         .build();
-        when(openSearchServerlessClient.getSecurityConfig(any(GetSecurityConfigRequest.class))).thenReturn(getSecurityConfigResponse);
+            GetSecurityConfigResponse.builder().securityConfigDetail(
+                SecurityConfigDetail.builder()
+                    .id(MOCK_SECURITY_CONFIG_ID)
+                    .configVersion(MOCK_SECURITY_CONFIG_VERSION)
+                    .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
+                    .samlOptions(MOCK_SDK_SAML_OPTIONS)
+                    .build())
+                .build();
+        when(openSearchServerlessClient.getSecurityConfig(any(GetSecurityConfigRequest.class)))
+            .thenReturn(getSecurityConfigResponse);
 
-        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        final ProgressEvent<ResourceModel, CallbackContext> response =
+            handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
@@ -105,8 +108,8 @@ public class ReadHandlerTest extends AbstractTestBase {
     public void handleRequest_WithoutId_Fail() {
         final ResourceModel desiredResourceModel = ResourceModel.builder().build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                                                                                    .desiredResourceState(desiredResourceModel)
-                                                                                    .build();
+            .desiredResourceState(desiredResourceModel)
+            .build();
         final ProgressEvent<ResourceModel, CallbackContext> response = handler
                 .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 

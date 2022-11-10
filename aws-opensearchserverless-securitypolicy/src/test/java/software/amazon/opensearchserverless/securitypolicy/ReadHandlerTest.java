@@ -52,33 +52,32 @@ public class ReadHandlerTest extends AbstractTestBase {
         final ReadHandler handler = new ReadHandler();
 
         final ResourceModel model = ResourceModel.builder()
-                                                 .name(MOCK_POLICY_NAME)
-                                                 .type(MOCK_POLICY_TYPE)
-                                                 .policyVersion(MOCK_POLICY_VERSION)
-                                                 .description(MOCK_POLICY_DESCRIPTION)
-                                                 .policy(MOCK_POLICY_DOCUMENT)
-                                                 .build();
+            .name(MOCK_POLICY_NAME)
+            .type(MOCK_POLICY_TYPE)
+            .description(MOCK_POLICY_DESCRIPTION)
+            .policy(MOCK_POLICY_DOCUMENT)
+            .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                                                                                    .desiredResourceState(model)
-                                                                                    .build();
+            .desiredResourceState(model)
+            .build();
 
-        final GetSecurityPolicyResponse getSecurityPolicyResponse =
-                GetSecurityPolicyResponse.builder()
-                                         .securityPolicyDetail(
-                                                 SecurityPolicyDetail.builder()
-                                                                     .name(MOCK_POLICY_NAME)
-                                                                     .type(MOCK_POLICY_TYPE)
-                                                                     .policyVersion(MOCK_POLICY_VERSION)
-                                                                     .description(MOCK_POLICY_DESCRIPTION)
-                                                                     .policy(MOCK_POLICY_DOCUMENT)
-                                                                     .build()
-                                                                 ).build();
+        final GetSecurityPolicyResponse getSecurityPolicyResponse = GetSecurityPolicyResponse.builder()
+            .securityPolicyDetail(
+                SecurityPolicyDetail.builder()
+                    .name(MOCK_POLICY_NAME)
+                    .type(MOCK_POLICY_TYPE)
+                    .policyVersion(MOCK_POLICY_VERSION)
+                    .description(MOCK_POLICY_DESCRIPTION)
+                    .policy(MOCK_POLICY_DOCUMENT)
+                    .build()
+            ).build();
 
         when(proxyClient.client().getSecurityPolicy(any(GetSecurityPolicyRequest.class)))
-                .thenReturn(getSecurityPolicyResponse);
+            .thenReturn(getSecurityPolicyResponse);
 
-        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request,
+            new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);

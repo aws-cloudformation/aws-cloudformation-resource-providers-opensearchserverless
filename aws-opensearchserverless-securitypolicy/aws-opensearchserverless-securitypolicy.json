@@ -38,13 +38,6 @@
             "pattern": "^[a-z][a-z0-9-]{2,31}$",
             "description": "The name of the policy"
         },
-        "PolicyVersion": {
-            "type": "string",
-            "maxLength": 36,
-            "minLength": 20,
-            "pattern": "^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$",
-            "description": "The version of the policy"
-        },
         "Type": {
             "$ref": "#/definitions/SecurityPolicyType"
         }
@@ -52,14 +45,13 @@
     "required": [
         "Policy"
     ],
-    "readOnlyProperties": [
-        "/properties/Name",
+    "createOnlyProperties": [
         "/properties/Type",
-        "/properties/PolicyVersion"
+        "/properties/Name"
     ],
     "primaryIdentifier": [
-        "/properties/Name",
-        "/properties/Type"
+        "/properties/Type",
+        "/properties/Name"
     ],
     "handlers": {
         "create": {

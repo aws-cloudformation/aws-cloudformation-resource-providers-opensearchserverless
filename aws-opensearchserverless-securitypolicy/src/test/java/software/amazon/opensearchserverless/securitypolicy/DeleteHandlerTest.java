@@ -48,18 +48,20 @@ public class DeleteHandlerTest extends AbstractTestBase {
         final DeleteHandler handler = new DeleteHandler();
 
         final ResourceModel model = ResourceModel.builder()
-                                                 .name(MOCK_POLICY_NAME)
-                                                 .type(MOCK_POLICY_TYPE)
-                                                 .build();
+            .name(MOCK_POLICY_NAME)
+            .type(MOCK_POLICY_TYPE)
+            .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                                                                                    .desiredResourceState(model)
-                                                                                    .build();
+            .desiredResourceState(model)
+            .build();
 
         final DeleteSecurityPolicyResponse deleteSecurityPolicyResponse = DeleteSecurityPolicyResponse.builder().build();
-        when(proxyClient.client().deleteSecurityPolicy(any(DeleteSecurityPolicyRequest.class))).thenReturn(deleteSecurityPolicyResponse);
+        when(proxyClient.client().deleteSecurityPolicy(any(DeleteSecurityPolicyRequest.class)))
+            .thenReturn(deleteSecurityPolicyResponse);
 
-        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        final ProgressEvent<ResourceModel, CallbackContext> response =
+            handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
