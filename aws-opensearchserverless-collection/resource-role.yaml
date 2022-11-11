@@ -34,6 +34,7 @@ Resources:
                 - "aoss:CreateCollection"
                 - "aoss:DeleteCollection"
                 - "aoss:ListCollections"
+                - "aoss:UpdateCollection"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

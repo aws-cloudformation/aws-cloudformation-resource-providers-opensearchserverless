@@ -1,12 +1,6 @@
 package software.amazon.opensearchserverless.collection;
 
-import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionResponse;
-import software.amazon.awssdk.services.opensearchserverless.model.CollectionDetail;
-import software.amazon.awssdk.services.opensearchserverless.model.CollectionStatus;
-import software.amazon.awssdk.services.opensearchserverless.model.CreateCollectionRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.DeleteCollectionRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.ListCollectionsResponse;
+import software.amazon.awssdk.services.opensearchserverless.model.*;
 import software.amazon.awssdk.services.opensearchserverless.model.Tag;
 import software.amazon.awssdk.utils.CollectionUtils;
 
@@ -90,6 +84,19 @@ public class Translator {
         return DeleteCollectionRequest.builder()
                                       .id(model.getId())
                                       .build();
+    }
+
+    /**
+     * Request to update a resource
+     *
+     * @param model resource model
+     * @return UpdateCollectionRequest the aws service request to update a resource
+     */
+    static UpdateCollectionRequest translateToUpdateRequest(final @NonNull ResourceModel model) {
+        return UpdateCollectionRequest.builder()
+            .id(model.getId())
+            .description(model.getDescription())
+            .build();
     }
 
     /**
