@@ -3,5 +3,12 @@
         "Name": "contracttest-collection-name",
         "Type": "SEARCH",
         "Description": "contracttest Collection description"
-    }
+    },
+    "PatchInputs": [
+        {
+            "op": "replace",
+            "path": "Description",
+            "value": "contracttest Collection description updated"
+        }
+    ]
 }

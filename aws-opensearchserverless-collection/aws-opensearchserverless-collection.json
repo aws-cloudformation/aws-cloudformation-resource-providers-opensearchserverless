@@ -104,7 +104,8 @@
         "/properties/Id"
     ],
     "additionalIdentifiers": [
-        ["/properties/Name"]
+        ["/properties/Name"],
+        ["/properties/Arn"]
     ],
     "handlers": {
         "create": {
@@ -126,6 +127,12 @@
         },
         "read": {
             "permissions": [
+                "aoss:BatchGetCollection"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "aoss:UpdateCollection",
                 "aoss:BatchGetCollection"
             ]
         }
