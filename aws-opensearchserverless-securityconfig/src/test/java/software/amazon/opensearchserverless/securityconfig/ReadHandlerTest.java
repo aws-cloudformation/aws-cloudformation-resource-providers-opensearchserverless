@@ -4,6 +4,7 @@ import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerless
 import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityConfigRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityConfigResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.SecurityConfigDetail;
+import software.amazon.awssdk.services.opensearchserverless.model.SecurityConfigType;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.OperationStatus;
@@ -26,24 +27,25 @@ public class ReadHandlerTest extends AbstractTestBase {
 
     private static final String MOCK_SECURITY_CONFIG_ID = "1";
     private static final String MOCK_SECURITY_CONFIG_DESCRIPTION = "Security config description";
+    private static final String MOCK_SECURITY_CONFIG_TYPE = SecurityConfigType.SAML.toString();
     private static final String MOCK_SECURITY_CONFIG_VERSION = "securityconfigversion";
     private static final String MOCK_METADATA = "metadata";
     private static final String MOCK_USER_ATTRIBUTE = "user-attribute";
     private static final String MOCK_GROUP_ATTRIBUTE = "group-attribute";
     private static final int MOCK_SESSION_TIMEOUT = 1;
     private static final SamlConfigOptions MOCK_SAML_OPTIONS = SamlConfigOptions.builder()
-                                                                                .metadata(MOCK_METADATA)
-                                                                                .userAttribute(MOCK_USER_ATTRIBUTE)
-                                                                                .groupAttribute(MOCK_GROUP_ATTRIBUTE)
-                                                                                .sessionTimeout(MOCK_SESSION_TIMEOUT)
-                                                                                .build();
+        .metadata(MOCK_METADATA)
+        .userAttribute(MOCK_USER_ATTRIBUTE)
+        .groupAttribute(MOCK_GROUP_ATTRIBUTE)
+        .sessionTimeout(MOCK_SESSION_TIMEOUT)
+        .build();
     private static final software.amazon.awssdk.services.opensearchserverless.model.SamlConfigOptions MOCK_SDK_SAML_OPTIONS =
-            software.amazon.awssdk.services.opensearchserverless.model.SamlConfigOptions.builder()
-                                                                                        .metadata(MOCK_METADATA)
-                                                                                        .userAttribute(MOCK_USER_ATTRIBUTE)
-                                                                                        .groupAttribute(MOCK_GROUP_ATTRIBUTE)
-                                                                                        .sessionTimeout(MOCK_SESSION_TIMEOUT)
-                                                                                        .build();
+        software.amazon.awssdk.services.opensearchserverless.model.SamlConfigOptions.builder()
+            .metadata(MOCK_METADATA)
+            .userAttribute(MOCK_USER_ATTRIBUTE)
+            .groupAttribute(MOCK_GROUP_ATTRIBUTE)
+            .sessionTimeout(MOCK_SESSION_TIMEOUT)
+            .build();
     private OpenSearchServerlessClient openSearchServerlessClient;
     private AmazonWebServicesClientProxy proxy;
     private ProxyClient<OpenSearchServerlessClient> proxyClient;
@@ -69,6 +71,7 @@ public class ReadHandlerTest extends AbstractTestBase {
     public void handleRequest_SimpleSuccess() {
         final ResourceModel expectedModel = ResourceModel.builder()
             .id(MOCK_SECURITY_CONFIG_ID)
+            .type(MOCK_SECURITY_CONFIG_TYPE)
             .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
             .samlOptions(MOCK_SAML_OPTIONS)
             .build();
@@ -79,12 +82,12 @@ public class ReadHandlerTest extends AbstractTestBase {
             .build();
         final GetSecurityConfigResponse getSecurityConfigResponse =
             GetSecurityConfigResponse.builder().securityConfigDetail(
-                SecurityConfigDetail.builder()
-                    .id(MOCK_SECURITY_CONFIG_ID)
-                    .configVersion(MOCK_SECURITY_CONFIG_VERSION)
-                    .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
-                    .samlOptions(MOCK_SDK_SAML_OPTIONS)
-                    .build())
+                    SecurityConfigDetail.builder()
+                        .id(MOCK_SECURITY_CONFIG_ID)
+                        .configVersion(MOCK_SECURITY_CONFIG_VERSION)
+                        .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
+                        .samlOptions(MOCK_SDK_SAML_OPTIONS)
+                        .build())
                 .build();
         when(openSearchServerlessClient.getSecurityConfig(any(GetSecurityConfigRequest.class)))
             .thenReturn(getSecurityConfigResponse);
@@ -111,7 +114,7 @@ public class ReadHandlerTest extends AbstractTestBase {
             .desiredResourceState(desiredResourceModel)
             .build();
         final ProgressEvent<ResourceModel, CallbackContext> response = handler
-                .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+            .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);

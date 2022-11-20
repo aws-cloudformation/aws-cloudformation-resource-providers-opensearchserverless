@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 public class CreateHandlerTest extends AbstractTestBase {
 
     private static final String MOCK_SECURITY_CONFIG_ID = "1";
-    private static final String MOCK_SECURITY_CONFIG_TYPE = SecurityConfigType.SAML.name();
+    private static final String MOCK_SECURITY_CONFIG_TYPE = SecurityConfigType.SAML.toString();
     private static final String MOCK_SECURITY_CONFIG_NAME = "security-config-name";
     private static final String MOCK_SECURITY_CONFIG_DESCRIPTION = "Security config description";
     private static final String MOCK_SECURITY_CONFIG_VERSION = "securityconfigversion";
@@ -38,18 +38,18 @@ public class CreateHandlerTest extends AbstractTestBase {
     private static final String MOCK_GROUP_ATTRIBUTE = "group-attribute";
     private static final int MOCK_SESSION_TIMEOUT = 1;
     private static final SamlConfigOptions MOCK_SAML_OPTIONS = SamlConfigOptions.builder()
-                                                                                .metadata(MOCK_METADATA)
-                                                                                .userAttribute(MOCK_USER_ATTRIBUTE)
-                                                                                .groupAttribute(MOCK_GROUP_ATTRIBUTE)
-                                                                                .sessionTimeout(MOCK_SESSION_TIMEOUT)
-                                                                                .build();
+        .metadata(MOCK_METADATA)
+        .userAttribute(MOCK_USER_ATTRIBUTE)
+        .groupAttribute(MOCK_GROUP_ATTRIBUTE)
+        .sessionTimeout(MOCK_SESSION_TIMEOUT)
+        .build();
     private static final software.amazon.awssdk.services.opensearchserverless.model.SamlConfigOptions MOCK_SDK_SAML_OPTIONS =
-            software.amazon.awssdk.services.opensearchserverless.model.SamlConfigOptions.builder()
-                                                                                        .metadata(MOCK_METADATA)
-                                                                                        .userAttribute(MOCK_USER_ATTRIBUTE)
-                                                                                        .groupAttribute(MOCK_GROUP_ATTRIBUTE)
-                                                                                        .sessionTimeout(MOCK_SESSION_TIMEOUT)
-                                                                                        .build();
+        software.amazon.awssdk.services.opensearchserverless.model.SamlConfigOptions.builder()
+            .metadata(MOCK_METADATA)
+            .userAttribute(MOCK_USER_ATTRIBUTE)
+            .groupAttribute(MOCK_GROUP_ATTRIBUTE)
+            .sessionTimeout(MOCK_SESSION_TIMEOUT)
+            .build();
     private OpenSearchServerlessClient openSearchServerlessClient;
     private AmazonWebServicesClientProxy proxy;
     private ProxyClient<OpenSearchServerlessClient> proxyClient;
@@ -74,31 +74,35 @@ public class CreateHandlerTest extends AbstractTestBase {
     @Test
     public void handleRequest_SimpleSuccess() {
         final ResourceModel expectedModel = ResourceModel.builder()
-                                                         .id(MOCK_SECURITY_CONFIG_ID)
-                                                         .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
-                                                         .samlOptions(MOCK_SAML_OPTIONS)
-                                                         .build();
+            .id(MOCK_SECURITY_CONFIG_ID)
+            .type(MOCK_SECURITY_CONFIG_TYPE)
+            .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
+            .samlOptions(MOCK_SAML_OPTIONS)
+            .build();
 
         final CreateSecurityConfigResponse createSecurityConfigResponse =
-                CreateSecurityConfigResponse.builder().securityConfigDetail(
-                                                    SecurityConfigDetail.builder()
-                                                                        .id(MOCK_SECURITY_CONFIG_ID)
-                                                                        .configVersion(MOCK_SECURITY_CONFIG_VERSION)
-                                                                        .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
-                                                                        .samlOptions(MOCK_SDK_SAML_OPTIONS)
-                                                                        .build())
-                                            .build();
-        when(openSearchServerlessClient.createSecurityConfig(any(CreateSecurityConfigRequest.class))).thenReturn(createSecurityConfigResponse);
+            CreateSecurityConfigResponse.builder().securityConfigDetail(
+                    SecurityConfigDetail.builder()
+                        .id(MOCK_SECURITY_CONFIG_ID)
+                        .configVersion(MOCK_SECURITY_CONFIG_VERSION)
+                        .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
+                        .samlOptions(MOCK_SDK_SAML_OPTIONS)
+                        .build())
+                .build();
+        when(openSearchServerlessClient.createSecurityConfig(any(CreateSecurityConfigRequest.class)))
+            .thenReturn(createSecurityConfigResponse);
 
         final ResourceModel model = ResourceModel.builder()
-                                                 .name(MOCK_SECURITY_CONFIG_NAME)
-                                                 .type(MOCK_SECURITY_CONFIG_TYPE)
-                                                 .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
-                                                 .samlOptions(MOCK_SAML_OPTIONS)
-                                                 .build();
-        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(model).build();
+            .name(MOCK_SECURITY_CONFIG_NAME)
+            .type(MOCK_SECURITY_CONFIG_TYPE)
+            .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
+            .samlOptions(MOCK_SAML_OPTIONS)
+            .build();
+        final ResourceHandlerRequest<ResourceModel> request =
+            ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(model).build();
 
-        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        final ProgressEvent<ResourceModel, CallbackContext> response =
+            handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
@@ -113,18 +117,20 @@ public class CreateHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_WhenResourceAlreadyExists_ThrowsException() {
-        when(openSearchServerlessClient.createSecurityConfig(any(CreateSecurityConfigRequest.class))).thenThrow(ConflictException.builder().build());
+        when(openSearchServerlessClient.createSecurityConfig(any(CreateSecurityConfigRequest.class)))
+            .thenThrow(ConflictException.builder().build());
 
         final ResourceModel model = ResourceModel.builder()
-                                                 .name(MOCK_SECURITY_CONFIG_NAME)
-                                                 .type(MOCK_SECURITY_CONFIG_TYPE)
-                                                 .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
-                                                 .samlOptions(MOCK_SAML_OPTIONS)
-                                                 .build();
-        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(model).build();
+            .name(MOCK_SECURITY_CONFIG_NAME)
+            .type(MOCK_SECURITY_CONFIG_TYPE)
+            .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
+            .samlOptions(MOCK_SAML_OPTIONS)
+            .build();
+        final ResourceHandlerRequest<ResourceModel> request =
+            ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(model).build();
 
         assertThrows(CfnAlreadyExistsException.class,
-                     () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+            () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
         verify(openSearchServerlessClient).createSecurityConfig(any(CreateSecurityConfigRequest.class));
     }
@@ -134,10 +140,10 @@ public class CreateHandlerTest extends AbstractTestBase {
     public void handleRequest_WithId_Fail() {
         final ResourceModel desiredResourceModel = ResourceModel.builder().id(MOCK_SECURITY_CONFIG_ID).build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                                                                                    .desiredResourceState(desiredResourceModel)
-                                                                                    .build();
+            .desiredResourceState(desiredResourceModel)
+            .build();
         final ProgressEvent<ResourceModel, CallbackContext> response = handler
-                .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+            .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
@@ -150,10 +156,10 @@ public class CreateHandlerTest extends AbstractTestBase {
     public void handleRequest_WithNoName_Fail() {
         final ResourceModel desiredResourceModel = ResourceModel.builder().type(MOCK_SECURITY_CONFIG_TYPE).build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                                                                                    .desiredResourceState(desiredResourceModel)
-                                                                                    .build();
+            .desiredResourceState(desiredResourceModel)
+            .build();
         final ProgressEvent<ResourceModel, CallbackContext> response = handler
-                .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+            .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
@@ -166,10 +172,10 @@ public class CreateHandlerTest extends AbstractTestBase {
     public void handleRequest_WithNoType_Fail() {
         final ResourceModel desiredResourceModel = ResourceModel.builder().name(MOCK_SECURITY_CONFIG_NAME).build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                                                                                    .desiredResourceState(desiredResourceModel)
-                                                                                    .build();
+            .desiredResourceState(desiredResourceModel)
+            .build();
         final ProgressEvent<ResourceModel, CallbackContext> response = handler
-                .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+            .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);

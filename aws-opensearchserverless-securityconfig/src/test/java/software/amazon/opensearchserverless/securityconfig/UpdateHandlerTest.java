@@ -29,6 +29,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     private static final String MOCK_SECURITY_CONFIG_ID = "1";
     private static final String MOCK_SECURITY_CONFIG_DESCRIPTION = "Security config description";
     private static final String MOCK_SECURITY_CONFIG_DESCRIPTION_1 = "Security config description updated";
+    private static final String MOCK_SECURITY_CONFIG_TYPE = SecurityConfigType.SAML.toString();
     private static final String MOCK_SECURITY_CONFIG_VERSION = "securityconfigversion";
     private static final String MOCK_METADATA = "metadata";
     private static final String MOCK_USER_ATTRIBUTE = "user-attribute";
@@ -42,12 +43,12 @@ public class UpdateHandlerTest extends AbstractTestBase {
         .build();
     private static final software.amazon.awssdk.services.opensearchserverless.model.SamlConfigOptions
         MOCK_SDK_SAML_OPTIONS =
-            software.amazon.awssdk.services.opensearchserverless.model.SamlConfigOptions.builder()
-                .metadata(MOCK_METADATA)
-                .userAttribute(MOCK_USER_ATTRIBUTE)
-                .groupAttribute(MOCK_GROUP_ATTRIBUTE)
-                .sessionTimeout(MOCK_SESSION_TIMEOUT)
-                .build();
+        software.amazon.awssdk.services.opensearchserverless.model.SamlConfigOptions.builder()
+            .metadata(MOCK_METADATA)
+            .userAttribute(MOCK_USER_ATTRIBUTE)
+            .groupAttribute(MOCK_GROUP_ATTRIBUTE)
+            .sessionTimeout(MOCK_SESSION_TIMEOUT)
+            .build();
     private OpenSearchServerlessClient openSearchServerlessClient;
     private AmazonWebServicesClientProxy proxy;
     private ProxyClient<OpenSearchServerlessClient> proxyClient;
@@ -72,10 +73,11 @@ public class UpdateHandlerTest extends AbstractTestBase {
     @Test
     public void handleRequest_SimpleSuccess() {
         final ResourceModel expectedModel = ResourceModel.builder()
-                                                         .id(MOCK_SECURITY_CONFIG_ID)
-                                                         .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
-                                                         .samlOptions(MOCK_SAML_OPTIONS)
-                                                         .build();
+            .id(MOCK_SECURITY_CONFIG_ID)
+            .type(MOCK_SECURITY_CONFIG_TYPE)
+            .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
+            .samlOptions(MOCK_SAML_OPTIONS)
+            .build();
 
         final GetSecurityConfigResponse getSecurityConfigResponse =
             GetSecurityConfigResponse.builder().securityConfigDetail(
@@ -92,12 +94,12 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         final UpdateSecurityConfigResponse updateSecurityConfigResponse =
             UpdateSecurityConfigResponse.builder().securityConfigDetail(
-                SecurityConfigDetail.builder()
-                    .id(MOCK_SECURITY_CONFIG_ID)
-                    .configVersion(MOCK_SECURITY_CONFIG_DESCRIPTION_1)
-                    .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
-                    .samlOptions(MOCK_SDK_SAML_OPTIONS)
-                    .build())
+                    SecurityConfigDetail.builder()
+                        .id(MOCK_SECURITY_CONFIG_ID)
+                        .configVersion(MOCK_SECURITY_CONFIG_DESCRIPTION_1)
+                        .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
+                        .samlOptions(MOCK_SDK_SAML_OPTIONS)
+                        .build())
                 .build();
         when(openSearchServerlessClient.updateSecurityConfig(any(UpdateSecurityConfigRequest.class)))
             .thenReturn(updateSecurityConfigResponse);
@@ -150,7 +152,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
             ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(model).build();
 
         assertThrows(CfnInvalidRequestException.class,
-                     () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+            () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
         verify(openSearchServerlessClient).updateSecurityConfig(any(UpdateSecurityConfigRequest.class));
     }
 
@@ -180,7 +182,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
             ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(model).build();
 
         assertThrows(CfnNotFoundException.class,
-                     () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+            () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
         verify(openSearchServerlessClient).updateSecurityConfig(any(UpdateSecurityConfigRequest.class));
     }
@@ -223,7 +225,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
         final ResourceHandlerRequest<ResourceModel> request =
             ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(desiredResourceModel).build();
         final ProgressEvent<ResourceModel, CallbackContext> response = handler
-                .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+            .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
@@ -238,7 +240,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
         final ResourceHandlerRequest<ResourceModel> request =
             ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(desiredResourceModel).build();
         final ProgressEvent<ResourceModel, CallbackContext> response = handler
-                .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+            .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
@@ -255,7 +257,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
                 .desiredResourceState(desiredResourceModel)
                 .build();
         final ProgressEvent<ResourceModel, CallbackContext> response = handler
-                .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+            .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);

@@ -18,11 +18,11 @@ public class Translator {
      */
     static CreateSecurityConfigRequest translateToCreateRequest(final ResourceModel model) {
         return CreateSecurityConfigRequest.builder()
-                                          .type(model.getType())
-                                          .name(model.getName())
-                                          .description(model.getDescription())
-                                          .samlOptions(translateSamlConfigOptionsToSDK(model.getSamlOptions()))
-                                          .build();
+            .type(model.getType())
+            .name(model.getName())
+            .description(model.getDescription())
+            .samlOptions(translateSamlConfigOptionsToSDK(model.getSamlOptions()))
+            .build();
     }
 
     /**
@@ -105,9 +105,9 @@ public class Translator {
      */
     static ListSecurityConfigsRequest translateToListRequest(ResourceModel model, String nextToken) {
         return ListSecurityConfigsRequest.builder()
-                                         .type(model.getType())
-                                         .nextToken(nextToken)
-                                         .build();
+            .type(model.getType())
+            .nextToken(nextToken)
+            .build();
     }
 
     /**
@@ -118,14 +118,14 @@ public class Translator {
      */
     static List<ResourceModel> translateFromListRequest(final ListSecurityConfigsResponse listSecurityConfigsResponse) {
         return streamOfOrEmpty(listSecurityConfigsResponse.securityConfigDetails())
-                .map(Translator::translateSecurityConfigDetailFromSDK)
-                .collect(Collectors.toList());
+            .map(Translator::translateSecurityConfigDetailFromSDK)
+            .collect(Collectors.toList());
     }
 
     private static <T> Stream<T> streamOfOrEmpty(final Collection<T> collection) {
         return Optional.ofNullable(collection)
-                       .map(Collection::stream)
-                       .orElseGet(Stream::empty);
+            .map(Collection::stream)
+            .orElseGet(Stream::empty);
     }
 
     /**
@@ -134,14 +134,15 @@ public class Translator {
      * @param samlConfigOptions resource model SamlConfigOptions
      * @return SDK SamlConfigOptions
      */
-    public static software.amazon.awssdk.services.opensearchserverless.model.SamlConfigOptions translateSamlConfigOptionsToSDK(final SamlConfigOptions samlConfigOptions) {
+    public static software.amazon.awssdk.services.opensearchserverless.model.SamlConfigOptions
+        translateSamlConfigOptionsToSDK(final SamlConfigOptions samlConfigOptions) {
         return samlConfigOptions == null ? null :
-               software.amazon.awssdk.services.opensearchserverless.model.SamlConfigOptions.builder()
-                                                                                           .metadata(samlConfigOptions.getMetadata())
-                                                                                           .userAttribute(samlConfigOptions.getUserAttribute())
-                                                                                           .groupAttribute(samlConfigOptions.getGroupAttribute())
-                                                                                           .sessionTimeout(samlConfigOptions.getSessionTimeout())
-                                                                                           .build();
+            software.amazon.awssdk.services.opensearchserverless.model.SamlConfigOptions.builder()
+                .metadata(samlConfigOptions.getMetadata())
+                .userAttribute(samlConfigOptions.getUserAttribute())
+                .groupAttribute(samlConfigOptions.getGroupAttribute())
+                .sessionTimeout(samlConfigOptions.getSessionTimeout())
+                .build();
     }
 
     /**
@@ -152,19 +153,20 @@ public class Translator {
      */
     public static SamlConfigOptions translateSamlConfigOptionsFromSDK(final software.amazon.awssdk.services.opensearchserverless.model.SamlConfigOptions samlConfigOptions) {
         return samlConfigOptions == null ? null :
-               SamlConfigOptions.builder()
-                                .metadata(samlConfigOptions.metadata())
-                                .userAttribute(samlConfigOptions.userAttribute())
-                                .groupAttribute(samlConfigOptions.groupAttribute())
-                                .sessionTimeout(samlConfigOptions.sessionTimeout())
-                                .build();
+            SamlConfigOptions.builder()
+                .metadata(samlConfigOptions.metadata())
+                .userAttribute(samlConfigOptions.userAttribute())
+                .groupAttribute(samlConfigOptions.groupAttribute())
+                .sessionTimeout(samlConfigOptions.sessionTimeout())
+                .build();
     }
 
     private static ResourceModel translateSecurityConfigDetailFromSDK(SecurityConfigDetail securityConfigDetail) {
         return ResourceModel.builder()
-                            .id(securityConfigDetail.id())
-                            .description(securityConfigDetail.description())
-                            .samlOptions(translateSamlConfigOptionsFromSDK(securityConfigDetail.samlOptions()))
-                            .build();
+            .id(securityConfigDetail.id())
+            .type(SecurityConfigType.SAML.toString())
+            .description(securityConfigDetail.description())
+            .samlOptions(translateSamlConfigOptionsFromSDK(securityConfigDetail.samlOptions()))
+            .build();
     }
 }
