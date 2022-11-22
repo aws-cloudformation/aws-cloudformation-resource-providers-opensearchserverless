@@ -1,15 +1,6 @@
 package software.amazon.opensearchserverless.accesspolicy;
 
-import software.amazon.awssdk.services.opensearchserverless.model.AccessPolicyDetail;
-import software.amazon.awssdk.services.opensearchserverless.model.CreateAccessPolicyRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.CreateAccessPolicyResponse;
-import software.amazon.awssdk.services.opensearchserverless.model.DeleteAccessPolicyRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.GetAccessPolicyRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.GetAccessPolicyResponse;
-import software.amazon.awssdk.services.opensearchserverless.model.ListAccessPoliciesRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.ListAccessPoliciesResponse;
-import software.amazon.awssdk.services.opensearchserverless.model.UpdateAccessPolicyRequest;
-import software.amazon.awssdk.services.opensearchserverless.model.UpdateAccessPolicyResponse;
+import software.amazon.awssdk.services.opensearchserverless.model.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -133,8 +124,8 @@ public class Translator {
      * @return list of resource models
      */
     static List<ResourceModel> translateFromListRequest(final ListAccessPoliciesResponse listAccessPoliciesResponse) {
-        return streamOfOrEmpty(listAccessPoliciesResponse.accessPolicyDetails())
-                .map(Translator::translateAccessPolicyDetailFromSDK)
+        return streamOfOrEmpty(listAccessPoliciesResponse.accessPolicySummaries())
+                .map(Translator::translateAccessPolicySummaryFromSDK)
                 .collect(Collectors.toList());
     }
 
@@ -144,12 +135,19 @@ public class Translator {
                        .orElseGet(Stream::empty);
     }
 
+    private static ResourceModel translateAccessPolicySummaryFromSDK(AccessPolicySummary accessPolicySummary) {
+        return ResourceModel.builder()
+            .type(accessPolicySummary.typeAsString())
+            .name(accessPolicySummary.name())
+            .description(accessPolicySummary.description())
+            .build();
+    }
     private static ResourceModel translateAccessPolicyDetailFromSDK(AccessPolicyDetail accessPolicyDetail) {
         return ResourceModel.builder()
                 .type(accessPolicyDetail.typeAsString())
                 .name(accessPolicyDetail.name())
                 .description(accessPolicyDetail.description())
-                .policy(accessPolicyDetail.policy())
+                .policy(accessPolicyDetail.policy().toString())
                 .build();
     }
 }

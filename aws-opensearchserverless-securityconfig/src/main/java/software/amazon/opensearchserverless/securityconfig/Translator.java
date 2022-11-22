@@ -117,8 +117,8 @@ public class Translator {
      * @return list of resource models
      */
     static List<ResourceModel> translateFromListRequest(final ListSecurityConfigsResponse listSecurityConfigsResponse) {
-        return streamOfOrEmpty(listSecurityConfigsResponse.securityConfigDetails())
-            .map(Translator::translateSecurityConfigDetailFromSDK)
+        return streamOfOrEmpty(listSecurityConfigsResponse.securityConfigSummaries())
+            .map(Translator::translateSecurityConfigSummaryFromSDK)
             .collect(Collectors.toList());
     }
 
@@ -159,6 +159,14 @@ public class Translator {
                 .groupAttribute(samlConfigOptions.groupAttribute())
                 .sessionTimeout(samlConfigOptions.sessionTimeout())
                 .build();
+    }
+
+    private static ResourceModel translateSecurityConfigSummaryFromSDK(SecurityConfigSummary securityConfigSummary) {
+        return ResourceModel.builder()
+            .id(securityConfigSummary.id())
+            .type(securityConfigSummary.typeAsString())
+            .description(securityConfigSummary.description())
+            .build();
     }
 
     private static ResourceModel translateSecurityConfigDetailFromSDK(SecurityConfigDetail securityConfigDetail) {

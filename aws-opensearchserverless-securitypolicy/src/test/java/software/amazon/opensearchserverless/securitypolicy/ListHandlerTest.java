@@ -3,7 +3,7 @@ package software.amazon.opensearchserverless.securitypolicy;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.ListSecurityPoliciesRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.ListSecurityPoliciesResponse;
-import software.amazon.awssdk.services.opensearchserverless.model.SecurityPolicyDetail;
+import software.amazon.awssdk.services.opensearchserverless.model.SecurityPolicySummary;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
@@ -45,26 +45,26 @@ public class ListHandlerTest extends AbstractTestBase {
     public void handleRequest_SimpleSuccess() {
         final ListHandler handler = new ListHandler();
 
-        Collection<SecurityPolicyDetail> securityPolicyDetails = ImmutableList.of(
-                SecurityPolicyDetail.builder().name(MOCK_POLICY_NAME_1).type(MOCK_POLICY_TYPE_1).build(),
-                SecurityPolicyDetail.builder().name(MOCK_POLICY_NAME_2).type(MOCK_POLICY_TYPE_1).build());
+        Collection<SecurityPolicySummary> securityPolicySummaries = ImmutableList.of(
+            SecurityPolicySummary.builder().name(MOCK_POLICY_NAME_1).type(MOCK_POLICY_TYPE_1).build(),
+            SecurityPolicySummary.builder().name(MOCK_POLICY_NAME_2).type(MOCK_POLICY_TYPE_1).build());
         final ListSecurityPoliciesResponse listSecurityPoliciesResponse =
-                ListSecurityPoliciesResponse.builder()
-                                            .securityPolicyDetails(securityPolicyDetails)
-                                            .build();
+            ListSecurityPoliciesResponse.builder()
+                .securityPolicySummaries(securityPolicySummaries)
+                .build();
         when(proxyClient.client().listSecurityPolicies(any(ListSecurityPoliciesRequest.class)))
-                .thenReturn(listSecurityPoliciesResponse);
+            .thenReturn(listSecurityPoliciesResponse);
 
         final ResourceModel model = ResourceModel.builder()
-                                                 .type(MOCK_POLICY_TYPE_1)
-                                                 .build();
+            .type(MOCK_POLICY_TYPE_1)
+            .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                                                                                    .desiredResourceState(model)
-                                                                                    .build();
+            .desiredResourceState(model)
+            .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+            handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);

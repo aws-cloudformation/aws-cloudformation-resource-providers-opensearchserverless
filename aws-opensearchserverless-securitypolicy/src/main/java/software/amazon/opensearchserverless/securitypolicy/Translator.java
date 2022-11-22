@@ -50,7 +50,7 @@ public class Translator {
             .name(securityPolicyDetail.name())
             .type(securityPolicyDetail.typeAsString())
             .description(securityPolicyDetail.description())
-            .policy(securityPolicyDetail.policy())
+            .policy(securityPolicyDetail.policy().toString())
             .build();
     }
 
@@ -108,7 +108,7 @@ public class Translator {
      */
     static List<ResourceModel> translateFromListRequest(
         final ListSecurityPoliciesResponse listSecurityPoliciesResponse) {
-        return streamOfOrEmpty(listSecurityPoliciesResponse.securityPolicyDetails())
+        return streamOfOrEmpty(listSecurityPoliciesResponse.securityPolicySummaries())
             .map(resource -> ResourceModel.builder()
                 .name(resource.name())
                 .type(resource.typeAsString())
@@ -135,7 +135,7 @@ public class Translator {
             .name(securityPolicyDetail.name())
             .type(securityPolicyDetail.typeAsString())
             .description(securityPolicyDetail.description())
-            .policy(securityPolicyDetail.policy())
+            .policy(securityPolicyDetail.policy().toString())
             .build();
     }
 }

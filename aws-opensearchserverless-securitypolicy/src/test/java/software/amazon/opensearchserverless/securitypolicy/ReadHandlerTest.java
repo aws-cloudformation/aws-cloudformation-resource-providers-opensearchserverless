@@ -1,5 +1,6 @@
 package software.amazon.opensearchserverless.securitypolicy;
 
+import software.amazon.awssdk.core.document.Document;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityPolicyRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityPolicyResponse;
@@ -28,7 +29,7 @@ public class ReadHandlerTest extends AbstractTestBase {
     private static final String MOCK_POLICY_NAME = "policy-name";
     private static final String MOCK_POLICY_TYPE = "encryption";
     private static final String MOCK_POLICY_DESCRIPTION = "Policy description";
-    private static final String MOCK_POLICY_DOCUMENT = "Policy Document";
+    private static final Document MOCK_POLICY_DOCUMENT = Document.fromString("Policy Document");
     private static final String MOCK_POLICY_VERSION = "policyversion";
     @Mock
     OpenSearchServerlessClient openSearchServerlessClient;
@@ -55,7 +56,7 @@ public class ReadHandlerTest extends AbstractTestBase {
             .name(MOCK_POLICY_NAME)
             .type(MOCK_POLICY_TYPE)
             .description(MOCK_POLICY_DESCRIPTION)
-            .policy(MOCK_POLICY_DOCUMENT)
+            .policy(MOCK_POLICY_DOCUMENT.toString())
             .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
