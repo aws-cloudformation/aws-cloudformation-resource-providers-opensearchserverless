@@ -1,5 +1,6 @@
 package software.amazon.opensearchserverless.accesspolicy;
 
+import software.amazon.awssdk.core.document.Document;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.AccessPolicyDetail;
 import software.amazon.awssdk.services.opensearchserverless.model.AccessPolicyType;
@@ -28,7 +29,7 @@ public class CreateHandlerTest extends AbstractTestBase {
     private static final String MOCK_ACCESS_POLICY_TYPE = AccessPolicyType.DATA.name();
     private static final String MOCK_ACCESS_POLICY_NAME = "access-policy-name";
     private static final String MOCK_ACCESS_POLICY_DESCRIPTION = "Access policy description";
-    private static final String MOCK_ACCESS_POLICY_DOCUMENT = "Access Policy Document";
+    private static final Document MOCK_ACCESS_POLICY_DOCUMENT = Document.fromString("Access Policy Document");
     private OpenSearchServerlessClient openSearchServerlessClient;
     private AmazonWebServicesClientProxy proxy;
     private ProxyClient<OpenSearchServerlessClient> proxyClient;
@@ -54,14 +55,14 @@ public class CreateHandlerTest extends AbstractTestBase {
                                                          .name(MOCK_ACCESS_POLICY_NAME)
                                                          .type(MOCK_ACCESS_POLICY_TYPE)
                                                          .description(MOCK_ACCESS_POLICY_DESCRIPTION)
-                                                         .policy(MOCK_ACCESS_POLICY_DOCUMENT)
+                                                         .policy(MOCK_ACCESS_POLICY_DOCUMENT.toString())
                                                          .build();
 
         final ResourceModel model = ResourceModel.builder()
                                                  .name(MOCK_ACCESS_POLICY_NAME)
                                                  .type(MOCK_ACCESS_POLICY_TYPE)
                                                  .description(MOCK_ACCESS_POLICY_DESCRIPTION)
-                                                 .policy(MOCK_ACCESS_POLICY_DOCUMENT)
+                                                 .policy(MOCK_ACCESS_POLICY_DOCUMENT.toString())
                                                  .build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(model).build();
 

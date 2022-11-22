@@ -1,5 +1,6 @@
 package software.amazon.opensearchserverless.securitypolicy;
 
+import software.amazon.awssdk.core.document.Document;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.CreateSecurityPolicyRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.CreateSecurityPolicyResponse;
@@ -30,7 +31,7 @@ public class CreateHandlerTest extends AbstractTestBase {
     private static final String MOCK_POLICY_NAME = "policy-name";
     private static final String MOCK_POLICY_TYPE = "encryption";
     private static final String MOCK_POLICY_DESCRIPTION = "Policy description";
-    private static final String MOCK_POLICY_DOCUMENT = "Policy Document";
+    private static final Document MOCK_POLICY_DOCUMENT = Document.fromString("Policy Document");
     private static final String MOCK_POLICY_VERSION = "policyversion";
     @Mock
     OpenSearchServerlessClient openSearchServerlessClient;
@@ -57,7 +58,7 @@ public class CreateHandlerTest extends AbstractTestBase {
             .name(MOCK_POLICY_NAME)
             .type(MOCK_POLICY_TYPE)
             .description(MOCK_POLICY_DESCRIPTION)
-            .policy(MOCK_POLICY_DOCUMENT)
+            .policy(MOCK_POLICY_DOCUMENT.toString())
             .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
@@ -92,7 +93,7 @@ public class CreateHandlerTest extends AbstractTestBase {
                 ).build();
 
         when(proxyClient.client().getSecurityPolicy(any(GetSecurityPolicyRequest.class)))
-                .thenReturn(getSecurityPolicyResponse);
+            .thenReturn(getSecurityPolicyResponse);
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
             handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);

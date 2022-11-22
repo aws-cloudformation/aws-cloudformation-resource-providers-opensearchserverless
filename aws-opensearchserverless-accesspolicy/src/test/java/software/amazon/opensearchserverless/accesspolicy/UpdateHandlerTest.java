@@ -1,5 +1,6 @@
 package software.amazon.opensearchserverless.accesspolicy;
 
+import software.amazon.awssdk.core.document.Document;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.*;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
@@ -29,7 +30,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     private static final String MOCK_ACCESS_POLICY_TYPE = AccessPolicyType.DATA.name();
     private static final String MOCK_ACCESS_POLICY_NAME = "access-policy-name";
     private static final String MOCK_ACCESS_POLICY_DESCRIPTION = "Access policy description";
-    private static final String MOCK_ACCESS_POLICY_DOCUMENT = "Access Policy Document";
+    private static final Document MOCK_ACCESS_POLICY_DOCUMENT = Document.fromString("Access Policy Document");
 
     private static final String MOCK_ACCESS_POLICY_VERSION = "Mock Access Policy Version";
     private OpenSearchServerlessClient openSearchServerlessClient;
@@ -54,23 +55,23 @@ public class UpdateHandlerTest extends AbstractTestBase {
         final UpdateHandler handler = new UpdateHandler();
 
         final ResourceModel expectedModel = ResourceModel.builder()
-                                                         .name(MOCK_ACCESS_POLICY_NAME)
-                                                         .type(MOCK_ACCESS_POLICY_TYPE)
-                                                         .description(MOCK_ACCESS_POLICY_DESCRIPTION)
-                                                         .policy(MOCK_ACCESS_POLICY_DOCUMENT)
-                                                         .build();
+            .name(MOCK_ACCESS_POLICY_NAME)
+            .type(MOCK_ACCESS_POLICY_TYPE)
+            .description(MOCK_ACCESS_POLICY_DESCRIPTION)
+            .policy(MOCK_ACCESS_POLICY_DOCUMENT.toString())
+            .build();
 
         final UpdateAccessPolicyResponse updateAccessPolicyResponse =
-                UpdateAccessPolicyResponse.builder()
-                                          .accessPolicyDetail(
-                                                  AccessPolicyDetail.builder()
-                                                                    .name(MOCK_ACCESS_POLICY_NAME)
-                                                                    .type(MOCK_ACCESS_POLICY_TYPE)
-                                                                    .description(MOCK_ACCESS_POLICY_DESCRIPTION)
-                                                                    .policy(MOCK_ACCESS_POLICY_DOCUMENT)
-                                                                    .build()
-                                                             )
-                                          .build();
+            UpdateAccessPolicyResponse.builder()
+                .accessPolicyDetail(
+                    AccessPolicyDetail.builder()
+                        .name(MOCK_ACCESS_POLICY_NAME)
+                        .type(MOCK_ACCESS_POLICY_TYPE)
+                        .description(MOCK_ACCESS_POLICY_DESCRIPTION)
+                        .policy(MOCK_ACCESS_POLICY_DOCUMENT)
+                        .build()
+                )
+                .build();
 
         final GetAccessPolicyResponse getAccessPolicyResponse =
             GetAccessPolicyResponse.builder()
@@ -88,11 +89,11 @@ public class UpdateHandlerTest extends AbstractTestBase {
         when(openSearchServerlessClient.updateAccessPolicy(any(UpdateAccessPolicyRequest.class))).thenReturn(updateAccessPolicyResponse);
 
         final ResourceModel model = ResourceModel.builder()
-                                                 .name(MOCK_ACCESS_POLICY_NAME)
-                                                 .type(MOCK_ACCESS_POLICY_TYPE)
-                                                 .description(MOCK_ACCESS_POLICY_DESCRIPTION)
-                                                 .policy(MOCK_ACCESS_POLICY_DOCUMENT)
-                                                 .build();
+            .name(MOCK_ACCESS_POLICY_NAME)
+            .type(MOCK_ACCESS_POLICY_TYPE)
+            .description(MOCK_ACCESS_POLICY_DESCRIPTION)
+            .policy(MOCK_ACCESS_POLICY_DOCUMENT.toString())
+            .build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(model).build();
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 

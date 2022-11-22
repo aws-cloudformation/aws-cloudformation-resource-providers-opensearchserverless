@@ -1,7 +1,7 @@
 package software.amazon.opensearchserverless.accesspolicy;
 
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
-import software.amazon.awssdk.services.opensearchserverless.model.AccessPolicyDetail;
+import software.amazon.awssdk.services.opensearchserverless.model.AccessPolicySummary;
 import software.amazon.awssdk.services.opensearchserverless.model.AccessPolicyType;
 import software.amazon.awssdk.services.opensearchserverless.model.ListAccessPoliciesRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.ListAccessPoliciesResponse;
@@ -45,11 +45,11 @@ public class ListHandlerTest extends AbstractTestBase {
     public void handleRequest_SimpleSuccess() {
         final ListHandler handler = new ListHandler();
 
-        final Collection<AccessPolicyDetail> accessPolicyDetails = ImmutableList.of(
-                AccessPolicyDetail.builder().type(MOCK_ACCESS_POLICY_TYPE).name(MOCK_ACCESS_POLICY_NAME_1).build(),
-                AccessPolicyDetail.builder().type(MOCK_ACCESS_POLICY_TYPE).name(MOCK_ACCESS_POLICY_NAME_2).build()
-                                                                                   );
-        final ListAccessPoliciesResponse listAccessPoliciesResponse = ListAccessPoliciesResponse.builder().accessPolicyDetails(accessPolicyDetails).build();
+        final Collection<AccessPolicySummary> accessPolicySummaries = ImmutableList.of(
+            AccessPolicySummary.builder().type(MOCK_ACCESS_POLICY_TYPE).name(MOCK_ACCESS_POLICY_NAME_1).build(),
+            AccessPolicySummary.builder().type(MOCK_ACCESS_POLICY_TYPE).name(MOCK_ACCESS_POLICY_NAME_2).build()
+        );
+        final ListAccessPoliciesResponse listAccessPoliciesResponse = ListAccessPoliciesResponse.builder().accessPolicySummaries(accessPolicySummaries).build();
         when(openSearchServerlessClient.listAccessPolicies(any(ListAccessPoliciesRequest.class))).thenReturn(listAccessPoliciesResponse);
 
         final ResourceModel model = ResourceModel.builder().type(MOCK_ACCESS_POLICY_TYPE).build();
@@ -63,7 +63,7 @@ public class ListHandlerTest extends AbstractTestBase {
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModel()).isNull();
         assertThat(response.getResourceModels()).isNotNull();
-        assertThat(response.getResourceModels()).hasSize(accessPolicyDetails.size());
+        assertThat(response.getResourceModels()).hasSize(accessPolicySummaries.size());
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
     }
