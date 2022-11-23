@@ -3,7 +3,7 @@
         "Name": "accesspolicy-name-1",
         "Type": "data",
         "Description": "Accesspolicy description",
-        "Policy": "[{\"Description\":\"data policy v1.0\",\"Rules\":[{\"ResourceType\":\"index\",\"Resource\":[\"index/*/*\"],\"Permission\":[\"aoss:ReadDocument\"]},{\"ResourceType\":\"collection\",\"Resource\":[\"collection/*\"],\"Permission\":[\"aoss:*\"]}],\"Principal\":[\"arn:aws:iam::{{account}}:user/test-abc\"]}]"
+        "Policy": "[{\"Rules\": [{\"Resource\": [\"index/*/*\"],\"Permission\": [\"aoss:ReadDocument\"],\"ResourceType\": \"index\"}, {\"Resource\": [\"collection/*\"],\"Permission\": [\"aoss:*\"],\"ResourceType\": \"collection\"}],\"Principal\": [\"arn:aws:iam::{{account}}:user/test-abc\"],\"Description\": \"data policy v1.0\"}]"
     },
     "PatchInputs": [
         {
