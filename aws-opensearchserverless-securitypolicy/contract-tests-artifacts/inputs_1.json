@@ -3,7 +3,7 @@
         "Name": "securitypolicy-name-1",
         "Type": "encryption",
         "Description": "SecurityPolicy  description 1",
-        "Policy":  "{\"Rules\":[{\"ResourceType\":\"collection\",\"Resource\":[\"collection/cfntest*\"]}],\"AWSOwnedKey\":true}"
+        "Policy": "{\"Rules\": [{\"Resource\": [\"collection/cfntest*\"],\"ResourceType\": \"collection\"}],\"AWSOwnedKey\": true}"
     },
     "PatchInputs": [
         {
