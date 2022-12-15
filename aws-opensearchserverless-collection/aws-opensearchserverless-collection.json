@@ -95,6 +95,9 @@
         "/properties/CollectionEndpoint",
         "/properties/DashboardEndpoint"
     ],
+    "writeOnlyProperties": [
+        "/properties/Tags"
+    ],
     "createOnlyProperties": [
         "/properties/Name",
         "/properties/Tags",
@@ -111,7 +114,8 @@
         "create": {
             "permissions": [
                 "aoss:CreateCollection",
-                "aoss:BatchGetCollection"
+                "aoss:BatchGetCollection",
+                "iam:CreateServiceLinkedRole"
             ]
         },
         "delete": {

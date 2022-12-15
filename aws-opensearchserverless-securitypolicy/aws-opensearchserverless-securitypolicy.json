@@ -56,20 +56,24 @@
     "handlers": {
         "create": {
             "permissions": [
+                "aoss:GetSecurityPolicy",
                 "aoss:CreateSecurityPolicy",
-                "aoss:GetSecurityPolicy"
+                "kms:DescribeKey",
+                "kms:CreateGrant"
             ]
         },
         "update": {
             "permissions": [
+                "aoss:GetSecurityPolicy",
                 "aoss:UpdateSecurityPolicy",
-                "aoss:GetSecurityPolicy"
+                "kms:DescribeKey",
+                "kms:CreateGrant"
             ]
         },
         "delete": {
             "permissions": [
-                "aoss:DeleteSecurityPolicy",
-                "aoss:GetSecurityPolicy"
+                "aoss:GetSecurityPolicy",
+                "aoss:DeleteSecurityPolicy"
             ]
         },
         "list": {
@@ -79,7 +83,8 @@
         },
         "read": {
             "permissions": [
-                "aoss:GetSecurityPolicy"
+                "aoss:GetSecurityPolicy",
+                "kms:DescribeKey"
             ]
         }
     },

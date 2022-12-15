@@ -76,27 +76,79 @@
     "handlers": {
         "create": {
             "permissions": [
-                "aoss:CreateVpcEndpoint"
+                "aoss:BatchGetVpcEndpoint",
+                "aoss:CreateVpcEndpoint",
+                "ec2:CreateVpcEndpoint",
+                "ec2:DeleteVpcEndPoints",
+                "ec2:DescribeVpcEndpoints",
+                "ec2:ModifyVpcEndPoint",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeSecurityGroups",
+                "ec2:CreateTags",
+                "route53:ChangeResourceRecordSets",
+                "route53:GetChange",
+                "route53:GetHostedZone",
+                "route53:ListResourceRecordSets",
+                "route53:ListHostedZonesByName",
+                "route53:CreateHostedZone",
+                "route53:ListHostedZonesByVPC",
+                "route53:AssociateVPCWithHostedZone"
             ]
         },
         "read": {
             "permissions": [
-                "aoss:BatchGetVpcEndpoint"
+                "aoss:BatchGetVpcEndpoint",
+                "ec2:DescribeVpcEndpoints"
             ]
         },
         "update": {
             "permissions": [
-                "aoss:UpdateVpcEndpoint"
+                "aoss:BatchGetVpcEndpoint",
+                "aoss:UpdateVpcEndpoint",
+                "ec2:CreateVpcEndpoint",
+                "ec2:DeleteVpcEndPoints",
+                "ec2:DescribeVpcEndpoints",
+                "ec2:ModifyVpcEndPoint",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeSecurityGroups",
+                "ec2:CreateTags",
+                "route53:ChangeResourceRecordSets",
+                "route53:GetChange",
+                "route53:GetHostedZone",
+                "route53:ListResourceRecordSets",
+                "route53:ListHostedZonesByName",
+                "route53:CreateHostedZone",
+                "route53:ListHostedZonesByVPC",
+                "route53:AssociateVPCWithHostedZone"
             ]
         },
         "delete": {
             "permissions": [
-                "aoss:DeleteVpcEndpoint"
+                "aoss:BatchGetVpcEndpoint",
+                "aoss:DeleteVpcEndpoint",
+                "ec2:DeleteVpcEndPoints",
+                "ec2:DescribeVpcEndpoints",
+                "ec2:ModifyVpcEndPoint",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeSecurityGroups",
+                "ec2:CreateTags",
+                "route53:ChangeResourceRecordSets",
+                "route53:GetChange",
+                "route53:GetHostedZone",
+                "route53:ListResourceRecordSets",
+                "route53:ListHostedZonesByName",
+                "route53:CreateHostedZone",
+                "route53:ListHostedZonesByVPC",
+                "route53:AssociateVPCWithHostedZone"
             ]
         },
         "list": {
             "permissions": [
-                "aoss:ListVpcEndpoints"
+                "aoss:ListVpcEndpoints",
+                "ec2:DescribeVpcEndpoints"
             ]
         }
     },

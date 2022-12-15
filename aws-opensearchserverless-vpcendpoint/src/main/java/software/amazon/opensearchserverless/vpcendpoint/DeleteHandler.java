@@ -20,12 +20,14 @@ import com.amazonaws.util.StringUtils;
 
 public class DeleteHandler extends BaseHandlerStd {
 
+    public static final int CLEANUP_WAIT_COUNT = 10;
+
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-            final AmazonWebServicesClientProxy proxy,
-            final ResourceHandlerRequest<ResourceModel> request,
-            final CallbackContext callbackContext,
-            final ProxyClient<OpenSearchServerlessClient> proxyClient,
-            final Logger logger) {
+        final AmazonWebServicesClientProxy proxy,
+        final ResourceHandlerRequest<ResourceModel> request,
+        final CallbackContext callbackContext,
+        final ProxyClient<OpenSearchServerlessClient> proxyClient,
+        final Logger logger) {
 
         final ResourceModel model = request.getDesiredResourceState();
         if (StringUtils.isNullOrEmpty(model.getId())) {
@@ -33,24 +35,28 @@ public class DeleteHandler extends BaseHandlerStd {
         }
 
         return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
-                            .then(progress -> proxy.initiate("AWS-OpenSearchServerless-VpcEndpoint::Delete::PreDeletionCheck",
-                                                             proxyClient,
-                                                             progress.getResourceModel(),
-                                                             progress.getCallbackContext())
-                                                   .translateToServiceRequest(Translator::translateToReadRequest)
-                                                   .makeServiceCall(this::getActiveVpcEndpoint)
-                                                   .handleError(this::handleGetActiveVpcEndpointException)
-                                                   .progress())
-                            .then(progress -> proxy.initiate("AWS-OpenSearchServerless-VpcEndpoint::Delete",
-                                                             proxyClient,
-                                                             progress.getResourceModel(),
-                                                             progress.getCallbackContext())
-                                                   .translateToServiceRequest(Translator::translateToDeleteRequest)
-                                                   .makeServiceCall((deleteVpcEndpointRequest, proxyClient1) ->
-                                                                            deleteVpcEndpoint(deleteVpcEndpointRequest, proxyClient1, logger))
-                                                   .stabilize((awsRequest, awsResponse, proxyClient1, resourceModel, callbackContext1) ->
-                                                                      stabilizeVpcEndpointDelete(awsRequest, proxyClient1, logger))
-                                                   .done((deleteRequest) -> ProgressEvent.<ResourceModel, CallbackContext>builder().status(OperationStatus.SUCCESS).build()));
+            .then(progress -> proxy.initiate("AWS-OpenSearchServerless-VpcEndpoint::Delete::PreDeletionCheck",
+                    proxyClient,
+                    progress.getResourceModel(),
+                    progress.getCallbackContext())
+                .translateToServiceRequest(Translator::translateToReadRequest)
+                .makeServiceCall(this::getActiveVpcEndpoint)
+                .handleError(this::handleGetActiveVpcEndpointException)
+                .progress())
+            .then(progress -> proxy.initiate("AWS-OpenSearchServerless-VpcEndpoint::Delete",
+                    proxyClient,
+                    progress.getResourceModel(),
+                    progress.getCallbackContext())
+                .translateToServiceRequest(Translator::translateToDeleteRequest)
+                .makeServiceCall((deleteVpcEndpointRequest, proxyClient1) -> {
+                    DeleteVpcEndpointResponse awsResponse =
+                        deleteVpcEndpoint(deleteVpcEndpointRequest, proxyClient1, logger);
+                    callbackContext.setCleanupWaitCount(CLEANUP_WAIT_COUNT);
+                    return awsResponse;
+                })
+                .stabilize((awsRequest, awsResponse, proxyClient1, resourceModel, callbackContext1) ->
+                    stabilizeVpcEndpointDelete(awsRequest, proxyClient1, callbackContext1, logger))
+                .done((deleteRequest) -> ProgressEvent.<ResourceModel, CallbackContext>builder().status(OperationStatus.SUCCESS).build()));
     }
 
     /**
@@ -61,15 +67,22 @@ public class DeleteHandler extends BaseHandlerStd {
      *                                 Returns true only if VpcEndpoint is not found or status is FAILED
      */
     private boolean stabilizeVpcEndpointDelete(
-            final DeleteVpcEndpointRequest deleteVpcEndpointRequest,
-            final ProxyClient<OpenSearchServerlessClient> proxyClient,
-            final Logger logger) {
+        final DeleteVpcEndpointRequest deleteVpcEndpointRequest,
+        final ProxyClient<OpenSearchServerlessClient> proxyClient,
+        final CallbackContext callbackContext,
+        final Logger logger) {
         logger.log(String.format("Stabilize VpcEndpointDelete for resource %s", deleteVpcEndpointRequest));
 
         final BatchGetVpcEndpointRequest request = BatchGetVpcEndpointRequest.builder().ids(deleteVpcEndpointRequest.id()).build();
         final BatchGetVpcEndpointResponse batchGetVpcEndpointResponse = proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::batchGetVpcEndpoint);
         if (batchGetVpcEndpointResponse.vpcEndpointDetails().isEmpty()) {
-            return true;
+            int cleanupWaitCount = callbackContext.getCleanupWaitCount() - 1;
+            if (cleanupWaitCount > 0 ) {
+                callbackContext.setCleanupWaitCount(cleanupWaitCount);
+                return false;
+            } else {
+                return true;
+            }
         } else if (batchGetVpcEndpointResponse.vpcEndpointDetails().size() == 1) {
             final VpcEndpointDetail vpcEndpointDetail = batchGetVpcEndpointResponse.vpcEndpointDetails().get(0);
             if (vpcEndpointDetail.status().equals(VpcEndpointStatus.DELETING)) {
@@ -80,9 +93,9 @@ public class DeleteHandler extends BaseHandlerStd {
     }
 
     private DeleteVpcEndpointResponse deleteVpcEndpoint(
-            final DeleteVpcEndpointRequest deleteVpcEndpointRequest,
-            final ProxyClient<OpenSearchServerlessClient> proxyClient,
-            final Logger logger) {
+        final DeleteVpcEndpointRequest deleteVpcEndpointRequest,
+        final ProxyClient<OpenSearchServerlessClient> proxyClient,
+        final Logger logger) {
         DeleteVpcEndpointResponse deleteVpcEndpointResponse;
         try {
             logger.log(String.format("Sending delete Vpc Endpoint request: %s",deleteVpcEndpointRequest));
