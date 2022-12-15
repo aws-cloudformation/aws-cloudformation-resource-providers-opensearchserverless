@@ -1,6 +1,6 @@
 {
     "CreateInputs": {
-        "Name": "contracttest-collection-name",
+        "Name": "col-{{uuid[4:20]}}",
         "Type": "SEARCH",
         "Description": "contracttest Collection description"
     },

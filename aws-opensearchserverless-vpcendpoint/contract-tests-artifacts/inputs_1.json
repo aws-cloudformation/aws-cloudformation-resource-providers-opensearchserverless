@@ -1,6 +1,6 @@
 {
     "CreateInputs": {
-        "Name": "contract-test-vpc-name-1",
+        "Name": "vpc-{{uuid[4:20]}}",
         "VpcId": "{{awsopensearchserverlessvpcendpointcto1}}",
         "SubnetIds": ["{{awsopensearchserverlessvpcendpointcto2}}"],
         "SecurityGroupIds": ["{{awsopensearchserverlessvpcendpointcto4}}"]

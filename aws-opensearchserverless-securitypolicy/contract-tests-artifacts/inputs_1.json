@@ -1,6 +1,6 @@
 {
     "CreateInputs": {
-        "Name": "securitypolicy-name-1",
+        "Name": "sp-{{uuid[4:20]}}",
         "Type": "encryption",
         "Description": "SecurityPolicy  description 1",
         "Policy": "{\"Rules\": [{\"Resource\": [\"collection/cfntest*\"],\"ResourceType\": \"collection\"}],\"AWSOwnedKey\": true}"

@@ -35,6 +35,8 @@ Resources:
                 - "aoss:GetSecurityPolicy"
                 - "aoss:ListSecurityPolicies"
                 - "aoss:UpdateSecurityPolicy"
+                - "kms:CreateGrant"
+                - "kms:DescribeKey"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

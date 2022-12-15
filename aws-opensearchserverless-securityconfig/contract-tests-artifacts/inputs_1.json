@@ -1,6 +1,6 @@
 {
     "CreateInputs": {
-        "Name": "securityconfig-name-1",
+        "Name": "sc-{{uuid[4:20]}}",
         "Type": "saml",
         "Description": "SecurityConfig description 1",
         "SamlOptions": {

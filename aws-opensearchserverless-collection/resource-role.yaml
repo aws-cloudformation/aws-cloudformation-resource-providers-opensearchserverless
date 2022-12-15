@@ -35,6 +35,7 @@ Resources:
                 - "aoss:DeleteCollection"
                 - "aoss:ListCollections"
                 - "aoss:UpdateCollection"
+                - "iam:CreateServiceLinkedRole"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:
