@@ -51,10 +51,6 @@ public class CreateHandler extends BaseHandlerStd {
             return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "Name cannot be empty");
         }
 
-        if (StringUtils.isNullOrEmpty(model.getType())) {
-            return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "Type cannot be empty");
-        }
-
         Map<String, String> allDesiredTags = Maps.newHashMap();
         allDesiredTags.putAll(Optional.ofNullable(request.getDesiredResourceTags()).orElse(Collections.emptyMap()));
         allDesiredTags.putAll(Optional.ofNullable(request.getSystemTags()).orElse(Collections.emptyMap()));
