@@ -1,6 +1,5 @@
 package software.amazon.opensearchserverless.collection;
 
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionResponse;
@@ -9,9 +8,7 @@ import software.amazon.awssdk.services.opensearchserverless.model.ConflictExcept
 import software.amazon.awssdk.services.opensearchserverless.model.CreateCollectionRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.CreateCollectionResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.InternalServerException;
-import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
-import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotStabilizedException;
@@ -121,12 +118,8 @@ public class CreateHandler extends BaseHandlerStd {
                 proxyClient.injectCredentialsAndInvokeV2(createCollectionRequest, proxyClient.client()::createCollection);
         } catch (ConflictException e) {
             throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME,createCollectionRequest.name(),e);
-        } catch (ValidationException e) {
-            throw new CfnInvalidRequestException(createCollectionRequest.toString(), e);
         } catch (InternalServerException e) {
             throw new CfnInternalFailureException(e);
-        } catch (AwsServiceException e) {
-            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
         }
         logger.log(String.format("%s successfully created. response: %s", ResourceModel.TYPE_NAME, createCollectionResponse));
         return createCollectionResponse;
