@@ -43,9 +43,9 @@ _Required_: Yes
 
 _Type_: String
 
-_Minimum_: <code>3</code>
+_Minimum Length_: <code>3</code>
 
-_Maximum_: <code>32</code>
+_Maximum Length_: <code>32</code>
 
 _Pattern_: <code>^[a-z][a-z0-9-]{2,31}$</code>
 
@@ -79,9 +79,9 @@ _Required_: Yes
 
 _Type_: String
 
-_Minimum_: <code>1</code>
+_Minimum Length_: <code>1</code>
 
-_Maximum_: <code>255</code>
+_Maximum Length_: <code>255</code>
 
 _Pattern_: <code>^vpc-[0-9a-z]*$</code>
 

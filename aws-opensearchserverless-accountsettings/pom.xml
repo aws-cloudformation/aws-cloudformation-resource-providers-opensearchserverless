@@ -16,7 +16,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <aws.java.sdk.version>2.18.0</aws.java.sdk.version>
+        <aws.java.sdk.version>2.19.12</aws.java.sdk.version>
         <cfn.generate.args/>
     </properties>
 
@@ -36,8 +36,8 @@
         <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/opensearchserverless -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
-            <artifactId>aws-java-sdk-opensearchserverless</artifactId>
-            <version>2.0</version>
+            <artifactId>opensearchserverless</artifactId>
+            <version>${aws.java.sdk.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/sdk-core -->
         <dependency>

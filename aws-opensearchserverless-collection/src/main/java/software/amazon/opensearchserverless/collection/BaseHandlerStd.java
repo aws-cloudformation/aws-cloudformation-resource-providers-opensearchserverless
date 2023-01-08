@@ -19,6 +19,19 @@ import lombok.NonNull;
 public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
 
     static final String INVALID_COLLECTION_ID_NOT_FOUND = "InvalidCollectionID.NotFound";
+    private final OpenSearchServerlessClient openSearchServerlessClient;
+
+    protected BaseHandlerStd() {
+        this(ClientBuilder.getClient());
+    }
+
+    protected BaseHandlerStd(OpenSearchServerlessClient openSearchServerlessClient ) {
+        this.openSearchServerlessClient = openSearchServerlessClient;
+    }
+
+    private OpenSearchServerlessClient getOpenSearchServerlessClient() {
+        return openSearchServerlessClient;
+    }
 
     @Override
     public final ProgressEvent<ResourceModel, CallbackContext> handleRequest(
@@ -30,9 +43,8 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
                 proxy,
                 request,
                 callbackContext != null ? callbackContext : new CallbackContext(),
-                proxy.newProxy(ClientBuilder::getClient),
-                logger
-                            );
+                proxy.newProxy(this::getOpenSearchServerlessClient),
+                logger);
     }
 
     protected abstract ProgressEvent<ResourceModel, CallbackContext> handleRequest(
@@ -52,12 +64,13 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     protected BatchGetCollectionResponse getActiveCollection(
             final @NonNull BatchGetCollectionRequest batchGetCollectionRequest,
             final @NonNull ProxyClient<OpenSearchServerlessClient> proxyClient) {
-        final BatchGetCollectionResponse response = proxyClient.injectCredentialsAndInvokeV2(batchGetCollectionRequest, proxyClient.client()::batchGetCollection);
-        if (!response.collectionDetails().isEmpty() && response.collectionDetails().get(0).status().equals(CollectionStatus.ACTIVE)) {
+        final BatchGetCollectionResponse response =proxyClient.injectCredentialsAndInvokeV2(batchGetCollectionRequest,
+                proxyClient.client()::batchGetCollection);
+        if (!response.collectionDetails().isEmpty()
+                && response.collectionDetails().get(0).status().equals(CollectionStatus.ACTIVE)) {
             return response;
         }
         throw new CfnNotFoundException(ResourceModel.TYPE_NAME, batchGetCollectionRequest.ids().get(0));
-
     }
 
     /**
@@ -78,7 +91,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
             final @NonNull ResourceModel model,
             final CallbackContext context) throws Exception {
         if ((exception instanceof AwsServiceException && ((AwsServiceException) exception).awsErrorDetails().errorCode().equals(INVALID_COLLECTION_ID_NOT_FOUND))
-                    || exception instanceof CfnNotFoundException) {
+                || exception instanceof CfnNotFoundException) {
             return ProgressEvent.failed(model, context, HandlerErrorCode.NotFound, exception.getMessage());
         }
         throw exception;
