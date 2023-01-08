@@ -1,6 +1,5 @@
 package software.amazon.opensearchserverless.vpcendpoint;
 
-
 import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
@@ -19,6 +18,19 @@ import lombok.NonNull;
 
 public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
   static final String INVALID_VpcEndpoint_ID_NOT_FOUND = "InvalidVpcEndpointID.NotFound";
+  private final OpenSearchServerlessClient openSearchServerlessClient;
+
+  protected BaseHandlerStd() {
+    this(ClientBuilder.getClient());
+  }
+
+  protected BaseHandlerStd(OpenSearchServerlessClient openSearchServerlessClient ) {
+    this.openSearchServerlessClient = openSearchServerlessClient;
+  }
+
+  private OpenSearchServerlessClient getOpenSearchServerlessClient() {
+    return openSearchServerlessClient;
+  }
 
   @Override
   public final ProgressEvent<ResourceModel, CallbackContext> handleRequest(
@@ -30,9 +42,8 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
             proxy,
             request,
             callbackContext != null ? callbackContext : new CallbackContext(),
-            proxy.newProxy(ClientBuilder::getClient),
-            logger
-                        );
+            proxy.newProxy(this::getOpenSearchServerlessClient),
+            logger);
   }
 
   protected abstract ProgressEvent<ResourceModel, CallbackContext> handleRequest(
@@ -57,7 +68,6 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
       return response;
     }
     throw new CfnNotFoundException(ResourceModel.TYPE_NAME, batchGetVpcEndpointRequest.ids().get(0));
-
   }
 
   /**

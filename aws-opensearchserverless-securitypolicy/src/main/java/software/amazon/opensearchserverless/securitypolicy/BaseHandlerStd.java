@@ -8,6 +8,21 @@ import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
+
+    private final OpenSearchServerlessClient openSearchServerlessClient;
+
+    protected BaseHandlerStd() {
+        this(ClientBuilder.getClient());
+    }
+
+    protected BaseHandlerStd(OpenSearchServerlessClient openSearchServerlessClient ) {
+        this.openSearchServerlessClient = openSearchServerlessClient;
+    }
+
+    private OpenSearchServerlessClient getOpenSearchServerlessClient() {
+        return openSearchServerlessClient;
+    }
+
     @Override
     public final ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final AmazonWebServicesClientProxy proxy,
@@ -18,9 +33,8 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
             proxy,
             request,
             callbackContext != null ? callbackContext : new CallbackContext(),
-            proxy.newProxy(ClientBuilder::getClient),
-            logger
-        );
+            proxy.newProxy(this::getOpenSearchServerlessClient),
+            logger);
     }
 
     protected abstract ProgressEvent<ResourceModel, CallbackContext> handleRequest(
