@@ -52,7 +52,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final UpdateHandler handler = new UpdateHandler();
+        final UpdateHandler handler = new UpdateHandler(openSearchServerlessClient);
 
         final ResourceModel expectedModel = ResourceModel.builder()
             .name(MOCK_ACCESS_POLICY_NAME)

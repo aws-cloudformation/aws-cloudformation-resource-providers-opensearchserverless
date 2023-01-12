@@ -49,7 +49,7 @@ public class CreateHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final CreateHandler handler = new CreateHandler();
+        final CreateHandler handler = new CreateHandler(openSearchServerlessClient);
 
         final ResourceModel expectedModel = ResourceModel.builder()
                                                          .name(MOCK_ACCESS_POLICY_NAME)

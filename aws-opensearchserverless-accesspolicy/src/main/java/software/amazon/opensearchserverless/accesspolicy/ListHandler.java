@@ -17,6 +17,14 @@ import com.amazonaws.util.StringUtils;
 
 public class ListHandler extends BaseHandlerStd {
 
+    public ListHandler() {
+        super();
+    }
+
+    public ListHandler(OpenSearchServerlessClient openSearchServerlessClient) {
+        super(openSearchServerlessClient);
+    }
+
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
             final AmazonWebServicesClientProxy proxy,

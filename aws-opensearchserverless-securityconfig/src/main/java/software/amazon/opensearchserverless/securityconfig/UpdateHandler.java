@@ -16,6 +16,14 @@ import com.amazonaws.util.StringUtils;
 
 public class UpdateHandler extends BaseHandlerStd {
 
+    public UpdateHandler() {
+        super();
+    }
+
+    public UpdateHandler(OpenSearchServerlessClient openSearchServerlessClient) {
+        super(openSearchServerlessClient);
+    }
+
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
             final AmazonWebServicesClientProxy proxy,
             final ResourceHandlerRequest<ResourceModel> request,

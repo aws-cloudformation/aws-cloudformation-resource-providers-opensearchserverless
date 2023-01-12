@@ -20,6 +20,17 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 public class UpdateHandler extends BaseHandlerStd {
 
     private Logger logger;
+    private final ReadHandler readHandler;
+
+    public UpdateHandler() {
+        super();
+        readHandler = new ReadHandler(getOpenSearchServerlessClient());
+    }
+
+    public UpdateHandler(OpenSearchServerlessClient openSearchServerlessClient) {
+        super(openSearchServerlessClient);
+        readHandler = new ReadHandler(getOpenSearchServerlessClient());
+    }
 
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final @NonNull AmazonWebServicesClientProxy proxy,
@@ -50,7 +61,7 @@ public class UpdateHandler extends BaseHandlerStd {
                 .makeServiceCall((updateCollectionRequest, proxyClient1) -> proxyClient.injectCredentialsAndInvokeV2(updateCollectionRequest, proxyClient1.client()::updateCollection))
                 .stabilize(this::stabilizeCollectionUpdate)
                 .progress())
-            .then(progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
+            .then(progress -> readHandler.handleRequest(proxy, request, callbackContext, proxyClient, logger));
     }
 
     /**

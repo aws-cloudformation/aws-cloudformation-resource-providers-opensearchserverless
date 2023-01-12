@@ -38,11 +38,13 @@ public class UpdateHandlerTest extends AbstractTestBase {
     OpenSearchServerlessClient openSearchServerlessClient;
     private AmazonWebServicesClientProxy proxy;
     private ProxyClient<OpenSearchServerlessClient> proxyClient;
+    private UpdateHandler handler;
 
     @BeforeEach
     public void setup() {
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
         proxyClient = MOCK_PROXY(proxy, openSearchServerlessClient);
+        handler = new UpdateHandler(openSearchServerlessClient);
     }
 
     @AfterEach
@@ -53,8 +55,6 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final UpdateHandler handler = new UpdateHandler();
-
         final UpdateSecurityPolicyResponse updateSecurityPolicyResponse = UpdateSecurityPolicyResponse.builder()
             .securityPolicyDetail(
                 SecurityPolicyDetail.builder()

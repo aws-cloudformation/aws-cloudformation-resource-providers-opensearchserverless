@@ -27,6 +27,18 @@ import com.amazonaws.util.StringUtils;
 
 public class CreateHandler extends BaseHandlerStd {
 
+    private final ReadHandler readHandler;
+
+    public CreateHandler() {
+        super();
+        readHandler = new ReadHandler(getOpenSearchServerlessClient());
+    }
+
+    public CreateHandler(OpenSearchServerlessClient openSearchServerlessClient) {
+        super(openSearchServerlessClient);
+        readHandler = new ReadHandler(getOpenSearchServerlessClient());
+    }
+
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final AmazonWebServicesClientProxy proxy,
         final ResourceHandlerRequest<ResourceModel> request,
@@ -56,7 +68,7 @@ public class CreateHandler extends BaseHandlerStd {
                     .stabilize((awsRequest, awsResponse, client, cbModel, context) -> stabilizeVpcEndpointCreate(awsResponse, client, cbModel, logger))
                     .done((createVpcEndpointRequest, createVpcEndpointResponse, client, resourceModel, callbackContext1) -> ProgressEvent.progress(resourceModel, callbackContext1))
             )
-            .then(progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
+            .then(progress -> readHandler.handleRequest(proxy, request, callbackContext, proxyClient, logger));
     }
 
     /**

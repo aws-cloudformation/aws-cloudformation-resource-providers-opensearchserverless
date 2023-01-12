@@ -22,6 +22,14 @@ public class DeleteHandler extends BaseHandlerStd {
 
     public static final int CLEANUP_WAIT_COUNT = 10;
 
+    public DeleteHandler() {
+        super();
+    }
+
+    public DeleteHandler(OpenSearchServerlessClient openSearchServerlessClient) {
+        super(openSearchServerlessClient);
+    }
+
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final AmazonWebServicesClientProxy proxy,
         final ResourceHandlerRequest<ResourceModel> request,

@@ -37,11 +37,13 @@ public class CreateHandlerTest extends AbstractTestBase {
     OpenSearchServerlessClient openSearchServerlessClient;
     private AmazonWebServicesClientProxy proxy;
     private ProxyClient<OpenSearchServerlessClient> proxyClient;
+    private CreateHandler handler;
 
     @BeforeEach
     public void setup() {
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
         proxyClient = MOCK_PROXY(proxy, openSearchServerlessClient);
+        handler = new CreateHandler(openSearchServerlessClient);
     }
 
     @AfterEach
@@ -52,8 +54,6 @@ public class CreateHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final CreateHandler handler = new CreateHandler();
-
         final ResourceModel model = ResourceModel.builder()
             .name(MOCK_POLICY_NAME)
             .type(MOCK_POLICY_TYPE)

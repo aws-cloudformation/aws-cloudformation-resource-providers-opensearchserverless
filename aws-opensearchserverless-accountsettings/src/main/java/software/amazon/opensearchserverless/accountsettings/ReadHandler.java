@@ -12,6 +12,12 @@ import software.amazon.cloudformation.proxy.*;
 
 public class ReadHandler extends BaseHandlerStd {
 
+    public ReadHandler() {
+    }
+    public ReadHandler(OpenSearchServerlessClient openSearchServerlessClient) {
+        super(openSearchServerlessClient);
+    }
+
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final @NonNull AmazonWebServicesClientProxy proxy,

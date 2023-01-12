@@ -51,10 +51,10 @@ public class DeleteHandlerTest extends AbstractTestBase {
 
     @BeforeEach
     public void setup() {
-        handler = new DeleteHandler();
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
         openSearchServerlessClient = mock(OpenSearchServerlessClient.class);
         proxyClient = MOCK_PROXY(proxy, openSearchServerlessClient);
+        handler = new DeleteHandler(openSearchServerlessClient);
     }
 
     @AfterEach

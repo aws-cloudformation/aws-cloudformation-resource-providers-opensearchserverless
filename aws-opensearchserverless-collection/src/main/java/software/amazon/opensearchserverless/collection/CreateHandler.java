@@ -30,6 +30,17 @@ import lombok.NonNull;
 
 public class CreateHandler extends BaseHandlerStd {
     private Logger logger;
+    private final ReadHandler readHandler;
+
+    public CreateHandler() {
+        super();
+        readHandler = new ReadHandler(getOpenSearchServerlessClient());
+    }
+
+    public CreateHandler(OpenSearchServerlessClient openSearchServerlessClient) {
+        super(openSearchServerlessClient);
+        readHandler = new ReadHandler(getOpenSearchServerlessClient());
+    }
 
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final @NonNull AmazonWebServicesClientProxy proxy,
@@ -64,7 +75,7 @@ public class CreateHandler extends BaseHandlerStd {
                     })
 
             )
-            .then(progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
+            .then(progress -> readHandler.handleRequest(proxy, request, callbackContext, proxyClient, logger));
     }
 
     /**
