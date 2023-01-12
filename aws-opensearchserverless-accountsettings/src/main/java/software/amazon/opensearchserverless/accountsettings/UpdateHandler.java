@@ -14,6 +14,14 @@ import software.amazon.cloudformation.proxy.*;
 
 public class UpdateHandler extends BaseHandlerStd {
 
+    public UpdateHandler() {
+        super();
+    }
+
+    public UpdateHandler(OpenSearchServerlessClient openSearchServerlessClient) {
+        super(openSearchServerlessClient);
+    }
+
     @Override
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final AmazonWebServicesClientProxy proxy,

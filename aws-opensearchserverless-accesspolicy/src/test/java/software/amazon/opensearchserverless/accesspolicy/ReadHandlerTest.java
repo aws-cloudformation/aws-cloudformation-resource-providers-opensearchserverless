@@ -53,7 +53,7 @@ public class ReadHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final ReadHandler handler = new ReadHandler();
+        final ReadHandler handler = new ReadHandler(openSearchServerlessClient);
 
         final ResourceModel expectedModel = ResourceModel.builder()
                                                          .name(MOCK_ACCESS_POLICY_NAME)

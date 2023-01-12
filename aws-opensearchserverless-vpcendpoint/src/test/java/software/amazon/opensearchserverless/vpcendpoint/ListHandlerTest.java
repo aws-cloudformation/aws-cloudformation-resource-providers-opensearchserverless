@@ -38,7 +38,7 @@ public class ListHandlerTest extends AbstractTestBase {
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
         openSearchServerlessClient = Mockito.mock(OpenSearchServerlessClient.class);
         proxyClient = MOCK_PROXY(proxy, openSearchServerlessClient);
-        handler = new ListHandler();
+        handler = new ListHandler(openSearchServerlessClient);
     }
 
     @AfterEach

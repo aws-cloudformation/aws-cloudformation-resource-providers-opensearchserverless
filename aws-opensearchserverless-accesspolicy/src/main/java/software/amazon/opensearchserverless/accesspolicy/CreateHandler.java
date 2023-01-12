@@ -22,6 +22,14 @@ import com.amazonaws.util.StringUtils;
 
 public class CreateHandler extends BaseHandlerStd {
 
+    public CreateHandler() {
+        super();
+    }
+
+    public CreateHandler(OpenSearchServerlessClient openSearchServerlessClient) {
+        super(openSearchServerlessClient);
+    }
+
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
             final AmazonWebServicesClientProxy proxy,
             final ResourceHandlerRequest<ResourceModel> request,

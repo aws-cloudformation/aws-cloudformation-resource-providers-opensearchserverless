@@ -57,7 +57,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
         openSearchServerlessClient = mock(OpenSearchServerlessClient.class);
         proxyClient = MOCK_PROXY(proxy, openSearchServerlessClient);
-        handler = new UpdateHandler();
+        handler = new UpdateHandler(openSearchServerlessClient);
     }
 
     @AfterEach

@@ -23,11 +23,14 @@ public class DeleteHandlerTest extends AbstractTestBase {
     private AmazonWebServicesClientProxy proxy;
     private ProxyClient<OpenSearchServerlessClient> proxyClient;
 
+    private DeleteHandler handler;
+
     @BeforeEach
     public void setup() {
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
         openSearchServerlessClient = mock(OpenSearchServerlessClient.class);
         proxyClient = MOCK_PROXY(proxy, openSearchServerlessClient);
+        handler = new DeleteHandler(openSearchServerlessClient);
     }
 
     @AfterEach
@@ -41,8 +44,6 @@ public class DeleteHandlerTest extends AbstractTestBase {
     @Test
     @org.junit.jupiter.api.Tag("skipSdkInteraction")
     public void handleRequest_SimpleSuccess() {
-        final DeleteHandler handler = new DeleteHandler();
-
         final ResourceModel model = ResourceModel.builder()
             .accountId(MOCK_ACCOUNT_ID)
             .build();
@@ -68,8 +69,6 @@ public class DeleteHandlerTest extends AbstractTestBase {
     @Test
     @org.junit.jupiter.api.Tag("skipSdkInteraction")
     public void handleRequest_IncorrectAccountId_NotFound() {
-        final DeleteHandler handler = new DeleteHandler();
-
         final ResourceModel model = ResourceModel.builder()
             .accountId(MOCK_ACCOUNT_ID_1)
             .build();

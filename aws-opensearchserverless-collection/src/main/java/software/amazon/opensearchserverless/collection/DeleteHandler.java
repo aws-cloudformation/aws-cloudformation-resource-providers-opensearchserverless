@@ -22,6 +22,14 @@ import lombok.NonNull;
 public class DeleteHandler extends BaseHandlerStd {
     private Logger logger;
 
+    public DeleteHandler() {
+        super();
+    }
+
+    public DeleteHandler(OpenSearchServerlessClient openSearchServerlessClient) {
+        super(openSearchServerlessClient);
+    }
+
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
             final @NonNull AmazonWebServicesClientProxy proxy,
             final @NonNull ResourceHandlerRequest<ResourceModel> request,

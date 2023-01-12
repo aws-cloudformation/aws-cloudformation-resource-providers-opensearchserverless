@@ -11,12 +11,19 @@ import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.amazonaws.util.StringUtils;
 
 public class ListHandler extends BaseHandlerStd {
+
+    public ListHandler() {
+        super();
+    }
+
+    public ListHandler(OpenSearchServerlessClient openSearchServerlessClient) {
+        super(openSearchServerlessClient);
+    }
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(

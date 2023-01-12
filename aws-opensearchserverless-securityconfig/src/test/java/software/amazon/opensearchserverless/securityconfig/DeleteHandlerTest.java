@@ -5,7 +5,6 @@ import software.amazon.awssdk.services.opensearchserverless.model.DeleteSecurity
 import software.amazon.awssdk.services.opensearchserverless.model.DeleteSecurityConfigResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
-import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
@@ -41,7 +40,7 @@ public class DeleteHandlerTest extends AbstractTestBase {
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
         openSearchServerlessClient = mock(OpenSearchServerlessClient.class);
         proxyClient = MOCK_PROXY(proxy, openSearchServerlessClient);
-        handler = new DeleteHandler();
+        handler = new DeleteHandler(openSearchServerlessClient);
     }
 
     @AfterEach

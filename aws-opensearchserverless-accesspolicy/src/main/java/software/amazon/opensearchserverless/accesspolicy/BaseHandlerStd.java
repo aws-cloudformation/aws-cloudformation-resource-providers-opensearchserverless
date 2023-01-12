@@ -19,7 +19,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
         this.openSearchServerlessClient = openSearchServerlessClient;
     }
 
-    private OpenSearchServerlessClient getOpenSearchServerlessClient() {
+    protected OpenSearchServerlessClient getOpenSearchServerlessClient() {
         return openSearchServerlessClient;
     }
 

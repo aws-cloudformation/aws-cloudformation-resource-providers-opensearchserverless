@@ -7,6 +7,14 @@ import software.amazon.cloudformation.proxy.*;
 
 public class DeleteHandler extends BaseHandlerStd {
 
+    public DeleteHandler() {
+        super();
+    }
+
+    public DeleteHandler(OpenSearchServerlessClient openSearchServerlessClient) {
+        super(openSearchServerlessClient);
+    }
+
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final @NonNull AmazonWebServicesClientProxy proxy,

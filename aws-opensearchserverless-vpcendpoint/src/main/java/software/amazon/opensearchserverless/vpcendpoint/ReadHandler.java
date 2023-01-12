@@ -13,6 +13,12 @@ import com.amazonaws.util.StringUtils;
 public class ReadHandler extends BaseHandlerStd {
     private Logger logger;
 
+    public ReadHandler() {
+    }
+    public ReadHandler(OpenSearchServerlessClient openSearchServerlessClient) {
+        super(openSearchServerlessClient);
+    }
+
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
             final AmazonWebServicesClientProxy proxy,
             final ResourceHandlerRequest<ResourceModel> request,

@@ -14,6 +14,12 @@ import lombok.NonNull;
 public class ReadHandler extends BaseHandlerStd {
     private Logger logger;
 
+    public ReadHandler() {
+    }
+    public ReadHandler(OpenSearchServerlessClient openSearchServerlessClient) {
+        super(openSearchServerlessClient);
+    }
+
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
             final @NonNull AmazonWebServicesClientProxy proxy,
             final @NonNull ResourceHandlerRequest<ResourceModel> request,

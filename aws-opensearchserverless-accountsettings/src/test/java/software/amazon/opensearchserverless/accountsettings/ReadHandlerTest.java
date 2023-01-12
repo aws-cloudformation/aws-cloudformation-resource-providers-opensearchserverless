@@ -31,11 +31,14 @@ public class ReadHandlerTest extends AbstractTestBase {
     private AmazonWebServicesClientProxy proxy;
     private ProxyClient<OpenSearchServerlessClient> proxyClient;
 
+    private ReadHandler handler;
+
     @BeforeEach
     public void setup() {
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
         openSearchServerlessClient = mock(OpenSearchServerlessClient.class);
         proxyClient = MOCK_PROXY(proxy, openSearchServerlessClient);
+        handler = new ReadHandler(openSearchServerlessClient);
     }
 
     @AfterEach
@@ -48,8 +51,6 @@ public class ReadHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final ReadHandler handler = new ReadHandler();
-
         final ResourceModel expectedModel = ResourceModel.builder()
             .accountId(MOCK_ACCOUNT_ID)
             .capacityLimits(CapacityLimits.builder()
@@ -95,8 +96,6 @@ public class ReadHandlerTest extends AbstractTestBase {
     @Test
     @org.junit.jupiter.api.Tag("skipSdkInteraction")
     public void handleRequest_IncorrectAccountId_NotFound() {
-        final ReadHandler handler = new ReadHandler();
-
         final ResourceModel model = ResourceModel.builder()
             .accountId(MOCK_ACCOUNT_ID_1)
             .build();
@@ -119,8 +118,6 @@ public class ReadHandlerTest extends AbstractTestBase {
     @Test
     @org.junit.jupiter.api.Tag("skipSdkInteraction")
     public void handleRequest_WhenServerFailure_ThrowsException() {
-        final ReadHandler handler = new ReadHandler();
-
         final ResourceModel model = ResourceModel.builder()
             .accountId(MOCK_ACCOUNT_ID)
             .build();
@@ -143,8 +140,6 @@ public class ReadHandlerTest extends AbstractTestBase {
     @Test
     @org.junit.jupiter.api.Tag("skipSdkInteraction")
     public void handleRequest_WhenAwsServiceException_ThrowsException() {
-        final ReadHandler handler = new ReadHandler();
-
         final ResourceModel model = ResourceModel.builder()
             .accountId(MOCK_ACCOUNT_ID)
             .build();
@@ -167,8 +162,6 @@ public class ReadHandlerTest extends AbstractTestBase {
     @Test
     @org.junit.jupiter.api.Tag("skipSdkInteraction")
     public void handleRequest_WhenValidationException_ThrowsException() {
-        final ReadHandler handler = new ReadHandler();
-
         final ResourceModel model = ResourceModel.builder()
             .accountId(MOCK_ACCOUNT_ID)
             .build();

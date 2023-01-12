@@ -53,10 +53,10 @@ public class ReadHandlerTest extends AbstractTestBase {
 
     @BeforeEach
     public void setup() {
-        handler = new ReadHandler();
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
         openSearchServerlessClient = mock(OpenSearchServerlessClient.class);
         proxyClient = MOCK_PROXY(proxy, openSearchServerlessClient);
+        handler = new ReadHandler(openSearchServerlessClient);
     }
 
     @AfterEach

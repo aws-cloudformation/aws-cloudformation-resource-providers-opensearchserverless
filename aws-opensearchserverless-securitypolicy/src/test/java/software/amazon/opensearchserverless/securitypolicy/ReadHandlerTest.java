@@ -35,11 +35,13 @@ public class ReadHandlerTest extends AbstractTestBase {
     OpenSearchServerlessClient openSearchServerlessClient;
     private AmazonWebServicesClientProxy proxy;
     private ProxyClient<OpenSearchServerlessClient> proxyClient;
+    private ReadHandler handler;
 
     @BeforeEach
     public void setup() {
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
         proxyClient = MOCK_PROXY(proxy, openSearchServerlessClient);
+        handler = new ReadHandler(openSearchServerlessClient);
     }
 
     @AfterEach
@@ -50,8 +52,6 @@ public class ReadHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final ReadHandler handler = new ReadHandler();
-
         final ResourceModel model = ResourceModel.builder()
             .name(MOCK_POLICY_NAME)
             .type(MOCK_POLICY_TYPE)

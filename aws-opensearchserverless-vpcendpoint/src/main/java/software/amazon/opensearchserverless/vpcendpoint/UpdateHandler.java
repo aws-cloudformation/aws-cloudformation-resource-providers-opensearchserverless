@@ -26,6 +26,18 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 public class UpdateHandler extends BaseHandlerStd {
 
+    private final ReadHandler readHandler;
+
+    public UpdateHandler() {
+        super();
+        readHandler = new ReadHandler(getOpenSearchServerlessClient());
+    }
+
+    public UpdateHandler(OpenSearchServerlessClient openSearchServerlessClient) {
+        super(openSearchServerlessClient);
+        readHandler = new ReadHandler(getOpenSearchServerlessClient());
+    }
+
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final AmazonWebServicesClientProxy proxy,
         final ResourceHandlerRequest<ResourceModel> request,
@@ -96,7 +108,7 @@ public class UpdateHandler extends BaseHandlerStd {
                         stabilizeVpcEndpointUpdate(client, cbModel, logger))
                     .progress())
             // STEP 4 [describe call/chain to return the resource model]
-            .then(progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
+            .then(progress -> readHandler.handleRequest(proxy, request, callbackContext, proxyClient, logger));
     }
 
     /**

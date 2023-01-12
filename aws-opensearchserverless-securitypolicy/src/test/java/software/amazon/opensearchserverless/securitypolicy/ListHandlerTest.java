@@ -34,17 +34,17 @@ public class ListHandlerTest extends AbstractTestBase {
     OpenSearchServerlessClient openSearchServerlessClient;
     private AmazonWebServicesClientProxy proxy;
     private ProxyClient<OpenSearchServerlessClient> proxyClient;
+    private ListHandler handler;
 
     @BeforeEach
     public void setup() {
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
         proxyClient = MOCK_PROXY(proxy, openSearchServerlessClient);
+        handler = new ListHandler(openSearchServerlessClient);
     }
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final ListHandler handler = new ListHandler();
-
         Collection<SecurityPolicySummary> securityPolicySummaries = ImmutableList.of(
             SecurityPolicySummary.builder().name(MOCK_POLICY_NAME_1).type(MOCK_POLICY_TYPE_1).build(),
             SecurityPolicySummary.builder().name(MOCK_POLICY_NAME_2).type(MOCK_POLICY_TYPE_1).build());

@@ -31,11 +31,14 @@ public class CreateHandlerTest extends AbstractTestBase {
     private AmazonWebServicesClientProxy proxy;
     private ProxyClient<OpenSearchServerlessClient> proxyClient;
 
+    private CreateHandler handler;
+
     @BeforeEach
     public void setup() {
         proxy = new AmazonWebServicesClientProxy(logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
         openSearchServerlessClient = mock(OpenSearchServerlessClient.class);
         proxyClient = MOCK_PROXY(proxy, openSearchServerlessClient);
+        handler = new CreateHandler(openSearchServerlessClient);
     }
 
     @AfterEach
@@ -48,8 +51,6 @@ public class CreateHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final CreateHandler handler = new CreateHandler();
-
         final ResourceModel expectedModel = ResourceModel.builder()
             .accountId(MOCK_ACCOUNT_ID)
             .capacityLimits(CapacityLimits.builder()
@@ -102,8 +103,6 @@ public class CreateHandlerTest extends AbstractTestBase {
     @Test
     @org.junit.jupiter.api.Tag("skipSdkInteraction")
     public void handleRequest_WithoutCapacityLimits_Fail() {
-        final CreateHandler handler = new CreateHandler();
-
         final ResourceModel model = ResourceModel.builder()
             .build();
 
@@ -125,8 +124,6 @@ public class CreateHandlerTest extends AbstractTestBase {
     @Test
     @org.junit.jupiter.api.Tag("skipSdkInteraction")
     public void handleRequest_EmptyCapacityLimits_Fail() {
-        final CreateHandler handler = new CreateHandler();
-
         final ResourceModel model = ResourceModel.builder()
             .capacityLimits(CapacityLimits.builder().build())
             .build();
@@ -149,8 +146,6 @@ public class CreateHandlerTest extends AbstractTestBase {
     @Test
     @org.junit.jupiter.api.Tag("skipSdkInteraction")
     public void handleRequest_WhenServerFailure_ThrowsException() {
-        final CreateHandler handler = new CreateHandler();
-
         final ResourceModel model = ResourceModel.builder()
             .capacityLimits(CapacityLimits.builder()
                 .maxIndexingCapacityInOCU(MOCK_MAX_INDEXING_CAPACITY_IN_OCU)
@@ -176,8 +171,6 @@ public class CreateHandlerTest extends AbstractTestBase {
     @Test
     @org.junit.jupiter.api.Tag("skipSdkInteraction")
     public void handleRequest_WhenAwsServiceException_ThrowsException() {
-        final CreateHandler handler = new CreateHandler();
-
         final ResourceModel model = ResourceModel.builder()
             .capacityLimits(CapacityLimits.builder()
                 .maxIndexingCapacityInOCU(MOCK_MAX_INDEXING_CAPACITY_IN_OCU)
@@ -203,8 +196,6 @@ public class CreateHandlerTest extends AbstractTestBase {
     @Test
     @org.junit.jupiter.api.Tag("skipSdkInteraction")
     public void handleRequest_WhenValidationException_ThrowsException() {
-        final CreateHandler handler = new CreateHandler();
-
         final ResourceModel model = ResourceModel.builder()
             .capacityLimits(CapacityLimits.builder()
                 .maxIndexingCapacityInOCU(MOCK_MAX_INDEXING_CAPACITY_IN_OCU)

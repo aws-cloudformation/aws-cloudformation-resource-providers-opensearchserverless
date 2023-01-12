@@ -23,6 +23,18 @@ import com.amazonaws.util.StringUtils;
 
 public class CreateHandler extends BaseHandlerStd {
 
+    private final ReadHandler readHandler;
+
+    public CreateHandler() {
+        super();
+        readHandler = new ReadHandler(getOpenSearchServerlessClient());
+    }
+
+    public CreateHandler(OpenSearchServerlessClient openSearchServerlessClient) {
+        super(openSearchServerlessClient);
+        readHandler = new ReadHandler(getOpenSearchServerlessClient());
+    }
+
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
         final AmazonWebServicesClientProxy proxy,
         final ResourceHandlerRequest<ResourceModel> request,
@@ -54,7 +66,7 @@ public class CreateHandler extends BaseHandlerStd {
                     .progress()
             )
             .then(progress ->
-                new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
+                readHandler.handleRequest(proxy, request, callbackContext, proxyClient, logger));
     }
 
     private CreateSecurityPolicyResponse createSecurityPolicy(

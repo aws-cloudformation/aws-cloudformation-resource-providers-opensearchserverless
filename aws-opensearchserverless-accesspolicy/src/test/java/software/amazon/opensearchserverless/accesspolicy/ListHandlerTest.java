@@ -43,7 +43,7 @@ public class ListHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final ListHandler handler = new ListHandler();
+        final ListHandler handler = new ListHandler(openSearchServerlessClient);
 
         final Collection<AccessPolicySummary> accessPolicySummaries = ImmutableList.of(
             AccessPolicySummary.builder().type(MOCK_ACCESS_POLICY_TYPE).name(MOCK_ACCESS_POLICY_NAME_1).build(),
