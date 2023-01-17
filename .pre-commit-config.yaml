@@ -16,4 +16,5 @@ repos:
           - --no-sort-keys
       - id: check-merge-conflict
       - id: check-yaml
+        args: ['--unsafe']
         exclude: .github/workflows/java-ci-with-maven.yml

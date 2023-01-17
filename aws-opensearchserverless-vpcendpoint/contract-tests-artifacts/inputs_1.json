@@ -1,15 +1,21 @@
 {
-    "CreateInputs": {
-        "Name": "vpc-{{uuid[4:20]}}",
-        "VpcId": "{{awsopensearchserverlessvpcendpointcto1}}",
-        "SubnetIds": ["{{awsopensearchserverlessvpcendpointcto2}}"],
-        "SecurityGroupIds": ["{{awsopensearchserverlessvpcendpointcto4}}"]
-    },
-    "PatchInputs": [
-        {
-            "op": "replace",
-            "path": "SubnetIds",
-            "value": ["{{awsopensearchserverlessvpcendpointcto3}}"]
-        }
+  "CreateInputs": {
+    "Name": "vpc-{{uuid[4:20]}}",
+    "VpcId": "{{awsopensearchserverlessvpcendpointcto1}}",
+    "SubnetIds": [
+      "{{awsopensearchserverlessvpcendpointcto2}}"
+    ],
+    "SecurityGroupIds": [
+      "{{awsopensearchserverlessvpcendpointcto4}}"
     ]
+  },
+  "PatchInputs": [
+    {
+      "op": "replace",
+      "path": "SubnetIds",
+      "value": [
+        "{{awsopensearchserverlessvpcendpointcto3}}"
+      ]
+    }
+  ]
 }

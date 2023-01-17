@@ -1,6 +1,6 @@
 {
-    "capacityLimits": {
-        "maxIndexingCapacityInOCU": 3,
-        "maxSearchCapacityInOCU": 5
-    }
+  "capacityLimits": {
+    "maxIndexingCapacityInOCU": 3,
+    "maxSearchCapacityInOCU": 5
+  }
 }

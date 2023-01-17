@@ -1,15 +1,15 @@
 {
-    "CreateInputs": {
-        "Name": "ap-{{uuid[4:20]}}",
-        "Type": "data",
-        "Description": "Accesspolicy description",
-        "Policy": "[{\"Rules\": [{\"Resource\": [\"index/*/*\"],\"Permission\": [\"aoss:ReadDocument\"],\"ResourceType\": \"index\"}, {\"Resource\": [\"collection/*\"],\"Permission\": [\"aoss:*\"],\"ResourceType\": \"collection\"}],\"Principal\": [\"arn:aws:iam::{{account}}:user/test-abc\"],\"Description\": \"data policy v1.0\"}]"
-    },
-    "PatchInputs": [
-        {
-            "op": "replace",
-            "path": "Description",
-            "value": "Accesspolicy description updated"
-        }
-    ]
+  "CreateInputs": {
+    "Name": "ap-{{uuid[4:20]}}",
+    "Type": "data",
+    "Description": "Accesspolicy description",
+    "Policy": "[{\"Rules\": [{\"Resource\": [\"index/*/*\"],\"Permission\": [\"aoss:ReadDocument\"],\"ResourceType\": \"index\"}, {\"Resource\": [\"collection/*\"],\"Permission\": [\"aoss:*\"],\"ResourceType\": \"collection\"}],\"Principal\": [\"arn:aws:iam::{{account}}:user/test-abc\"],\"Description\": \"data policy v1.0\"}]"
+  },
+  "PatchInputs": [
+    {
+      "op": "replace",
+      "path": "Description",
+      "value": "Accesspolicy description updated"
+    }
+  ]
 }

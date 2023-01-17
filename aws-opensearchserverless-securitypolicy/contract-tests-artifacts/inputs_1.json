@@ -1,15 +1,15 @@
 {
-    "CreateInputs": {
-        "Name": "sp-{{uuid[4:20]}}",
-        "Type": "encryption",
-        "Description": "SecurityPolicy  description 1",
-        "Policy": "{\"Rules\": [{\"Resource\": [\"collection/cfntest*\"],\"ResourceType\": \"collection\"}],\"AWSOwnedKey\": true}"
-    },
-    "PatchInputs": [
-        {
-            "op": "replace",
-            "path": "Description",
-            "value": "SecurityPolicy description 1 updated"
-        }
-    ]
+  "CreateInputs": {
+    "Name": "sp-{{uuid[4:20]}}",
+    "Type": "encryption",
+    "Description": "SecurityPolicy  description 1",
+    "Policy": "{\"Rules\": [{\"Resource\": [\"collection/cfntest*\"],\"ResourceType\": \"collection\"}],\"AWSOwnedKey\": true}"
+  },
+  "PatchInputs": [
+    {
+      "op": "replace",
+      "path": "Description",
+      "value": "SecurityPolicy description 1 updated"
+    }
+  ]
 }
