@@ -26,8 +26,8 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
-    - name: Install jinja2 with 2.11.3 to resolve incompatible issue
-      run: pip install jinja2==2.11.3
+    - name: Install jinja2
+      run: pip install jinja2==3.1.2
     - name: Set up cloudformation-cli-java-plugin
       run: pip install cloudformation-cli-java-plugin
     - name: Downgrading markupsafe to 2.1.1
