@@ -30,6 +30,8 @@ jobs:
       run: pip install jinja2==2.11.3
     - name: Set up cloudformation-cli-java-plugin
       run: pip install cloudformation-cli-java-plugin
+    - name: Downgrading markupsafe to 2.0.1
+      run: pip install markupsafe==2.0.1
     - name: install and run pre-commit
       uses: pre-commit/action@v2.0.0
       with:
