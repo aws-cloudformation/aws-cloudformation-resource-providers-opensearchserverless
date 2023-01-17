@@ -21,4 +21,3 @@ Resources:
       Handler: software.amazon.opensearchserverless.securitypolicy.HandlerWrapper::testEntrypoint
       Runtime: java8
       CodeUri: ./target/aws-opensearchserverless-securitypolicy-handler-1.0-SNAPSHOT.jar
-

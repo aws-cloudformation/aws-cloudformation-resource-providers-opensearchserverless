@@ -118,4 +118,3 @@ The endpoint for the collection.
 #### DashboardEndpoint
 
 The OpenSearch Dashboards endpoint for the collection.
-

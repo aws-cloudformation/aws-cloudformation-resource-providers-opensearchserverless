@@ -1,14 +1,14 @@
 {
-    "CreateInputs": {
-        "Name": "col-{{uuid[4:20]}}",
-        "Type": "SEARCH",
-        "Description": "contracttest Collection description"
-    },
-    "PatchInputs": [
-        {
-            "op": "replace",
-            "path": "Description",
-            "value": "contracttest Collection description updated"
-        }
-    ]
+  "CreateInputs": {
+    "Name": "col-{{uuid[4:20]}}",
+    "Type": "SEARCH",
+    "Description": "contracttest Collection description"
+  },
+  "PatchInputs": [
+    {
+      "op": "replace",
+      "path": "Description",
+      "value": "contracttest Collection description updated"
+    }
+  ]
 }

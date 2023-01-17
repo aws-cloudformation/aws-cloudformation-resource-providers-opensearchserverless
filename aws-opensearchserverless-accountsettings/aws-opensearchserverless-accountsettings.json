@@ -1,71 +1,70 @@
 {
-    "typeName": "AWS::OpenSearchServerless::AccountSettings",
-    "description": "Definition of AWS::OpenSearchServerless::AccountSettings Resource Type",
-    "tagging": {
-        "taggable": false,
-        "tagOnCreate": false,
-        "tagUpdatable": false,
-        "cloudFormationSystemTags": false
-    },
-    "definitions": {
-        "CapacityLimits": {
-            "type": "object",
-            "properties": {
-                "MaxIndexingCapacityInOCU": {
-                    "type": "integer",
-                    "maximum": 10,
-                    "minimum": 0
-                },
-                "MaxSearchCapacityInOCU": {
-                    "type": "integer",
-                    "maximum": 10,
-                    "minimum": 0
-                }
-            },
-            "additionalProperties": false
+  "typeName": "AWS::OpenSearchServerless::AccountSettings",
+  "description": "Definition of AWS::OpenSearchServerless::AccountSettings Resource Type",
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "definitions": {
+    "CapacityLimits": {
+      "type": "object",
+      "properties": {
+        "MaxIndexingCapacityInOCU": {
+          "type": "integer",
+          "maximum": 10,
+          "minimum": 0
         },
-        "AccountId": {
-            "type": "string",
-            "description": "The identifier of the account",
-            "maxLength": 12,
-            "minLength": 12,
-            "pattern": "^[0-9]*$"
+        "MaxSearchCapacityInOCU": {
+          "type": "integer",
+          "maximum": 10,
+          "minimum": 0
         }
+      },
+      "additionalProperties": false
     },
-    "properties": {
-        "AccountId": {
-            "$ref": "#/definitions/AccountId"
-        },
-        "CapacityLimits": {
-            "$ref": "#/definitions/CapacityLimits"
-        }
+    "AccountId": {
+      "type": "string",
+      "description": "The identifier of the account",
+      "maxLength": 12,
+      "minLength": 12,
+      "pattern": "^[0-9]*$"
+    }
+  },
+  "properties": {
+    "AccountId": {
+      "$ref": "#/definitions/AccountId"
     },
-    "readOnlyProperties": [
-        "/properties/AccountId"
-    ],
-    "primaryIdentifier": [
-        "/properties/AccountId"
-    ],
-    "handlers": {
-        "read": {
-            "permissions": [
-                "aoss:GetAccountSettings"
-            ]
-        },
-        "create": {
-            "permissions": [
-                "aoss:UpdateAccountSettings"
-            ]
-        },
-        "update": {
-            "permissions": [
-                "aoss:UpdateAccountSettings"
-            ]
-        },
-        "delete": {
-            "permissions": [
-            ]
-        }
+    "CapacityLimits": {
+      "$ref": "#/definitions/CapacityLimits"
+    }
+  },
+  "readOnlyProperties": [
+    "/properties/AccountId"
+  ],
+  "primaryIdentifier": [
+    "/properties/AccountId"
+  ],
+  "handlers": {
+    "read": {
+      "permissions": [
+        "aoss:GetAccountSettings"
+      ]
     },
-    "additionalProperties": false
+    "create": {
+      "permissions": [
+        "aoss:UpdateAccountSettings"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "aoss:UpdateAccountSettings"
+      ]
+    },
+    "delete": {
+      "permissions": []
+    }
+  },
+  "additionalProperties": false
 }
