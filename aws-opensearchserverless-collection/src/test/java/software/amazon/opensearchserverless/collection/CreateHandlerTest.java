@@ -1,5 +1,8 @@
 package software.amazon.opensearchserverless.collection;
 
+import com.google.common.collect.ImmutableMap;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionResponse;
@@ -18,6 +21,7 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import com.google.common.collect.ImmutableList;
 
 import java.time.Duration;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,6 +54,9 @@ public class CreateHandlerTest extends AbstractTestBase {
 
     @Mock
     private OpenSearchServerlessClient openSearchServerlessClient;
+
+    @Captor
+    ArgumentCaptor<CreateCollectionRequest> createCollectionRequestArgumentCaptor;
 
     private CreateHandler handler;
 
@@ -126,6 +133,81 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getErrorCode()).isNull();
 
         verify(proxyClient.client()).createCollection(any(CreateCollectionRequest.class));
+    }
+
+    @Test
+    public void handleRequestWithTags_SimpleSuccess() {
+        final ResourceModel expectedModel = ResourceModel.builder()
+                .id(COLLECTION_ID)
+                .name(COLLECTION_NAME)
+                .type(COLLECTION_TYPE)
+                .description(COLLECTION_DESCRIPTION)
+                .arn(COLLECTION_ARN)
+                .collectionEndpoint(COLLECTION_ENDPOINT)
+                .dashboardEndpoint(DASHBOARD_ENDPOINT)
+                .build();
+
+
+        String testTagKey = "testTagKey";
+        String testTagValue = "testTagValue";
+        final ResourceModel requestModel = ResourceModel.builder()
+                .name(COLLECTION_NAME)
+                .type(COLLECTION_TYPE)
+                .description(COLLECTION_DESCRIPTION)
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(requestModel)
+                .desiredResourceTags(ImmutableMap.of(testTagKey, testTagValue))
+                .build();
+
+        final CreateCollectionResponse createCollectionResponse =
+                CreateCollectionResponse.builder()
+                        .createCollectionDetail(CreateCollectionDetail.builder().id(COLLECTION_ID).build())
+                        .build();
+        when(proxyClient.client().createCollection(any(CreateCollectionRequest.class))).thenReturn(createCollectionResponse);
+
+        final BatchGetCollectionResponse batchGetCollectionResponse =
+                BatchGetCollectionResponse.builder()
+                        .collectionDetails(
+                                CollectionDetail.builder()
+                                        .id(COLLECTION_ID)
+                                        .status(CollectionStatus.ACTIVE)
+                                        .name(COLLECTION_NAME)
+                                        .type(COLLECTION_TYPE)
+                                        .description(COLLECTION_DESCRIPTION)
+                                        .arn(COLLECTION_ARN)
+                                        .collectionEndpoint(COLLECTION_ENDPOINT)
+                                        .dashboardEndpoint(DASHBOARD_ENDPOINT)
+                                        .createdDate(CREATED_DATE)
+                                        .build()
+                        ).build();
+        when(proxyClient.client().batchGetCollection(any(BatchGetCollectionRequest.class)))
+                .thenReturn(batchGetCollectionResponse);
+
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler
+                .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel()).isEqualTo(expectedModel);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+
+        verify(proxyClient.client()).createCollection(createCollectionRequestArgumentCaptor.capture());
+
+        final CreateCollectionRequest createCollectionRequest = createCollectionRequestArgumentCaptor.getValue();
+        List<software.amazon.awssdk.services.opensearchserverless.model.Tag> tags = createCollectionRequest.tags();
+        boolean tagFound = false;
+        System.out.println(tags);
+        for (software.amazon.awssdk.services.opensearchserverless.model.Tag tag: tags) {
+            if(testTagKey.equals(tag.key()) && testTagValue.equals(tag.value())) {
+                tagFound = true;
+                break;
+            }
+        }
+        assertThat(tagFound).isEqualTo(true);
     }
 
     @Test
