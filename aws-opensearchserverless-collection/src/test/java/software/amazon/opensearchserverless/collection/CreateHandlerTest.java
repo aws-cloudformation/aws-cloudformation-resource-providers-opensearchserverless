@@ -200,7 +200,6 @@ public class CreateHandlerTest extends AbstractTestBase {
         final CreateCollectionRequest createCollectionRequest = createCollectionRequestArgumentCaptor.getValue();
         List<software.amazon.awssdk.services.opensearchserverless.model.Tag> tags = createCollectionRequest.tags();
         boolean tagFound = false;
-        System.out.println(tags);
         for (software.amazon.awssdk.services.opensearchserverless.model.Tag tag: tags) {
             if(testTagKey.equals(tag.key()) && testTagValue.equals(tag.value())) {
                 tagFound = true;
