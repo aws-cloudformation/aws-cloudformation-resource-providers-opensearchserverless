@@ -37,7 +37,7 @@ Properties:
 
 The name of the policy
 
-_Required_: No
+_Required_: Yes
 
 _Type_: String
 
@@ -53,7 +53,7 @@ _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/l
 
 The possible types for the access policy
 
-_Required_: No
+_Required_: Yes
 
 _Type_: String
 
@@ -79,7 +79,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 The JSON policy document that is the content for the policy
 
-_Required_: No
+_Required_: Yes
 
 _Type_: String
 
