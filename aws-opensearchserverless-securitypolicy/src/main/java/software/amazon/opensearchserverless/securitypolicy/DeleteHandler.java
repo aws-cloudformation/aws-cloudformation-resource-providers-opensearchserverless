@@ -1,16 +1,14 @@
 package software.amazon.opensearchserverless.securitypolicy;
 
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.DeleteSecurityPolicyRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.DeleteSecurityPolicyResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.InternalServerException;
 import software.amazon.awssdk.services.opensearchserverless.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
-import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
-import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
+import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
@@ -69,13 +67,12 @@ public class DeleteHandler extends BaseHandlerStd {
             deleteSecurityPolicyResponse = proxyClient.injectCredentialsAndInvokeV2(deleteSecurityPolicyRequest,
                 proxyClient.client()::deleteSecurityPolicy);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(ResourceModel.TYPE_NAME,deleteSecurityPolicyRequest.name(),e);
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME, String.format("Name:%s, Type:%s",
+                    deleteSecurityPolicyRequest.name(), deleteSecurityPolicyRequest.typeAsString()), e);
         } catch (ValidationException e) {
-            throw new CfnInvalidRequestException(deleteSecurityPolicyRequest.toString(), e);
+            throw new CfnInvalidRequestException(deleteSecurityPolicyRequest.toString() + ", " + e.getMessage(), e);
         } catch (InternalServerException e) {
-            throw new CfnInternalFailureException(e);
-        } catch (AwsServiceException e) {
-            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
+            throw new CfnServiceInternalErrorException("DeleteSecurityPolicy", e);
         }
         logger.log(String.format("%s successfully deleted. response: %s", ResourceModel.TYPE_NAME,
             deleteSecurityPolicyResponse));

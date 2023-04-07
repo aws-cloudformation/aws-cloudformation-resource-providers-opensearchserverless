@@ -1,16 +1,14 @@
 package software.amazon.opensearchserverless.securityconfig;
 
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityConfigRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityConfigResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.InternalServerException;
 import software.amazon.awssdk.services.opensearchserverless.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
-import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
-import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
+import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
@@ -58,13 +56,11 @@ public class ReadHandler extends BaseHandlerStd {
         try {
             getSecurityConfigResponse = proxyClient.injectCredentialsAndInvokeV2(getSecurityConfigRequest, proxyClient.client()::getSecurityConfig);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(e);
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME, getSecurityConfigRequest.id(), e);
         } catch (ValidationException e) {
-            throw new CfnInvalidRequestException(getSecurityConfigRequest.toString(), e);
+            throw new CfnInvalidRequestException(getSecurityConfigRequest.toString() + ", " + e.getMessage(), e);
         } catch (InternalServerException e) {
-            throw new CfnInternalFailureException(e);
-        } catch (final AwsServiceException e) {
-            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
+            throw new CfnServiceInternalErrorException("GetSecurityConfig", e);
         }
         logger.log(String.format("%s has successfully been read.", ResourceModel.TYPE_NAME));
         return getSecurityConfigResponse;

@@ -1,6 +1,5 @@
 package software.amazon.opensearchserverless.securitypolicy;
 
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.ConflictException;
 import software.amazon.awssdk.services.opensearchserverless.model.CreateSecurityPolicyRequest;
@@ -8,9 +7,8 @@ import software.amazon.awssdk.services.opensearchserverless.model.CreateSecurity
 import software.amazon.awssdk.services.opensearchserverless.model.InternalServerException;
 import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
-import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
-import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
+import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
@@ -80,13 +78,12 @@ public class CreateHandler extends BaseHandlerStd {
             createSecurityPolicyResponse = proxyClient.injectCredentialsAndInvokeV2(createSecurityPolicyRequest,
                 proxyClient.client()::createSecurityPolicy);
         } catch (ConflictException e) {
-            throw new CfnAlreadyExistsException(e);
+            throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME, String.format("Name:%s, Type:%s",
+                    createSecurityPolicyRequest.name(), createSecurityPolicyRequest.typeAsString()), e);
         } catch (ValidationException e) {
-            throw new CfnInvalidRequestException(createSecurityPolicyRequest.toString(), e);
+            throw new CfnInvalidRequestException(createSecurityPolicyRequest.toString() + ", " + e.getMessage(), e);
         } catch (InternalServerException e) {
-            throw new CfnInternalFailureException(e);
-        } catch (AwsServiceException e) {
-            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
+            throw new CfnServiceInternalErrorException("CreateSecurityPolicy", e);
         }
         logger.log(String.format("%s successfully created. response: %s", ResourceModel.TYPE_NAME,
             createSecurityPolicyResponse));

@@ -1,6 +1,5 @@
 package software.amazon.opensearchserverless.securityconfig;
 
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.*;
 import software.amazon.awssdk.services.opensearchserverless.model.ResourceNotFoundException;
@@ -95,15 +94,14 @@ public class UpdateHandler extends BaseHandlerStd {
             updateSecurityConfigResponse =
                     proxyClient.injectCredentialsAndInvokeV2(updateSecurityConfigRequest, proxyClient.client()::updateSecurityConfig);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(e);
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME, updateSecurityConfigRequest.id(), e);
         } catch (ValidationException e) {
-            throw new CfnInvalidRequestException(updateSecurityConfigRequest.toString(), e);
+            throw new CfnInvalidRequestException(updateSecurityConfigRequest.toString() + ", " + e.getMessage(), e);
         } catch (ConflictException e) {
-            throw new CfnResourceConflictException(ResourceModel.TYPE_NAME, updateSecurityConfigRequest.id(),e.getMessage(),e);
+            throw new CfnResourceConflictException(ResourceModel.TYPE_NAME, updateSecurityConfigRequest.id(),
+                    e.getMessage(), e);
         } catch (InternalServerException e) {
-            throw new CfnServiceInternalErrorException(e);
-        } catch (AwsServiceException e) {
-            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
+            throw new CfnServiceInternalErrorException("UpdateSecurityConfig", e);
         }
         logger.log(String.format("%s successfully updated for %s", ResourceModel.TYPE_NAME, updateSecurityConfigRequest));
         return updateSecurityConfigResponse;
@@ -118,13 +116,11 @@ public class UpdateHandler extends BaseHandlerStd {
         try {
             getSecurityConfigResponse = proxyClient.injectCredentialsAndInvokeV2(getSecurityConfigRequest, proxyClient.client()::getSecurityConfig);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(e);
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME, getSecurityConfigRequest.id(), e);
         } catch (ValidationException e) {
-            throw new CfnInvalidRequestException(getSecurityConfigRequest.toString(), e);
+            throw new CfnInvalidRequestException(getSecurityConfigRequest.toString() + ", " + e.getMessage(), e);
         } catch (InternalServerException e) {
-            throw new CfnInternalFailureException(e);
-        } catch (final AwsServiceException e) {
-            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
+            throw new CfnServiceInternalErrorException("GetSecurityConfig", e);
         }
         logger.log(String.format("%s has successfully been read.", ResourceModel.TYPE_NAME));
         return getSecurityConfigResponse;
