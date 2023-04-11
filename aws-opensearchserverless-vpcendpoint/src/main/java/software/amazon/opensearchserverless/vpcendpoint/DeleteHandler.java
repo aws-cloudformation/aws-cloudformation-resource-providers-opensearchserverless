@@ -1,13 +1,11 @@
 package software.amazon.opensearchserverless.vpcendpoint;
 
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.*;
-import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
-import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnNotStabilizedException;
+import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
@@ -109,13 +107,11 @@ public class DeleteHandler extends BaseHandlerStd {
             logger.log(String.format("Sending delete Vpc Endpoint request: %s",deleteVpcEndpointRequest));
             deleteVpcEndpointResponse = proxyClient.injectCredentialsAndInvokeV2(deleteVpcEndpointRequest, proxyClient.client()::deleteVpcEndpoint);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(e);
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME, deleteVpcEndpointRequest.id(), e);
         } catch (ValidationException e) {
-            throw new CfnInvalidRequestException(deleteVpcEndpointRequest.toString(), e);
+            throw new CfnInvalidRequestException(deleteVpcEndpointRequest.toString() + ", " + e.getMessage(), e);
         } catch (InternalServerException e) {
-            throw new CfnInternalFailureException(e);
-        } catch (AwsServiceException e) {
-            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
+            throw new CfnServiceInternalErrorException("DeleteVpcEndpoint", e);
         }
         logger.log(String.format("%s successfully deleted. response: %s", ResourceModel.TYPE_NAME, deleteVpcEndpointResponse));
         return deleteVpcEndpointResponse;

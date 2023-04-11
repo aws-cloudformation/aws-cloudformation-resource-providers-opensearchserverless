@@ -1,7 +1,6 @@
 package software.amazon.opensearchserverless.vpcendpoint;
 
 import lombok.NonNull;
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetVpcEndpointRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetVpcEndpointResponse;
@@ -12,11 +11,10 @@ import software.amazon.awssdk.services.opensearchserverless.model.UpdateVpcEndpo
 import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
 import software.amazon.awssdk.services.opensearchserverless.model.VpcEndpointDetail;
 import software.amazon.awssdk.services.opensearchserverless.model.VpcEndpointStatus;
-import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
-import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotStabilizedException;
 import software.amazon.cloudformation.exceptions.CfnResourceConflictException;
+import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
@@ -141,11 +139,9 @@ public class UpdateHandler extends BaseHandlerStd {
                 }
             }
         } catch (ValidationException e) {
-            throw new CfnInvalidRequestException(batchGetVpcEndpointRequest.toString(), e);
+            throw new CfnInvalidRequestException(batchGetVpcEndpointRequest.toString() + ", " + e.getMessage(), e);
         } catch (InternalServerException e) {
-            throw new CfnInternalFailureException(e);
-        } catch (AwsServiceException e) {
-            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
+            throw new CfnServiceInternalErrorException("BatchGetVpcEndpoint", e);
         }
         throw new CfnNotStabilizedException(ResourceModel.TYPE_NAME, resourceModel.getId());
     }
@@ -162,9 +158,7 @@ public class UpdateHandler extends BaseHandlerStd {
         } catch (ValidationException e) {
             throw new CfnInvalidRequestException(batchGetVpcEndpointRequest.toString(), e);
         } catch (InternalServerException e) {
-            throw new CfnInternalFailureException(e);
-        } catch (AwsServiceException e) {
-            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
+            throw new CfnServiceInternalErrorException("BatchGetVpcEndpoint", e);
         }
 
         if (batchGetVpcEndpointResponse.hasVpcEndpointDetails()
@@ -193,11 +187,9 @@ public class UpdateHandler extends BaseHandlerStd {
             throw new CfnResourceConflictException(ResourceModel.TYPE_NAME, updateVpcEndpointRequest.id(),
                 e.getMessage(), e);
         } catch (ValidationException e) {
-            throw new CfnInvalidRequestException(updateVpcEndpointRequest.toString(), e);
+            throw new CfnInvalidRequestException(updateVpcEndpointRequest.toString() + ", " + e.getMessage(), e);
         } catch (InternalServerException e) {
-            throw new CfnInternalFailureException(e);
-        } catch (AwsServiceException e) {
-            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
+            throw new CfnServiceInternalErrorException("UpdateVpcEndpoint", e);
         }
         logger.log(String.format("%s successfully updated. response: %s", ResourceModel.TYPE_NAME,
             updateVpcEndpointResponse));

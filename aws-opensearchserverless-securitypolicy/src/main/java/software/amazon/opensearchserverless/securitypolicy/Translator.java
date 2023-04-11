@@ -1,6 +1,14 @@
 package software.amazon.opensearchserverless.securitypolicy;
 
-import software.amazon.awssdk.services.opensearchserverless.model.*;
+import software.amazon.awssdk.services.opensearchserverless.model.CreateSecurityPolicyRequest;
+import software.amazon.awssdk.services.opensearchserverless.model.DeleteSecurityPolicyRequest;
+import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityPolicyRequest;
+import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityPolicyResponse;
+import software.amazon.awssdk.services.opensearchserverless.model.ListSecurityPoliciesRequest;
+import software.amazon.awssdk.services.opensearchserverless.model.ListSecurityPoliciesResponse;
+import software.amazon.awssdk.services.opensearchserverless.model.SecurityPolicyDetail;
+import software.amazon.awssdk.services.opensearchserverless.model.UpdateSecurityPolicyRequest;
+import software.amazon.awssdk.services.opensearchserverless.model.UpdateSecurityPolicyResponse;
 
 import java.util.Collection;
 import java.util.List;

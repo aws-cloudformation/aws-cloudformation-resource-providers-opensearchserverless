@@ -8,10 +8,11 @@ import software.amazon.awssdk.services.opensearchserverless.model.ConflictExcept
 import software.amazon.awssdk.services.opensearchserverless.model.CreateCollectionRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.CreateCollectionResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.InternalServerException;
+import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
-import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotStabilizedException;
+import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
@@ -128,9 +129,11 @@ public class CreateHandler extends BaseHandlerStd {
             createCollectionResponse =
                 proxyClient.injectCredentialsAndInvokeV2(createCollectionRequest, proxyClient.client()::createCollection);
         } catch (ConflictException e) {
-            throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME,createCollectionRequest.name(),e);
+            throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME, createCollectionRequest.name(), e);
         } catch (InternalServerException e) {
-            throw new CfnInternalFailureException(e);
+            throw new CfnServiceInternalErrorException("CreateCollection", e);
+        } catch (ValidationException e) {
+            throw new CfnInvalidRequestException(createCollectionRequest + ", " + e.getMessage(), e);
         }
         logger.log(String.format("%s successfully created. response: %s", ResourceModel.TYPE_NAME, createCollectionResponse));
         return createCollectionResponse;

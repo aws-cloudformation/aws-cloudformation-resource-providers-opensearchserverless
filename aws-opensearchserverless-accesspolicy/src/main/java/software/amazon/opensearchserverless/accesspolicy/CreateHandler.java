@@ -1,6 +1,5 @@
 package software.amazon.opensearchserverless.accesspolicy;
 
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.ConflictException;
 import software.amazon.awssdk.services.opensearchserverless.model.CreateAccessPolicyRequest;
@@ -8,9 +7,8 @@ import software.amazon.awssdk.services.opensearchserverless.model.CreateAccessPo
 import software.amazon.awssdk.services.opensearchserverless.model.InternalServerException;
 import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
-import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
-import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
+import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
@@ -65,13 +63,12 @@ public class CreateHandler extends BaseHandlerStd {
             logger.log(String.format("Sending create access policy request: %s", createAccessPolicyRequest));
             createAccessPolicyResponse = proxyClient.injectCredentialsAndInvokeV2(createAccessPolicyRequest, proxyClient.client()::createAccessPolicy);
         } catch (ConflictException e) {
-            throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME,String.format("Name:%s, Type:%s", createAccessPolicyRequest.name(), createAccessPolicyRequest.typeAsString()),e);
+            throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME, String.format("Name:%s, Type:%s",
+                    createAccessPolicyRequest.name(), createAccessPolicyRequest.typeAsString()), e);
         } catch (ValidationException e) {
-            throw new CfnInvalidRequestException(createAccessPolicyRequest.toString(), e);
+            throw new CfnInvalidRequestException(createAccessPolicyRequest.toString() + ", " + e.getMessage(), e);
         } catch (InternalServerException e) {
-            throw new CfnInternalFailureException(e);
-        } catch (AwsServiceException e) {
-            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
+            throw new CfnServiceInternalErrorException("CreateAccessPolicy", e);
         }
         logger.log(String.format("%s successfully created. response: %s", ResourceModel.TYPE_NAME, createAccessPolicyResponse));
         return createAccessPolicyResponse;

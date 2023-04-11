@@ -1,6 +1,5 @@
 package software.amazon.opensearchserverless.vpcendpoint;
 
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetVpcEndpointRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetVpcEndpointResponse;
@@ -11,10 +10,9 @@ import software.amazon.awssdk.services.opensearchserverless.model.InternalServer
 import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
 import software.amazon.awssdk.services.opensearchserverless.model.VpcEndpointDetail;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
-import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
-import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotStabilizedException;
+import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
@@ -112,13 +110,11 @@ public class CreateHandler extends BaseHandlerStd {
             logger.log(String.format("Sending create Vpc Endpoint request: %s",createVpcEndpointRequest));
             createVpcEndpointResponse = proxyClient.injectCredentialsAndInvokeV2(createVpcEndpointRequest, proxyClient.client()::createVpcEndpoint);
         } catch (ConflictException e) {
-            throw new CfnAlreadyExistsException(e);
+            throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME, createVpcEndpointRequest.name(), e);
         } catch (ValidationException e) {
-            throw new CfnInvalidRequestException(createVpcEndpointRequest.toString(), e);
+            throw new CfnInvalidRequestException(createVpcEndpointRequest.toString() + ", " + e.getMessage(), e);
         } catch (InternalServerException e) {
-            throw new CfnInternalFailureException(e);
-        } catch (AwsServiceException e) {
-            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
+            throw new CfnServiceInternalErrorException("CreateVpcEndpoint", e);
         }
         logger.log(String.format("%s successfully created. response: %s", ResourceModel.TYPE_NAME, createVpcEndpointResponse));
         return createVpcEndpointResponse;

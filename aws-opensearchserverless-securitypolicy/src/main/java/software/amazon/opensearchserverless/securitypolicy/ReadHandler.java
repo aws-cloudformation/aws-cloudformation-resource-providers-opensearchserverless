@@ -1,17 +1,15 @@
 package software.amazon.opensearchserverless.securitypolicy;
 
 import com.amazonaws.util.StringUtils;
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
 import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityPolicyRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityPolicyResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.InternalServerException;
 import software.amazon.awssdk.services.opensearchserverless.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
-import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
-import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
+import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
@@ -62,13 +60,12 @@ public class ReadHandler extends BaseHandlerStd {
             getSecurityPolicyResponse = proxyClient.injectCredentialsAndInvokeV2(getSecurityPolicyRequest,
                 proxyClient.client()::getSecurityPolicy);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(e);
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME, String.format("Name:%s, Type:%s",
+                    getSecurityPolicyRequest.name(), getSecurityPolicyRequest.typeAsString()), e);
         } catch (ValidationException e) {
-            throw new CfnInvalidRequestException(getSecurityPolicyRequest.toString(), e);
+            throw new CfnInvalidRequestException(getSecurityPolicyRequest.toString() + ", " + e.getMessage(), e);
         } catch (InternalServerException e) {
-            throw new CfnInternalFailureException(e);
-        } catch (final AwsServiceException e) {
-            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
+            throw new CfnServiceInternalErrorException("GetSecurityPolicy", e);
         }
         logger.log(String.format("%s successfully read. response: %s", ResourceModel.TYPE_NAME,
             getSecurityPolicyResponse));
