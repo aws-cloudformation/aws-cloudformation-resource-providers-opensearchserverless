@@ -109,6 +109,7 @@
     },
     "update": {
       "permissions": [
+        "aoss:GetSecurityConfig",
         "aoss:UpdateSecurityConfig"
       ]
     },
