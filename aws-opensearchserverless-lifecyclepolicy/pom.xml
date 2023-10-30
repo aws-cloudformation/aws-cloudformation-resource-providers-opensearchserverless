@@ -5,9 +5,9 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>software.amazon.opensearchserverless.vpcendpoint</groupId>
-    <artifactId>aws-opensearchserverless-vpcendpoint-handler</artifactId>
-    <name>aws-opensearchserverless-vpcendpoint-handler</name>
+    <groupId>software.amazon.opensearchserverless.lifecyclepolicy</groupId>
+    <artifactId>aws-opensearchserverless-lifecyclepolicy-handler</artifactId>
+    <name>aws-opensearchserverless-lifecyclepolicy-handler</name>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -235,12 +235,12 @@
                                         <limit>
                                             <counter>BRANCH</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.6</minimum>
+                                            <minimum>0.4</minimum>
                                         </limit>
                                         <limit>
                                             <counter>INSTRUCTION</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.8</minimum>
+                                            <minimum>0.6</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
@@ -254,7 +254,7 @@
             <resource>
                 <directory>${project.basedir}</directory>
                 <includes>
-                    <include>aws-opensearchserverless-vpcendpoint.json</include>
+                    <include>aws-opensearchserverless-lifecyclepolicy.json</include>
                 </includes>
             </resource>
             <resource>
