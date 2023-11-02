@@ -1,0 +1,18 @@
+{
+  "CreateInputs": {
+    "Name": "lp-{{uuid[4:20]}}",
+    "Type": "retention",
+    "Description": "LifecyclePolicy description",
+    "Policy": "{\"Rules\": [{\"Resource\": [\"index/cl-{{uuid[4:20]}}/log*\"],\"ResourceType\": \"index\",\"MinIndexRetention\": \"2d\"}]}"
+  },
+  "PatchInputs": [
+    {
+      "op": "replace",
+      "path": "Description",
+      "value": "LifecyclePolicy description updated"
+    }
+  ],
+  "ListInputs": {
+    "Type": "retention"
+  }
+}
