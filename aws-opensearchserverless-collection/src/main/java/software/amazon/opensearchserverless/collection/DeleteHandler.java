@@ -5,13 +5,20 @@ import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollec
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.CollectionDetail;
 import software.amazon.awssdk.services.opensearchserverless.model.CollectionStatus;
+import software.amazon.awssdk.services.opensearchserverless.model.ConflictException;
 import software.amazon.awssdk.services.opensearchserverless.model.DeleteCollectionRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.DeleteCollectionResponse;
+import software.amazon.awssdk.services.opensearchserverless.model.InternalServerException;
+import software.amazon.awssdk.services.opensearchserverless.model.ResourceNotFoundException;
+import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
+import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
+import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnNotStabilizedException;
+import software.amazon.cloudformation.exceptions.CfnResourceConflictException;
+import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
-import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
@@ -44,19 +51,33 @@ public class DeleteHandler extends BaseHandlerStd {
             return ProgressEvent.failed(model, callbackContext, HandlerErrorCode.InvalidRequest, "Id cannot be empty");
         }
 
-        return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
-                            .then(progress -> proxy.initiate("AWS-OpenSearchServerless-Collection::Delete::PreDeletionCheck", proxyClient, progress.getResourceModel(), progress.getCallbackContext())
-                                                   .translateToServiceRequest(Translator::translateToReadRequest)
-                                                   .makeServiceCall(this::getActiveCollection)
-                                                   .handleError(this::handleGetActiveCollectionException)
-                                                   .progress())
-                            .then(progress -> proxy.initiate("AWS-OpenSearchServerless-Collection::Delete", proxyClient, model, callbackContext)
-                                                   .translateToServiceRequest(Translator::translateToDeleteRequest)
-                                                   .makeServiceCall((deleteCollectionRequest, proxyClient1) -> proxyClient.injectCredentialsAndInvokeV2(deleteCollectionRequest, proxyClient1.client()::deleteCollection))
-                                                   .stabilize(this::stabilizeCollectionDelete)
-                                                   .done((deleteRequest) -> ProgressEvent.<ResourceModel, CallbackContext>builder().status(OperationStatus.SUCCESS).build()));
+        return proxy.initiate("AWS-OpenSearchServerless-Collection::Delete", proxyClient, model, callbackContext)
+                .translateToServiceRequest(Translator::translateToDeleteRequest)
+                .makeServiceCall((awsRequest, client) -> deleteCollection(awsRequest, client, logger))
+                .stabilize(this::stabilizeCollectionDelete)
+                .done(awsResponse -> ProgressEvent.defaultSuccessHandler(null));
+    }
 
-
+    private DeleteCollectionResponse deleteCollection(
+            final DeleteCollectionRequest deleteCollectionRequest,
+            final ProxyClient<OpenSearchServerlessClient> proxyClient,
+            final Logger logger) {
+        DeleteCollectionResponse deleteCollectionResponse;
+        try {
+            logger.log(String.format("Sending DeleteCollectionRequest: %s", deleteCollectionRequest));
+            deleteCollectionResponse = proxyClient.injectCredentialsAndInvokeV2(deleteCollectionRequest, proxyClient.client()::deleteCollection);
+        } catch (ResourceNotFoundException e) {
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME, deleteCollectionRequest.id(), e);
+        } catch (ValidationException e) {
+            throw new CfnInvalidRequestException(deleteCollectionRequest.toString() + ", " + e.getMessage(), e);
+        } catch (ConflictException e) {
+            throw new CfnResourceConflictException(ResourceModel.TYPE_NAME, deleteCollectionRequest.id(), e.getMessage(), e);
+        } catch (InternalServerException e) {
+            throw new CfnServiceInternalErrorException("DeleteCollection", e);
+        }
+        logger.log(String.format("%s DeleteCollection successfully initiated. response: %s",
+            ResourceModel.TYPE_NAME, deleteCollectionResponse));
+        return deleteCollectionResponse;
     }
 
     /**
