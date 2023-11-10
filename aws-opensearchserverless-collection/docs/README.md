@@ -87,7 +87,7 @@ _Required_: No
 
 _Type_: String
 
-_Allowed Values_: <code>SEARCH</code> | <code>TIMESERIES</code>
+_Allowed Values_: <code>SEARCH</code> | <code>TIMESERIES</code> | <code>VECTORSEARCH</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 

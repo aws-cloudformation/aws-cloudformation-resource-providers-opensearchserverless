@@ -5,10 +5,17 @@ import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollec
 import software.amazon.awssdk.services.opensearchserverless.model.BatchGetCollectionResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.CollectionDetail;
 import software.amazon.awssdk.services.opensearchserverless.model.CollectionStatus;
+import software.amazon.awssdk.services.opensearchserverless.model.ConflictException;
 import software.amazon.awssdk.services.opensearchserverless.model.DeleteCollectionRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.DeleteCollectionResponse;
+import software.amazon.awssdk.services.opensearchserverless.model.InternalServerException;
+import software.amazon.awssdk.services.opensearchserverless.model.ResourceNotFoundException;
+import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
+import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnNotStabilizedException;
+import software.amazon.cloudformation.exceptions.CfnResourceConflictException;
+import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.OperationStatus;
@@ -67,37 +74,20 @@ public class DeleteHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        //delete collection, initial status is ACTIVE, after delete collection resource does not exist
+        //Delete collection. After delete collection call, resource does not exist
         final ResourceModel model = ResourceModel.builder()
-                                                 .id(COLLECTION_ID)
-                                                 .build();
+                .id(COLLECTION_ID)
+                .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                                                                                    .desiredResourceState(model)
-                                                                                    .build();
-
+                .desiredResourceState(model)
+                .build();
         final BatchGetCollectionResponse batchGetCollectionResponse =
                 BatchGetCollectionResponse.builder()
-                                          .collectionDetails(
-                                                  CollectionDetail.builder()
-                                                                  .id(COLLECTION_ID)
-                                                                  .status(CollectionStatus.ACTIVE)
-                                                                  .name(COLLECTION_NAME)
-                                                                  .type(COLLECTION_TYPE)
-                                                                  .description(COLLECTION_DESCRIPTION)
-                                                                  .arn(COLLECTION_ARN)
-                                                                  .collectionEndpoint(COLLECTION_ENDPOINT)
-                                                                  .dashboardEndpoint(DASHBOARD_ENDPOINT)
-                                                                  .createdDate(CREATED_DATE)
-                                                                  .build())
-                                          .build();
-        final BatchGetCollectionResponse batchGetCollectionResponse1 =
-                BatchGetCollectionResponse.builder()
-                                          .collectionDetails(Collections.emptyList())
-                                          .build();
+                        .collectionDetails(Collections.emptyList())
+                        .build();
         when(proxyClient.client().batchGetCollection(any(BatchGetCollectionRequest.class)))
-                .thenReturn(batchGetCollectionResponse)
-                .thenReturn(batchGetCollectionResponse1);
+                .thenReturn(batchGetCollectionResponse);
 
         final DeleteCollectionResponse deleteCollectionResponse = DeleteCollectionResponse.builder().build();
         when(proxyClient.client().deleteCollection(any(DeleteCollectionRequest.class))).thenReturn(deleteCollectionResponse);
@@ -117,61 +107,42 @@ public class DeleteHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_Fail_Collection_Already_Released() {
-        //Delete already deleted collection
+    public void handleRequest_Stabilization_Success() {
+        //Delete collection. After delete collection call, resource takes some time to be deleted.
         final ResourceModel model = ResourceModel.builder()
-                                                 .id(COLLECTION_ID)
-                                                 .build();
-
-        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(model).build();
-        final BatchGetCollectionResponse batchGetCollectionResponse =
-                BatchGetCollectionResponse.builder()
-                                          .collectionDetails(Collections.emptyList())
-                                          .build();
-        when(proxyClient.client().batchGetCollection(any(BatchGetCollectionRequest.class))).thenReturn(batchGetCollectionResponse);
-
-        assertThrows(CfnNotFoundException.class,
-                     () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
-    }
-
-    @Test
-    public void handleRequest_Success_CollectionNotFoundAfterRelease() {
-        //Delete failed (or stabilization fail) with status as ACTIVE after delete
-        final ResourceModel model = ResourceModel.builder()
-                                                 .id(COLLECTION_ID)
-                                                 .build();
+                .id(COLLECTION_ID)
+                .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                                                                                    .desiredResourceState(model)
-                                                                                    .build();
-
-        final BatchGetCollectionResponse batchGetCollectionResponse =
+                .desiredResourceState(model)
+                .build();
+        final BatchGetCollectionResponse batchGetCollectionResponseDeleting =
                 BatchGetCollectionResponse.builder()
-                                          .collectionDetails(
-                                                  CollectionDetail.builder()
-                                                                  .id(COLLECTION_ID)
-                                                                  .status(CollectionStatus.ACTIVE)
-                                                                  .name(COLLECTION_NAME)
-                                                                  .type(COLLECTION_TYPE)
-                                                                  .description(COLLECTION_DESCRIPTION)
-                                                                  .arn(COLLECTION_ARN)
-                                                                  .collectionEndpoint(COLLECTION_ENDPOINT)
-                                                                  .dashboardEndpoint(DASHBOARD_ENDPOINT)
-                                                                  .createdDate(CREATED_DATE)
-                                                                  .build())
-                                          .build();
+                        .collectionDetails(
+                                CollectionDetail.builder()
+                                        .id(COLLECTION_ID)
+                                        .status(CollectionStatus.DELETING)
+                                        .name(COLLECTION_NAME)
+                                        .type(COLLECTION_TYPE)
+                                        .description(COLLECTION_DESCRIPTION)
+                                        .arn(COLLECTION_ARN)
+                                        .collectionEndpoint(COLLECTION_ENDPOINT)
+                                        .dashboardEndpoint(DASHBOARD_ENDPOINT)
+                                        .createdDate(CREATED_DATE)
+                                        .build())
+                        .build();
         final BatchGetCollectionResponse batchGetCollectionResponseEmpty =
                 BatchGetCollectionResponse.builder()
-                                          .collectionDetails(Collections.emptyList())
-                                          .build();
+                        .collectionDetails(Collections.emptyList())
+                        .build();
         when(proxyClient.client().batchGetCollection(any(BatchGetCollectionRequest.class)))
-                .thenReturn(batchGetCollectionResponse)
-                .thenReturn(batchGetCollectionResponseEmpty);
+                .thenReturn(batchGetCollectionResponseDeleting, batchGetCollectionResponseEmpty);
         final DeleteCollectionResponse deleteCollectionResponse = DeleteCollectionResponse.builder().build();
         when(proxyClient.client().deleteCollection(any(DeleteCollectionRequest.class))).thenReturn(deleteCollectionResponse);
 
         final ProgressEvent<ResourceModel, CallbackContext> response = handler
                 .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
@@ -184,76 +155,125 @@ public class DeleteHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_Failure_CollectionDeleteFailedAfterRelease() {
-        //Delete failed (or stabilization fail) with status as ACTIVE after delete
+    public void handleRequest_Failure_CollectionDeleteFailed() {
+        //Delete collection. After delete collection call, delete collection workflow fails.
         final ResourceModel model = ResourceModel.builder()
-                                                 .id(COLLECTION_ID)
-                                                 .build();
+                .id(COLLECTION_ID)
+                .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                                                                                    .desiredResourceState(model)
-                                                                                    .build();
+                .desiredResourceState(model)
+                .build();
 
-        final BatchGetCollectionResponse batchGetCollectionResponse =
+        final BatchGetCollectionResponse batchGetCollectionResponseDeleting =
                 BatchGetCollectionResponse.builder()
-                                          .collectionDetails(
-                                                  CollectionDetail.builder()
-                                                                  .id(COLLECTION_ID)
-                                                                  .status(CollectionStatus.ACTIVE)
-                                                                  .name(COLLECTION_NAME)
-                                                                  .type(COLLECTION_TYPE)
-                                                                  .description(COLLECTION_DESCRIPTION)
-                                                                  .arn(COLLECTION_ARN)
-                                                                  .collectionEndpoint(COLLECTION_ENDPOINT)
-                                                                  .dashboardEndpoint(DASHBOARD_ENDPOINT)
-                                                                  .createdDate(CREATED_DATE)
-                                                                  .build())
-                                          .build();
+                        .collectionDetails(
+                                CollectionDetail.builder()
+                                        .id(COLLECTION_ID)
+                                        .status(CollectionStatus.DELETING)
+                                        .name(COLLECTION_NAME)
+                                        .type(COLLECTION_TYPE)
+                                        .description(COLLECTION_DESCRIPTION)
+                                        .arn(COLLECTION_ARN)
+                                        .collectionEndpoint(COLLECTION_ENDPOINT)
+                                        .dashboardEndpoint(DASHBOARD_ENDPOINT)
+                                        .createdDate(CREATED_DATE)
+                                        .build())
+                        .build();
         final BatchGetCollectionResponse batchGetCollectionResponseFailed =
                 BatchGetCollectionResponse.builder()
-                                          .collectionDetails(
-                                                  CollectionDetail.builder()
-                                                                  .id(COLLECTION_ID)
-                                                                  .status(CollectionStatus.FAILED)
-                                                                  .name(COLLECTION_NAME)
-                                                                  .type(COLLECTION_TYPE)
-                                                                  .description(COLLECTION_DESCRIPTION)
-                                                                  .arn(COLLECTION_ARN)
-                                                                  .collectionEndpoint(COLLECTION_ENDPOINT)
-                                                                  .dashboardEndpoint(DASHBOARD_ENDPOINT)
-                                                                  .createdDate(CREATED_DATE)
-                                                                  .build())
-                                          .build();
+                        .collectionDetails(
+                                CollectionDetail.builder()
+                                        .id(COLLECTION_ID)
+                                        .status(CollectionStatus.FAILED)
+                                        .name(COLLECTION_NAME)
+                                        .type(COLLECTION_TYPE)
+                                        .description(COLLECTION_DESCRIPTION)
+                                        .arn(COLLECTION_ARN)
+                                        .collectionEndpoint(COLLECTION_ENDPOINT)
+                                        .dashboardEndpoint(DASHBOARD_ENDPOINT)
+                                        .createdDate(CREATED_DATE)
+                                        .build())
+                        .build();
         when(proxyClient.client().batchGetCollection(any(BatchGetCollectionRequest.class)))
-                .thenReturn(batchGetCollectionResponse)
-                .thenReturn(batchGetCollectionResponseFailed);
+                .thenReturn(batchGetCollectionResponseDeleting, batchGetCollectionResponseFailed);
         final DeleteCollectionResponse deleteCollectionResponse = DeleteCollectionResponse.builder().build();
         when(proxyClient.client().deleteCollection(any(DeleteCollectionRequest.class))).thenReturn(deleteCollectionResponse);
 
         assertThrows(CfnNotStabilizedException.class,
-                     () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
     }
 
     @Test
     public void handleRequest_Fail_NonExistingCollection() {
-        //Delete failed (or stabilization fail) with status as ACTIVE after delete
+        // If collection does not exist, delete handler returns Not Found.
         final ResourceModel model = ResourceModel.builder()
-                                                 .id(COLLECTION_ID)
-                                                 .build();
+                .id(COLLECTION_ID)
+                .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                                                                                    .desiredResourceState(model)
-                                                                                    .build();
+                .desiredResourceState(model)
+                .build();
 
-        final BatchGetCollectionResponse batchGetCollectionResponse =
-                BatchGetCollectionResponse.builder()
-                                          .collectionDetails(Collections.emptyList())
-                                          .build();
-        when(proxyClient.client().batchGetCollection(any(BatchGetCollectionRequest.class)))
-                .thenReturn(batchGetCollectionResponse);
+        when(proxyClient.client().deleteCollection(any(DeleteCollectionRequest.class)))
+                .thenThrow(ResourceNotFoundException.builder().build());
 
         assertThrows(CfnNotFoundException.class,
-                     () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+
+    }
+
+    @Test
+    public void handleRequest_Fail_InvalidRequest() {
+        final ResourceModel model = ResourceModel.builder()
+                .id(COLLECTION_ID)
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .build();
+
+        when(proxyClient.client().deleteCollection(any(DeleteCollectionRequest.class)))
+                .thenThrow(ValidationException.builder().build());
+
+        assertThrows(CfnInvalidRequestException.class,
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+
+    }
+
+    @Test
+    public void handleRequest_Fail_On_Conflict() {
+        final ResourceModel model = ResourceModel.builder()
+                .id(COLLECTION_ID)
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .build();
+
+        when(proxyClient.client().deleteCollection(any(DeleteCollectionRequest.class)))
+                .thenThrow(ConflictException.builder().build());
+
+        assertThrows(CfnResourceConflictException.class,
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+
+    }
+
+    @Test
+    public void handleRequest_Fail_ServerError() {
+        final ResourceModel model = ResourceModel.builder()
+                .id(COLLECTION_ID)
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .build();
+
+        when(proxyClient.client().deleteCollection(any(DeleteCollectionRequest.class)))
+                .thenThrow(InternalServerException.builder().build());
+
+        assertThrows(CfnServiceInternalErrorException.class,
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
     }
 
@@ -262,8 +282,8 @@ public class DeleteHandlerTest extends AbstractTestBase {
     public void handleRequest_Fail_NoCollectionIdInput() {
         final ResourceModel requestModel = ResourceModel.builder().build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                                                                                    .desiredResourceState(requestModel)
-                                                                                    .build();
+                .desiredResourceState(requestModel)
+                .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response = handler
                 .handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
