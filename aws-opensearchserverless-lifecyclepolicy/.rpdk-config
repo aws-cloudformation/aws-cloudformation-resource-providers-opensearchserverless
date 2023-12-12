@@ -2,7 +2,7 @@
     "artifact_type": "RESOURCE",
     "typeName": "AWS::OpenSearchServerless::LifecyclePolicy",
     "language": "java",
-    "runtime": "java8",
+    "runtime": "java11",
     "entrypoint": "software.amazon.opensearchserverless.lifecyclepolicy.HandlerWrapper::handleRequest",
     "testEntrypoint": "software.amazon.opensearchserverless.lifecyclepolicy.HandlerWrapper::testEntrypoint",
     "settings": {

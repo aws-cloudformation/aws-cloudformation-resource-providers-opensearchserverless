@@ -2,7 +2,7 @@
     "artifact_type": "RESOURCE",
     "typeName": "AWS::OpenSearchServerless::AccessPolicy",
     "language": "java",
-    "runtime": "java8",
+    "runtime": "java11",
     "entrypoint": "software.amazon.opensearchserverless.accesspolicy.HandlerWrapper::handleRequest",
     "testEntrypoint": "software.amazon.opensearchserverless.accesspolicy.HandlerWrapper::testEntrypoint",
     "settings": {

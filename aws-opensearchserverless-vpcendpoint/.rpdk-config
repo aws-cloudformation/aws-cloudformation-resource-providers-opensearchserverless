@@ -2,7 +2,7 @@
     "artifact_type": "RESOURCE",
     "typeName": "AWS::OpenSearchServerless::VpcEndpoint",
     "language": "java",
-    "runtime": "java8",
+    "runtime": "java11",
     "entrypoint": "software.amazon.opensearchserverless.vpcendpoint.HandlerWrapper::handleRequest",
     "testEntrypoint": "software.amazon.opensearchserverless.vpcendpoint.HandlerWrapper::testEntrypoint",
     "settings": {

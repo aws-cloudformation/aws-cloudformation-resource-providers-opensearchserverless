@@ -2,7 +2,7 @@
     "artifact_type": "RESOURCE",
     "typeName": "AWS::OpenSearchServerless::SecurityPolicy",
     "language": "java",
-    "runtime": "java8",
+    "runtime": "java11",
     "entrypoint": "software.amazon.opensearchserverless.securitypolicy.HandlerWrapper::handleRequest",
     "testEntrypoint": "software.amazon.opensearchserverless.securitypolicy.HandlerWrapper::testEntrypoint",
     "settings": {
