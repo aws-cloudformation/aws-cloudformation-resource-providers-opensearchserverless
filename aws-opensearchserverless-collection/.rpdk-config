@@ -2,7 +2,7 @@
     "artifact_type": "RESOURCE",
     "typeName": "AWS::OpenSearchServerless::Collection",
     "language": "java",
-    "runtime": "java8",
+    "runtime": "java11",
     "entrypoint": "software.amazon.opensearchserverless.collection.HandlerWrapper::handleRequest",
     "testEntrypoint": "software.amazon.opensearchserverless.collection.HandlerWrapper::testEntrypoint",
     "settings": {
