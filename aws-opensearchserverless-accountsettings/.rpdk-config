@@ -2,7 +2,7 @@
     "artifact_type": "RESOURCE",
     "typeName": "AWS::OpenSearchServerless::AccountSettings",
     "language": "java",
-    "runtime": "java8",
+    "runtime": "java11",
     "entrypoint": "software.amazon.opensearchserverless.accountsettings.HandlerWrapper::handleRequest",
     "testEntrypoint": "software.amazon.opensearchserverless.accountsettings.HandlerWrapper::testEntrypoint",
     "settings": {
