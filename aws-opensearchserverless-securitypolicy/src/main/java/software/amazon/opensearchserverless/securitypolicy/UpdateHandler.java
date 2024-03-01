@@ -7,6 +7,7 @@ import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityPol
 import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityPolicyResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.InternalServerException;
 import software.amazon.awssdk.services.opensearchserverless.model.ResourceNotFoundException;
+import software.amazon.awssdk.services.opensearchserverless.model.ServiceQuotaExceededException;
 import software.amazon.awssdk.services.opensearchserverless.model.UpdateSecurityPolicyRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.UpdateSecurityPolicyResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
@@ -14,6 +15,7 @@ import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnResourceConflictException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
+import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
@@ -115,6 +117,8 @@ public class UpdateHandler extends BaseHandlerStd {
         } catch (ConflictException e) {
             throw new CfnResourceConflictException(ResourceModel.TYPE_NAME, updateSecurityPolicyRequest.name(),
                 e.getMessage(), e);
+        } catch (ServiceQuotaExceededException e) {
+            throw new CfnServiceLimitExceededException(e);
         } catch (InternalServerException e) {
             throw new CfnServiceInternalErrorException("UpdateSecurityPolicy", e);
         }

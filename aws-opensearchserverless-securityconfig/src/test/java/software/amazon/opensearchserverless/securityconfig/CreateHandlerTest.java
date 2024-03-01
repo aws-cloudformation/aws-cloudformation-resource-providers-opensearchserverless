@@ -4,9 +4,15 @@ import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerless
 import software.amazon.awssdk.services.opensearchserverless.model.ConflictException;
 import software.amazon.awssdk.services.opensearchserverless.model.CreateSecurityConfigRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.CreateSecurityConfigResponse;
+import software.amazon.awssdk.services.opensearchserverless.model.InternalServerException;
 import software.amazon.awssdk.services.opensearchserverless.model.SecurityConfigDetail;
 import software.amazon.awssdk.services.opensearchserverless.model.SecurityConfigType;
+import software.amazon.awssdk.services.opensearchserverless.model.ServiceQuotaExceededException;
+import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
+import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
+import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
+import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.OperationStatus;
@@ -116,9 +122,12 @@ public class CreateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_WhenResourceAlreadyExists_ThrowsException() {
+    public void handleRequest_AlreadyExists_Fail() {
         when(openSearchServerlessClient.createSecurityConfig(any(CreateSecurityConfigRequest.class)))
-            .thenThrow(ConflictException.builder().build());
+                .thenThrow(ConflictException.builder()
+                        .message(String.format("Policy with name %s and type %s already exists",
+                                MOCK_SECURITY_CONFIG_NAME, MOCK_SECURITY_CONFIG_TYPE))
+                        .build());
 
         final ResourceModel model = ResourceModel.builder()
             .name(MOCK_SECURITY_CONFIG_NAME)
@@ -135,6 +144,84 @@ public class CreateHandlerTest extends AbstractTestBase {
         verify(openSearchServerlessClient).createSecurityConfig(any(CreateSecurityConfigRequest.class));
     }
 
+    @Test
+    public void handleRequest_ConflictException_Fail() {
+        when(openSearchServerlessClient.createSecurityConfig(any(CreateSecurityConfigRequest.class)))
+                .thenThrow(ConflictException.builder().build());
+
+        final ResourceModel model = ResourceModel.builder()
+                .name(MOCK_SECURITY_CONFIG_NAME)
+                .type(MOCK_SECURITY_CONFIG_TYPE)
+                .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
+                .samlOptions(MOCK_SAML_OPTIONS)
+                .build();
+        final ResourceHandlerRequest<ResourceModel> request =
+                ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(model).build();
+
+        assertThrows(CfnInvalidRequestException.class,
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+
+        verify(openSearchServerlessClient).createSecurityConfig(any(CreateSecurityConfigRequest.class));
+    }
+    @Test
+    public void handleRequest_ValidationException_Fail() {
+        when(openSearchServerlessClient.createSecurityConfig(any(CreateSecurityConfigRequest.class)))
+                .thenThrow(ValidationException.builder().build());
+
+        final ResourceModel model = ResourceModel.builder()
+                .name(MOCK_SECURITY_CONFIG_NAME)
+                .type(MOCK_SECURITY_CONFIG_TYPE)
+                .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
+                .samlOptions(MOCK_SAML_OPTIONS)
+                .build();
+        final ResourceHandlerRequest<ResourceModel> request =
+                ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(model).build();
+
+        assertThrows(CfnInvalidRequestException.class,
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+
+        verify(openSearchServerlessClient).createSecurityConfig(any(CreateSecurityConfigRequest.class));
+    }
+
+    @Test
+    public void handleRequest_ServiceQuotaExceededException_Fail() {
+        when(openSearchServerlessClient.createSecurityConfig(any(CreateSecurityConfigRequest.class)))
+                .thenThrow(ServiceQuotaExceededException.builder().build());
+
+        final ResourceModel model = ResourceModel.builder()
+                .name(MOCK_SECURITY_CONFIG_NAME)
+                .type(MOCK_SECURITY_CONFIG_TYPE)
+                .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
+                .samlOptions(MOCK_SAML_OPTIONS)
+                .build();
+        final ResourceHandlerRequest<ResourceModel> request =
+                ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(model).build();
+
+        assertThrows(CfnServiceLimitExceededException.class,
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+
+        verify(openSearchServerlessClient).createSecurityConfig(any(CreateSecurityConfigRequest.class));
+    }
+
+    @Test
+    public void handleRequest_InternalServerException_Fail() {
+        when(openSearchServerlessClient.createSecurityConfig(any(CreateSecurityConfigRequest.class)))
+                .thenThrow(InternalServerException.builder().build());
+
+        final ResourceModel model = ResourceModel.builder()
+                .name(MOCK_SECURITY_CONFIG_NAME)
+                .type(MOCK_SECURITY_CONFIG_TYPE)
+                .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
+                .samlOptions(MOCK_SAML_OPTIONS)
+                .build();
+        final ResourceHandlerRequest<ResourceModel> request =
+                ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(model).build();
+
+        assertThrows(CfnServiceInternalErrorException.class,
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+
+        verify(openSearchServerlessClient).createSecurityConfig(any(CreateSecurityConfigRequest.class));
+    }
     @Test
     @org.junit.jupiter.api.Tag("skipSdkInteraction")
     public void handleRequest_WithId_Fail() {

@@ -100,6 +100,8 @@ public class UpdateHandler extends BaseHandlerStd {
         } catch (ConflictException e) {
             throw new CfnResourceConflictException(ResourceModel.TYPE_NAME, updateSecurityConfigRequest.id(),
                     e.getMessage(), e);
+        } catch (ServiceQuotaExceededException e) {
+            throw new CfnServiceLimitExceededException(e);
         } catch (InternalServerException e) {
             throw new CfnServiceInternalErrorException("UpdateSecurityConfig", e);
         }

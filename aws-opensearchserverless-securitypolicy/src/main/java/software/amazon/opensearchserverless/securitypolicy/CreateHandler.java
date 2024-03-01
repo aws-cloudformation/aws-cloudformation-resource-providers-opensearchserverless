@@ -5,10 +5,12 @@ import software.amazon.awssdk.services.opensearchserverless.model.ConflictExcept
 import software.amazon.awssdk.services.opensearchserverless.model.CreateSecurityPolicyRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.CreateSecurityPolicyResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.InternalServerException;
+import software.amazon.awssdk.services.opensearchserverless.model.ServiceQuotaExceededException;
 import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
+import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
@@ -78,10 +80,16 @@ public class CreateHandler extends BaseHandlerStd {
             createSecurityPolicyResponse = proxyClient.injectCredentialsAndInvokeV2(createSecurityPolicyRequest,
                 proxyClient.client()::createSecurityPolicy);
         } catch (ConflictException e) {
-            throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME, String.format("Name:%s, Type:%s",
-                    createSecurityPolicyRequest.name(), createSecurityPolicyRequest.typeAsString()), e);
+            if (e.getMessage() != null && e.getMessage().contains("already exists")) {
+                throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME, String.format("Name:%s, Type:%s",
+                        createSecurityPolicyRequest.name(), createSecurityPolicyRequest.typeAsString()), e);
+            } else {
+                throw new CfnInvalidRequestException(createSecurityPolicyRequest.toString() + ", " + e.getMessage(), e);
+            }
         } catch (ValidationException e) {
             throw new CfnInvalidRequestException(createSecurityPolicyRequest.toString() + ", " + e.getMessage(), e);
+        } catch (ServiceQuotaExceededException e) {
+            throw new CfnServiceLimitExceededException(e);
         } catch (InternalServerException e) {
             throw new CfnServiceInternalErrorException("CreateSecurityPolicy", e);
         }

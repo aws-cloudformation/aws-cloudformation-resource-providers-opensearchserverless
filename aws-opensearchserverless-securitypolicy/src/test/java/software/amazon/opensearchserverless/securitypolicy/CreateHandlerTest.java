@@ -9,10 +9,12 @@ import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityPol
 import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityPolicyResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.InternalServerException;
 import software.amazon.awssdk.services.opensearchserverless.model.SecurityPolicyDetail;
+import software.amazon.awssdk.services.opensearchserverless.model.ServiceQuotaExceededException;
 import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
+import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.OperationStatus;
@@ -29,7 +31,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
@@ -189,7 +191,13 @@ public class CreateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void handleRequest_CreateWhenAlreadyExistsFail() {
+    public void handleRequest_AlreadyExists_Fail() {
+        when(openSearchServerlessClient.createSecurityPolicy(any(CreateSecurityPolicyRequest.class)))
+                .thenThrow(ConflictException.builder()
+                        .message(String.format("Policy with name %s and type %s already exists",
+                                MOCK_POLICY_NAME, MOCK_POLICY_TYPE))
+                        .build());
+
         final ResourceModel model = ResourceModel.builder()
                 .name(MOCK_POLICY_NAME)
                 .type(MOCK_POLICY_TYPE)
@@ -201,17 +209,17 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .desiredResourceState(model)
                 .build();
 
-        when(proxyClient.client().createSecurityPolicy(any(CreateSecurityPolicyRequest.class)))
-                .thenThrow(ConflictException.class);
+        assertThrows(CfnAlreadyExistsException.class,
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
-        Throwable throwable = catchThrowable(() ->
-                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
-
-        assertThat(throwable).isInstanceOf(CfnAlreadyExistsException.class);
+        verify(openSearchServerlessClient).createSecurityPolicy(any(CreateSecurityPolicyRequest.class));
     }
 
     @Test
-    public void handleRequest_CreateWhenInvalidRequestFail() {
+    public void handleRequest_ConflictException_Fail() {
+        when(openSearchServerlessClient.createSecurityPolicy(any(CreateSecurityPolicyRequest.class)))
+                .thenThrow(ConflictException.builder().build());
+
         final ResourceModel model = ResourceModel.builder()
                 .name(MOCK_POLICY_NAME)
                 .type(MOCK_POLICY_TYPE)
@@ -223,17 +231,17 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .desiredResourceState(model)
                 .build();
 
-        when(proxyClient.client().createSecurityPolicy(any(CreateSecurityPolicyRequest.class)))
-                .thenThrow(ValidationException.class);
+        assertThrows(CfnInvalidRequestException.class,
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
-        Throwable throwable = catchThrowable(() ->
-                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
-
-        assertThat(throwable).isInstanceOf(CfnInvalidRequestException.class);
+        verify(openSearchServerlessClient).createSecurityPolicy(any(CreateSecurityPolicyRequest.class));
     }
 
     @Test
-    public void handleRequest_CreateWhenInternalServerExceptionFail() {
+    public void handleRequest_ValidationException_Fail() {
+        when(openSearchServerlessClient.createSecurityPolicy(any(CreateSecurityPolicyRequest.class)))
+                .thenThrow(ValidationException.builder().build());
+
         final ResourceModel model = ResourceModel.builder()
                 .name(MOCK_POLICY_NAME)
                 .type(MOCK_POLICY_TYPE)
@@ -245,12 +253,53 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .desiredResourceState(model)
                 .build();
 
-        when(proxyClient.client().createSecurityPolicy(any(CreateSecurityPolicyRequest.class)))
-                .thenThrow(InternalServerException.class);
+        assertThrows(CfnInvalidRequestException.class,
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
-        Throwable throwable = catchThrowable(() ->
-                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+        verify(openSearchServerlessClient).createSecurityPolicy(any(CreateSecurityPolicyRequest.class));
+    }
 
-        assertThat(throwable).isInstanceOf(CfnServiceInternalErrorException.class);
+    @Test
+    public void handleRequest_ServiceQuotaExceededException_Fail() {
+        when(openSearchServerlessClient.createSecurityPolicy(any(CreateSecurityPolicyRequest.class)))
+                .thenThrow(ServiceQuotaExceededException.builder().build());
+
+        final ResourceModel model = ResourceModel.builder()
+                .name(MOCK_POLICY_NAME)
+                .type(MOCK_POLICY_TYPE)
+                .description(MOCK_POLICY_DESCRIPTION)
+                .policy(MOCK_POLICY_DOCUMENT.toString())
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .build();
+
+        assertThrows(CfnServiceLimitExceededException.class,
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+
+        verify(openSearchServerlessClient).createSecurityPolicy(any(CreateSecurityPolicyRequest.class));
+    }
+
+    @Test
+    public void handleRequest_InternalServerException_Fail() {
+        when(openSearchServerlessClient.createSecurityPolicy(any(CreateSecurityPolicyRequest.class)))
+                .thenThrow(InternalServerException.builder().build());
+
+        final ResourceModel model = ResourceModel.builder()
+                .name(MOCK_POLICY_NAME)
+                .type(MOCK_POLICY_TYPE)
+                .description(MOCK_POLICY_DESCRIPTION)
+                .policy(MOCK_POLICY_DOCUMENT.toString())
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .build();
+
+        assertThrows(CfnServiceInternalErrorException.class,
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+
+        verify(openSearchServerlessClient).createSecurityPolicy(any(CreateSecurityPolicyRequest.class));
     }
 }

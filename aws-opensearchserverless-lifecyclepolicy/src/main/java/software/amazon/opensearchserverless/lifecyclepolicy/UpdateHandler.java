@@ -12,10 +12,10 @@ import software.amazon.awssdk.services.opensearchserverless.model.ServiceQuotaEx
 import software.amazon.awssdk.services.opensearchserverless.model.UpdateLifecyclePolicyRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.UpdateLifecyclePolicyResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
-import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
+import software.amazon.cloudformation.exceptions.CfnResourceConflictException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
@@ -109,8 +109,7 @@ public class UpdateHandler extends BaseHandlerStd {
         try {
             updateLifecyclePolicyResponse = proxyClient.injectCredentialsAndInvokeV2(updateLifecyclePolicyRequest, proxyClient.client()::updateLifecyclePolicy);
         } catch (ConflictException e) {
-            throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME, String.format("Name:%s, Type:%s",
-                updateLifecyclePolicyRequest.name(), updateLifecyclePolicyRequest.typeAsString()), e);
+            throw new CfnResourceConflictException(ResourceModel.TYPE_NAME, updateLifecyclePolicyRequest.name(), e.getMessage(), e);
         } catch (ResourceNotFoundException e) {
             throw new CfnNotFoundException(e);
         } catch (ValidationException e) {

@@ -3,10 +3,12 @@ package software.amazon.opensearchserverless.accesspolicy;
 
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
+import software.amazon.awssdk.services.opensearchserverless.model.ConflictException;
 import software.amazon.awssdk.services.opensearchserverless.model.GetAccessPolicyRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.GetAccessPolicyResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.InternalServerException;
 import software.amazon.awssdk.services.opensearchserverless.model.ResourceNotFoundException;
+import software.amazon.awssdk.services.opensearchserverless.model.ServiceQuotaExceededException;
 import software.amazon.awssdk.services.opensearchserverless.model.UpdateAccessPolicyRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.UpdateAccessPolicyResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
@@ -14,7 +16,9 @@ import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInternalFailureException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
+import software.amazon.cloudformation.exceptions.CfnResourceConflictException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
+import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
@@ -114,6 +118,10 @@ public class UpdateHandler extends BaseHandlerStd {
             throw new CfnNotFoundException(e);
         } catch (ValidationException e) {
             throw new CfnInvalidRequestException(updateAccessPolicyRequest.toString(), e);
+        } catch (ConflictException e) {
+                throw new CfnResourceConflictException(ResourceModel.TYPE_NAME, updateAccessPolicyRequest.name(), e.getMessage(), e);
+        } catch (ServiceQuotaExceededException e) {
+            throw new CfnServiceLimitExceededException(e);
         } catch (InternalServerException e) {
             throw new CfnServiceInternalErrorException(e);
         } catch (AwsServiceException e) {
