@@ -28,6 +28,9 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import com.amazonaws.util.StringUtils;
 
+import static software.amazon.opensearchserverless.accesspolicy.Translator.getResourceIdentifierForGetAccessPolicyRequest;
+import static software.amazon.opensearchserverless.accesspolicy.Translator.getResourceIdentifierForUpdateAccessPolicyRequest;
+
 public class UpdateHandler extends BaseHandlerStd {
 
     public UpdateHandler() {
@@ -115,11 +118,16 @@ public class UpdateHandler extends BaseHandlerStd {
             updateAccessPolicyResponse = proxyClient.injectCredentialsAndInvokeV2(updateAccessPolicyRequest,
                 proxyClient.client()::updateAccessPolicy);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(e);
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME,
+                getResourceIdentifierForUpdateAccessPolicyRequest(updateAccessPolicyRequest),
+                e);
         } catch (ValidationException e) {
             throw new CfnInvalidRequestException(updateAccessPolicyRequest.toString(), e);
         } catch (ConflictException e) {
-                throw new CfnResourceConflictException(ResourceModel.TYPE_NAME, updateAccessPolicyRequest.name(), e.getMessage(), e);
+            throw new CfnResourceConflictException(ResourceModel.TYPE_NAME,
+                getResourceIdentifierForUpdateAccessPolicyRequest(updateAccessPolicyRequest),
+                e.getMessage(),
+                e);
         } catch (ServiceQuotaExceededException e) {
             throw new CfnServiceLimitExceededException(e);
         } catch (InternalServerException e) {
@@ -142,8 +150,9 @@ public class UpdateHandler extends BaseHandlerStd {
             getAccessPolicyResponse = proxyClient.injectCredentialsAndInvokeV2(getAccessPolicyRequest,
                 proxyClient.client()::getAccessPolicy);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(ResourceModel.TYPE_NAME,String.format("Name:%s, Type:%s",
-                getAccessPolicyRequest.name(), getAccessPolicyRequest.typeAsString()),e);
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME,
+                getResourceIdentifierForGetAccessPolicyRequest(getAccessPolicyRequest),
+                e);
         } catch (ValidationException e) {
             throw new CfnInvalidRequestException(getAccessPolicyRequest.toString(), e);
         } catch (InternalServerException e) {

@@ -140,9 +140,7 @@ public class Translator {
     }
 
     private static <T> Stream<T> streamOfOrEmpty(final Collection<T> collection) {
-        return Optional.ofNullable(collection)
-                       .map(Collection::stream)
-                       .orElseGet(Stream::empty);
+        return Optional.ofNullable(collection).stream().flatMap(Collection::stream);
     }
 
     private static ResourceModel translateAccessPolicySummaryFromSDK(AccessPolicySummary accessPolicySummary) {
@@ -159,5 +157,15 @@ public class Translator {
                 .description(accessPolicyDetail.description())
                 .policy(accessPolicyDetail.policy().toString())
                 .build();
+    }
+
+    static String getResourceIdentifierForUpdateAccessPolicyRequest(
+        final UpdateAccessPolicyRequest updateAccessPolicyRequest) {
+        return String.format("%s|%s", updateAccessPolicyRequest.typeAsString(), updateAccessPolicyRequest.name());
+    }
+
+    static String getResourceIdentifierForGetAccessPolicyRequest(
+        final GetAccessPolicyRequest getAccessPolicyRequest) {
+        return String.format("%s|%s", getAccessPolicyRequest.typeAsString(), getAccessPolicyRequest.name());
     }
 }

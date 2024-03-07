@@ -139,9 +139,7 @@ public class Translator {
     }
 
     private static <T> Stream<T> streamOfOrEmpty(final Collection<T> collection) {
-        return Optional.ofNullable(collection)
-            .map(Collection::stream)
-            .orElseGet(Stream::empty);
+        return Optional.ofNullable(collection).stream().flatMap(Collection::stream);
     }
 
     private static ResourceModel translateLifecyclePolicySummaryFromSDK(LifecyclePolicySummary lifecyclePolicySummary) {
@@ -169,5 +167,14 @@ public class Translator {
             .description(lifecyclePolicyDetail.description())
             .policy(lifecyclePolicyDetail.policy().toString())
             .build();
+    }
+
+    static String getResourceIdentifierForUpdateLifecyclePolicyRequest(
+        final UpdateLifecyclePolicyRequest updateLifecyclePolicyRequest) {
+        return String.format("%s|%s", updateLifecyclePolicyRequest.typeAsString(), updateLifecyclePolicyRequest.name());
+    }
+
+    static String getResourceIdentifier(final LifecyclePolicyIdentifier lifecyclePolicyIdentifier) {
+        return String.format("%s|%s", lifecyclePolicyIdentifier.typeAsString(), lifecyclePolicyIdentifier.name());
     }
 }

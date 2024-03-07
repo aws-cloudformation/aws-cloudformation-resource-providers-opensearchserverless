@@ -125,9 +125,7 @@ public class Translator {
     }
 
     private static <T> Stream<T> streamOfOrEmpty(final Collection<T> collection) {
-        return Optional.ofNullable(collection)
-            .map(Collection::stream)
-            .orElseGet(Stream::empty);
+        return Optional.ofNullable(collection).stream().flatMap(Collection::stream);
     }
 
     /**
@@ -145,5 +143,16 @@ public class Translator {
             .description(securityPolicyDetail.description())
             .policy(securityPolicyDetail.policy().toString())
             .build();
+    }
+
+    static String getResourceIdentifierForUpdateSecurityPolicyRequest(
+        final UpdateSecurityPolicyRequest updateSecurityPolicyRequest) {
+        return String.format("%s|%s",
+            updateSecurityPolicyRequest.typeAsString(), updateSecurityPolicyRequest.name());
+    }
+
+    static String getResourceIdentifierForGetSecurityPolicyRequest(final GetSecurityPolicyRequest getSecurityPolicyRequest) {
+        return String.format("%s|%s",
+            getSecurityPolicyRequest.typeAsString(), getSecurityPolicyRequest.name());
     }
 }

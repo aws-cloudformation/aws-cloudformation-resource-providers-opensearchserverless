@@ -23,6 +23,9 @@ import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
+import static software.amazon.opensearchserverless.securitypolicy.Translator.getResourceIdentifierForGetSecurityPolicyRequest;
+import static software.amazon.opensearchserverless.securitypolicy.Translator.getResourceIdentifierForUpdateSecurityPolicyRequest;
+
 public class UpdateHandler extends BaseHandlerStd {
 
     public UpdateHandler() {
@@ -110,13 +113,16 @@ public class UpdateHandler extends BaseHandlerStd {
             updateSecurityPolicyResponse = proxyClient.injectCredentialsAndInvokeV2(updateSecurityPolicyRequest,
                 proxyClient.client()::updateSecurityPolicy);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(ResourceModel.TYPE_NAME, String.format("Name:%s, Type:%s",
-                updateSecurityPolicyRequest.name(), updateSecurityPolicyRequest.typeAsString()), e);
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME,
+                getResourceIdentifierForUpdateSecurityPolicyRequest(updateSecurityPolicyRequest),
+                e);
         } catch (ValidationException e) {
             throw new CfnInvalidRequestException(updateSecurityPolicyRequest.toString() + ", " + e.getMessage(), e);
         } catch (ConflictException e) {
-            throw new CfnResourceConflictException(ResourceModel.TYPE_NAME, updateSecurityPolicyRequest.name(),
-                e.getMessage(), e);
+            throw new CfnResourceConflictException(ResourceModel.TYPE_NAME,
+                getResourceIdentifierForUpdateSecurityPolicyRequest(updateSecurityPolicyRequest),
+                e.getMessage(),
+                e);
         } catch (ServiceQuotaExceededException e) {
             throw new CfnServiceLimitExceededException(e);
         } catch (InternalServerException e) {
@@ -138,8 +144,9 @@ public class UpdateHandler extends BaseHandlerStd {
             getSecurityPolicyResponse = proxyClient.injectCredentialsAndInvokeV2(getSecurityPolicyRequest,
                 proxyClient.client()::getSecurityPolicy);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(ResourceModel.TYPE_NAME, String.format("Name:%s, Type:%s",
-                getSecurityPolicyRequest.name(), getSecurityPolicyRequest.typeAsString()), e);
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME,
+                getResourceIdentifierForGetSecurityPolicyRequest(getSecurityPolicyRequest),
+                e);
         } catch (ValidationException e) {
             throw new CfnInvalidRequestException(getSecurityPolicyRequest.toString() + ", " + e.getMessage(), e);
         } catch (InternalServerException e) {
