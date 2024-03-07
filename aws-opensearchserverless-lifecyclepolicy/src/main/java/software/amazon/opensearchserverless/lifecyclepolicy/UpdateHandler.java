@@ -12,10 +12,10 @@ import software.amazon.awssdk.services.opensearchserverless.model.ServiceQuotaEx
 import software.amazon.awssdk.services.opensearchserverless.model.UpdateLifecyclePolicyRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.UpdateLifecyclePolicyResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
-import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
+import software.amazon.cloudformation.exceptions.CfnResourceConflictException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
@@ -24,6 +24,9 @@ import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
+
+import static software.amazon.opensearchserverless.lifecyclepolicy.Translator.getResourceIdentifier;
+import static software.amazon.opensearchserverless.lifecyclepolicy.Translator.getResourceIdentifierForUpdateLifecyclePolicyRequest;
 
 public class UpdateHandler extends BaseHandlerStd {
 
@@ -108,13 +111,17 @@ public class UpdateHandler extends BaseHandlerStd {
         UpdateLifecyclePolicyResponse updateLifecyclePolicyResponse;
         try {
             updateLifecyclePolicyResponse = proxyClient.injectCredentialsAndInvokeV2(updateLifecyclePolicyRequest, proxyClient.client()::updateLifecyclePolicy);
-        } catch (ConflictException e) {
-            throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME, String.format("Name:%s, Type:%s",
-                updateLifecyclePolicyRequest.name(), updateLifecyclePolicyRequest.typeAsString()), e);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(e);
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME,
+                getResourceIdentifierForUpdateLifecyclePolicyRequest(updateLifecyclePolicyRequest),
+                e);
         } catch (ValidationException e) {
-            throw new CfnInvalidRequestException(updateLifecyclePolicyRequest.toString(), e);
+            throw new CfnInvalidRequestException(updateLifecyclePolicyRequest.toString() + ", " + e.getMessage(), e);
+        } catch (ConflictException e) {
+            throw new CfnResourceConflictException(ResourceModel.TYPE_NAME,
+                getResourceIdentifierForUpdateLifecyclePolicyRequest(updateLifecyclePolicyRequest),
+                e.getMessage(),
+                e);
         } catch (ServiceQuotaExceededException e) {
             throw new CfnServiceLimitExceededException(e);
         } catch (InternalServerException e) {
@@ -137,8 +144,8 @@ public class UpdateHandler extends BaseHandlerStd {
                 logger.log(String.format("%s has successfully been read.", ResourceModel.TYPE_NAME));
                 return batchGetLifecyclePolicyResponse;
             }
-            throw new CfnNotFoundException(ResourceModel.TYPE_NAME, String.format("Name:%s, Type:%s",
-                batchGetLifecyclePolicyRequest.identifiers().get(0).name(), batchGetLifecyclePolicyRequest.identifiers().get(0).typeAsString()));
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME,
+                getResourceIdentifier(batchGetLifecyclePolicyRequest.identifiers().get(0)));
         } catch (ValidationException e) {
             throw new CfnInvalidRequestException(batchGetLifecyclePolicyRequest.toString() + ", " + e.getMessage(), e);
         } catch (InternalServerException e) {

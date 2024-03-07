@@ -1,10 +1,25 @@
 package software.amazon.opensearchserverless.securityconfig;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.services.opensearchserverless.OpenSearchServerlessClient;
-import software.amazon.awssdk.services.opensearchserverless.model.*;
+import software.amazon.awssdk.services.opensearchserverless.model.ConflictException;
+import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityConfigRequest;
+import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityConfigResponse;
+import software.amazon.awssdk.services.opensearchserverless.model.ResourceNotFoundException;
+import software.amazon.awssdk.services.opensearchserverless.model.SecurityConfigDetail;
+import software.amazon.awssdk.services.opensearchserverless.model.SecurityConfigType;
+import software.amazon.awssdk.services.opensearchserverless.model.ServiceQuotaExceededException;
+import software.amazon.awssdk.services.opensearchserverless.model.UpdateSecurityConfigRequest;
+import software.amazon.awssdk.services.opensearchserverless.model.UpdateSecurityConfigResponse;
+import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnResourceConflictException;
+import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.OperationStatus;
@@ -14,14 +29,14 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import java.time.Duration;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateHandlerTest extends AbstractTestBase {
@@ -214,6 +229,37 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         assertThrows(CfnResourceConflictException.class,
             () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+
+        verify(openSearchServerlessClient).updateSecurityConfig(any(UpdateSecurityConfigRequest.class));
+    }
+
+    @Test
+    public void handleRequest_WhenServiceQuotaExceededException_ThrowsException() {
+        final GetSecurityConfigResponse getSecurityConfigResponse =
+                GetSecurityConfigResponse.builder().securityConfigDetail(
+                                SecurityConfigDetail.builder()
+                                        .id(MOCK_SECURITY_CONFIG_ID)
+                                        .configVersion(MOCK_SECURITY_CONFIG_VERSION)
+                                        .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
+                                        .samlOptions(MOCK_SDK_SAML_OPTIONS)
+                                        .build())
+                        .build();
+        when(openSearchServerlessClient.getSecurityConfig(any(GetSecurityConfigRequest.class)))
+                .thenReturn(getSecurityConfigResponse);
+
+        when(openSearchServerlessClient.updateSecurityConfig(any(UpdateSecurityConfigRequest.class)))
+                .thenThrow(ServiceQuotaExceededException.builder().build());
+
+        final ResourceModel model = ResourceModel.builder()
+                .id(MOCK_SECURITY_CONFIG_ID)
+                .description(MOCK_SECURITY_CONFIG_DESCRIPTION)
+                .samlOptions(MOCK_SAML_OPTIONS)
+                .build();
+        final ResourceHandlerRequest<ResourceModel> request =
+                ResourceHandlerRequest.<ResourceModel>builder().desiredResourceState(model).build();
+
+        assertThrows(CfnServiceLimitExceededException.class,
+                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
         verify(openSearchServerlessClient).updateSecurityConfig(any(UpdateSecurityConfigRequest.class));
     }

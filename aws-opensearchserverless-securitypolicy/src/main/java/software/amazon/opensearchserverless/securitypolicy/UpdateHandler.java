@@ -7,6 +7,7 @@ import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityPol
 import software.amazon.awssdk.services.opensearchserverless.model.GetSecurityPolicyResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.InternalServerException;
 import software.amazon.awssdk.services.opensearchserverless.model.ResourceNotFoundException;
+import software.amazon.awssdk.services.opensearchserverless.model.ServiceQuotaExceededException;
 import software.amazon.awssdk.services.opensearchserverless.model.UpdateSecurityPolicyRequest;
 import software.amazon.awssdk.services.opensearchserverless.model.UpdateSecurityPolicyResponse;
 import software.amazon.awssdk.services.opensearchserverless.model.ValidationException;
@@ -14,12 +15,16 @@ import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnResourceConflictException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
+import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
+
+import static software.amazon.opensearchserverless.securitypolicy.Translator.getResourceIdentifierForGetSecurityPolicyRequest;
+import static software.amazon.opensearchserverless.securitypolicy.Translator.getResourceIdentifierForUpdateSecurityPolicyRequest;
 
 public class UpdateHandler extends BaseHandlerStd {
 
@@ -108,13 +113,18 @@ public class UpdateHandler extends BaseHandlerStd {
             updateSecurityPolicyResponse = proxyClient.injectCredentialsAndInvokeV2(updateSecurityPolicyRequest,
                 proxyClient.client()::updateSecurityPolicy);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(ResourceModel.TYPE_NAME, String.format("Name:%s, Type:%s",
-                updateSecurityPolicyRequest.name(), updateSecurityPolicyRequest.typeAsString()), e);
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME,
+                getResourceIdentifierForUpdateSecurityPolicyRequest(updateSecurityPolicyRequest),
+                e);
         } catch (ValidationException e) {
             throw new CfnInvalidRequestException(updateSecurityPolicyRequest.toString() + ", " + e.getMessage(), e);
         } catch (ConflictException e) {
-            throw new CfnResourceConflictException(ResourceModel.TYPE_NAME, updateSecurityPolicyRequest.name(),
-                e.getMessage(), e);
+            throw new CfnResourceConflictException(ResourceModel.TYPE_NAME,
+                getResourceIdentifierForUpdateSecurityPolicyRequest(updateSecurityPolicyRequest),
+                e.getMessage(),
+                e);
+        } catch (ServiceQuotaExceededException e) {
+            throw new CfnServiceLimitExceededException(e);
         } catch (InternalServerException e) {
             throw new CfnServiceInternalErrorException("UpdateSecurityPolicy", e);
         }
@@ -134,8 +144,9 @@ public class UpdateHandler extends BaseHandlerStd {
             getSecurityPolicyResponse = proxyClient.injectCredentialsAndInvokeV2(getSecurityPolicyRequest,
                 proxyClient.client()::getSecurityPolicy);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(ResourceModel.TYPE_NAME, String.format("Name:%s, Type:%s",
-                getSecurityPolicyRequest.name(), getSecurityPolicyRequest.typeAsString()), e);
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME,
+                getResourceIdentifierForGetSecurityPolicyRequest(getSecurityPolicyRequest),
+                e);
         } catch (ValidationException e) {
             throw new CfnInvalidRequestException(getSecurityPolicyRequest.toString() + ", " + e.getMessage(), e);
         } catch (InternalServerException e) {

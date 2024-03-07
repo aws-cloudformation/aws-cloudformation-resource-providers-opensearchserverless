@@ -62,8 +62,12 @@ public class CreateHandler extends BaseHandlerStd {
             logger.log(String.format("Sending create lifecycle policy request: %s", createLifecyclePolicyRequest));
             createLifecyclePolicyResponse = proxyClient.injectCredentialsAndInvokeV2(createLifecyclePolicyRequest, proxyClient.client()::createLifecyclePolicy);
         } catch (ConflictException e) {
-            throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME, String.format("Name:%s, Type:%s",
-                createLifecyclePolicyRequest.name(), createLifecyclePolicyRequest.typeAsString()), e);
+            if (e.getMessage().contains("already exists")) {
+                throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME, String.format("Name:%s, Type:%s",
+                        createLifecyclePolicyRequest.name(), createLifecyclePolicyRequest.typeAsString()), e);
+            } else {
+                throw new CfnInvalidRequestException(createLifecyclePolicyRequest.toString() + ", " + e.getMessage(), e);
+            }
         } catch (ValidationException e) {
             throw new CfnInvalidRequestException(createLifecyclePolicyRequest.toString() + ", " + e.getMessage(), e);
         } catch (ServiceQuotaExceededException e) {
